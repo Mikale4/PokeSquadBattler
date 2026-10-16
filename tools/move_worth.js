@@ -21,7 +21,7 @@ async function worker(browser, wi) {
   const page = await browser.newPage(); const errs = [];
   page.on('pageerror', e => errs.push(String(e)));
   await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.fulfill({ status: 200, body: '' }));
-  await page.goto(PAGE); await page.waitForTimeout(500);
+  await page.goto(PAGE, { timeout: 300000 }); await page.waitForTimeout(500);
   await page.evaluate(([wi, TOP]) => {
     enterGuest(); closeModal();
     S.story[JOURNEY_END] = 3; for (const id of REGION_IDS) openRegion(id, 0);   // (a completed Kanto Journey: every region's Pokémon)
@@ -72,7 +72,7 @@ async function worker(browser, wi) {
 
 (async () => {
   const browser = await chromium.launch();
-  const p0 = await browser.newPage(); await p0.goto(PAGE); await p0.waitForTimeout(300);
+  const p0 = await browser.newPage(); await p0.goto(PAGE, { timeout: 300000 }); await p0.waitForTimeout(300);
   const slotOf = await p0.evaluate(() => Object.fromEntries(Object.keys(MOVES).map(m => [m, MOVES[m].s || 1]))); await p0.close();
   let acc = {};
   if (opt.fit) acc = JSON.parse(fs.readFileSync(opt.fit, 'utf8'));

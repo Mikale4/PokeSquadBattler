@@ -846,16 +846,14 @@ function makeBattle(cfg) {
     const M = sk.M, sp = M.sp, hp = att.hp / att.max.hp, thp = tar.hp / tar.max.hp;
     if (MAG_ROLL.has(sk.key)) return sk.rolled || (item(att, "loadeddice") ? 150 : 71);   // (rolled when used; its average when the AI sizes it up)
     if (sp === "flail") return hp >= .6875 ? 20 : hp >= .354 ? 40 : hp >= .208 ? 80 : hp >= .104 ? 100 : hp >= .042 ? 150 : 200;
-    if (sp === "present") return B.presentPow || 65;                  // (its roll; 65 when the AI sizes it up)
+    if (sp === "present") return B.presentPow || (item(att, "loadeddice") ? 120 : 65);   // (its roll; 65 when the AI sizes it up, 120 with Loaded Dice)
     if (sp === "lastrespects") return 50 + 50 * Math.min(5, fainted(att.team));   // Last Respects: +50 for each fainted teammate
     if (sp === "naturalgift") return (NG[att.held] || [0, 0])[1];
     if (sp === "fling") return flingPow(att.held);
     if (sp === "spitup") return 100 * (att.flags.stock || 0);
     if (sp === "trumpcard") return [40, 50, 60, 80, 200][Math.min(4, att.flags.trump || 0)];
     if (sp === "fickle") return B.fickleX ? 160 : 80;                 // Fickle Beam: double power half the time (the owner's rule)
-    if (sp === "storedpower") return 20 + 20 * sumUp(att.stages);
-    if (sp === "punishment") return Math.min(200, 60 + 20 * sumUp(tar.stages));
-    if (sp === "ragefist") return Math.min(350, (M.p || 50) + 50 * (att.hitsTaken || 0));   // Rage Fist from 50, Rage from 20
+    if (sp === "ragefist") return Math.min(350, (M.p || 50) + 50 * (att.hitsTaken || 0));   // Rage Fist, Rage, Punishment and Stored Power: 50, +50 a hit taken
     let p = sk.pow;
     if (sp === "lastresort" && lrBoost(att)) p *= 2;
     const since = x => x != null && x > (att.actT == null ? -1 : att.actT);
@@ -924,7 +922,7 @@ function makeBattle(cfg) {
     if (M.sp === "finalgambit") return { dmg: att.hp, e: 1 };
     if (M.sp === "counter" || M.sp === "mirrorcoat") { const h = att.lastHit && att.lastHit[M.sp === "counter" ? "P" : "S"]; return { dmg: h ? Math.max(1, Math.round(h.dmg * 2)) : 0, e: 1 }; }
     if (M.sp === "metalburst") { const h = att.lastHit && (B.counterCat ? att.lastHit[B.counterCat] : [att.lastHit.P, att.lastHit.S].filter(Boolean).sort((a, b) => b.dmg - a.dmg)[0]); return { dmg: h ? Math.max(1, Math.round(h.dmg * 1.5)) : 0, e: 1 }; }
-    const crit = opts.crit, phys = M.sp === "terablast" || M.sp === "hiddenpower" || sk.key === "photongeyser" ? statOf(att, "atk") > statOf(att, "spa") : M.c === "P", t = mtype(att, sk);
+    const crit = opts.crit, phys = M.sp === "terablast" || M.sp === "hiddenpower" || M.sp === "present" || sk.key === "photongeyser" ? statOf(att, "atk") > statOf(att, "spa") : M.c === "P", t = mtype(att, sk);
     let pow = movePower(att, tar, sk) * mastery(att, sk);
     if (has(att, "CHARGE") && t === "Electric") pow *= 2;                                                // Charge
     if (has(tar, "MINIMIZE") && MINI_HIT.has(sk.key)) pow *= 2;                                         // Minimize
@@ -1015,7 +1013,7 @@ function makeBattle(cfg) {
     const acc = clamp(att.stages.acc + fixedStage(att, "acc"), -6, 6);
     // (Loaded Dice: a multi-strike move's accuracy is 100%, the owner's rule; the accuracy and evasion stages still count)
     // (and Keen Eye and Illuminate: every move of theirs 100% accurate, the owner's rule)
-    let a = ((sk.hits && item(att, "loadeddice")) || (kn && kn.sure) ? 100 : storm && inWeather("sun") ? 50 : M.a) / 100 * stageMult(clamp(acc - eva, -6, 6), true);
+    let a = ((sk.hits || M.sp === "present") && item(att, "loadeddice") || (kn && kn.sure) ? 100 : storm && inWeather("sun") ? 50 : M.a) / 100 * stageMult(clamp(acc - eva, -6, 6), true);
     if (sk.mk === "acc") a *= mastery(att, sk); // status moves that can miss: Mastery adds accuracy
     if (M.c === "X" && tar.team !== att.team && tab(att, tar, "WONDER_SKIN")) a = Math.min(a, .5);
     return clamp(a, 0, 1);
@@ -1069,7 +1067,8 @@ function makeBattle(cfg) {
     if (M.sp === "fusion") (B.fusion = B.fusion || {})[sk.key] = B.turn;
     B.fickleX = M.sp === "fickle" && first !== false && R() < .5; if (B.fickleX) msg(`${Nm(att)} is going all out for this attack!`);
     if (M.sp === "present") {
-      const r = R(); if (r < .2) { if (!heal(tar, hpBase(tar) / 4, `${Nm(tar)} had its HP restored.`)) msg(`${Nm(tar)} can't receive the gift!`); return { dealt: 0 }; }
+      const r = item(att, "loadeddice") ? 1 : R();   // (Loaded Dice: always the 120-power gift, the owner's rule)
+      if (r < .2) { if (!heal(tar, hpBase(tar) / 4, `${Nm(tar)} had its HP restored.`)) msg(`${Nm(tar)} can't receive the gift!`); return { dealt: 0 }; }
       B.presentPow = r < .6 ? 40 : r < .9 ? 80 : 120;
     } else B.presentPow = 0;
     // abilities that soak up a move's type

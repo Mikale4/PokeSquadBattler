@@ -348,7 +348,8 @@ const worthF = (k, m) => { const sp = (MOVES[m] || {}).sp; if (!MOVE_WORTH_ON ||
 // Kick roll each strike, their power rising 1:2:3, so at a they deal (a + 2a² + 3a³)/6 of their whole. Twineedle and Double Kick
 // (two sure strikes) gain nothing
 const diceAcc = M => !M.a || M.a >= 100 ? 1 : M.sp === "tripleaxel" ? 6 / (M.a / 100 + 2 * (M.a / 100) ** 2 + 3 * (M.a / 100) ** 3) : 100 / M.a;
-const diceGain = (M, ab) => !M || !M.hit ? 1 : (M.hit[0] !== M.hit[1] && !(ab && abilityOf(ab).id === "SKILL_LINK") ? M.hit[1] / 3 : 1) * diceAcc(M);
+const diceGain = (M, ab) => M && M.sp === "present" ? 120 / (VAR_P.present * (M.a || 100) / 100) : !M || !M.hit ? 1 :   // (Present: its 120-power gift, never missing)
+   (M.hit[0] !== M.hit[1] && !(ab && abilityOf(ab).id === "SKILL_LINK") ? M.hit[1] / 3 : 1) * diceAcc(M);
 const diceMul = (m, ab, held) => held === "loadeddice" ? diceGain(MOVES[m], ab) : 1;
 const movePick = (k, m, ab, held) => moveValue(k, m) * abMoveMul(k, ab, m, held) * diceMul(m, ab, held) * worthF(k, m);
 
@@ -470,7 +471,7 @@ function moveIn0(k, m, ab, held, c) {
 // Charge before an Electric attack, Endure before Reversal, Flail or Endeavor, and Focus Energy with a high critical-hit move
 const COVERS = ["protect", "detect", "substitute"], PINCH = ["reversal", "flail", "endeavor"];
 const COMBO_MATE = new Set([...COVERS, ...PINCH, "rest", "rollout", "iceball"]);
-const COMBO_PART = new Set(["focuspunch", "snore", "sleeptalk", "defensecurl", "charge", "endure", "focusenergy", "batonpass", "hex", "venoshock", "toxic", "leechseed", "storedpower", "followme", "ragepowder"]);
+const COMBO_PART = new Set(["focuspunch", "snore", "sleeptalk", "defensecurl", "charge", "endure", "focusenergy", "batonpass", "hex", "venoshock", "toxic", "leechseed", "followme", "ragepowder"]);
 function comboBonus(k, mv, ab, held, c) {
   const has = m => mv.includes(m); let v = 0;
   if (has("snore") || has("sleeptalk")) v += has("rest") ? 25 : -40;
@@ -482,7 +483,6 @@ function comboBonus(k, mv, ab, held, c) {
   // (double power on a statused or poisoned target) with a move that inflicts it
   const M_ = m => m && MOVES[m];
   // Stored Power: 20 power plus 20 for every stat boost the user has (an S1 move, so it can be used every turn)
-  if (has("storedpower") && mv.some(m => M_(m) && M_(m).c === "X" && M_(m).st && M_(m).sw !== "target" && M_(m).st.some(([, n]) => n > 0))) v += 30;
   if (has("batonpass") && mv.some(m => M_(m) && M_(m).c === "X" && M_(m).st && M_(m).sw !== "target" && M_(m).st.some(([, n]) => n > 0))) v += 20;
   if (COVERS.some(has) && (has("toxic") || has("leechseed"))) v += 10;
   if (has("hex") && mv.some(m => M_(m) && M_(m).c === "X" && ["SLP", "PAR", "BRN", "PSN", "TOX"].includes(M_(m).ail))) v += 15;

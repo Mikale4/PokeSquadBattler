@@ -14,7 +14,7 @@ async function worker(browser, wi) {
   const page = await browser.newPage(); const errs = [];
   page.on('pageerror', e => errs.push(String(e)));
   await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.fulfill({ status: 200, body: '' }));
-  await page.goto(PAGE); await page.waitForTimeout(500);
+  await page.goto(PAGE, { timeout: 300000 }); await page.waitForTimeout(500);
   await page.evaluate(([TEAMS, SKIP]) => {
     enterGuest(); closeModal();
     S.story[JOURNEY_END] = 3; for (const id of REGION_IDS) openRegion(id, 0); MOVE_WORTH_ON = false;

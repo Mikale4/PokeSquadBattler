@@ -37,7 +37,7 @@ function makeSkill(key, slot) {
   const M = MOVES[key], target = moveTarget(M);
   const sk = { slot, key, name: M.n, type: M.t, cat: M.c, pow: M.p, acc: M.a, cd: CD[slot], target, M, anim: moveAnim(M, target) };
   if (M.c === "X" && slot === 1) sk.cd = 0;
-  if (VAR_P[M.sp]) { sk.pow = M.sp === "ragefist" ? M.p + 20 : VAR_P[M.sp]; sk.vary = 1; }   // Gyro Ball, Flail, Heavy Slam...: power that depends on the battle
+  if (VAR_P[M.sp]) { sk.pow = M.sp === "ragefist" ? M.p + 50 : VAR_P[M.sp]; sk.vary = 1; }   // (Rage Fist and the moves like it: one hit taken, the usual)   // Gyro Ball, Flail, Heavy Slam...: power that depends on the battle
   if (POW_RANGE[M.sp]) { sk.vary = 1; sk.range = POW_RANGE[M.sp]; }   // Magnitude: 10 to 150 a use (its average counts)
   if (M.hit) sk.hits = M.hit;
   sk.mk = masteryKind(sk);
@@ -138,7 +138,6 @@ function moveDesc(sk) {
     wakeupslap: "Double power against a sleeping target, and wakes it up", assurance: "Double power if the target was already hit since the user's last turn",
     payback: "Double power if the target has moved since the user's last turn", tantrum: "Double power if the user's last move failed",
     retaliate: "Double power if a teammate fainted since the user's last turn", lashout: "Double power if the user's stats were lowered since its last turn",
-    storedpower: "20 power, plus 20 for every stat stage the user has raised", punishment: "60 power, plus 20 for every stat stage the target has raised (up to 200)",
     weatherball: "In weather it becomes that weather's type (Fire, Water, Rock or Ice) and doubles in power", ragefist: `${M.p} power, plus 50 for every hit the user has taken (up to 350)`,
     foulplay: "Uses the target's Attack instead of the user's", bodypress: "Uses the user's Defense instead of its Attack",
     psyshock: "Hits the target's Defense instead of its Sp. Def", chipaway: "Ignores the target's stat changes", alwayscrit: "Always lands a critical hit",
@@ -151,7 +150,7 @@ function moveDesc(sk) {
     poltergeist: "", clearsmog: "Resets the target's stat changes", fakeout: "Works on any turn, not just the user's first on the field",
     mistyexplosion: "The user faints; 50% stronger in Misty Terrain", tripleaxel: `Strikes three times, at ${M.p}, ${M.p * 2} and ${M.p * 3} power; each strike can miss`,
     eruption: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)", metalburst: "It can't be chosen: when an opposing attack damages the user, it hits back at that attacker by itself for 1.5 times the damage once the attack is over, if it's ready (that isn't the user's turn: the move just goes on cooldown)",
-    present: "A gift of 40 (40%), 80 (30%) or 120 power (10%), or it restores 1/4 of the target's max HP (20%)",
+    present: "A gift of 40 (40%), 80 (30%) or 120 power (10%), or it restores 1/4 of the target's max HP (20%); physical when the user's Attack is higher than its Sp. Atk, special otherwise; with Loaded Dice, always the 120-power gift, and it never misses",
     fusion: "Double power if the other Fusion move (Fusion Flare or Fusion Bolt) was used since the user's last turn",
     smellingsalts: "Double power against a paralyzed target, and cures its paralysis", healblock: "The other side can't restore HP for 4 turns",
     strengthsap: "Restores HP equal to the target's Attack stat, then lowers its Attack", partingshot: "Lowers the target's Attack and Sp. Atk, then the user switches out",
@@ -719,7 +718,7 @@ Object.assign(HELD, {
   clearamulet: {"n": "Clear Amulet", "t": 3, "d": "Other Pokémon can't lower its stats.", "src": "bp"},
   mirrorherb: {"n": "Mirror Herb", "t": 2, "d": "When an opposing Pokémon's stats rise, it copies the rise (used up).", "src": "bp"},
   punchingglove: {"n": "Punching Glove", "t": 2, "d": "Its punching moves are 10% stronger and don't make contact.", "src": "bp"},
-  loadeddice: {"n": "Loaded Dice", "t": 3, "d": "Its multi-strike moves always strike the most times they can, at 100% accuracy (double and triple strikes too: once the first strike lands, every strike does), Magnitude is always 10 and the moves like it (Eruption, Heat Crash, Low Kick, Electro Ball, Gyro Ball...) always hit for 150, and Psywave always does its most.", "src": "bp"},
+  loadeddice: {"n": "Loaded Dice", "t": 3, "d": "Its multi-strike moves always strike the most times they can, at 100% accuracy (double and triple strikes too: once the first strike lands, every strike does), Magnitude is always 10 and the moves like it (Eruption, Heat Crash, Low Kick, Electro Ball, Gyro Ball...) always hit for 150, Present is always its 120-power gift and never misses, and Psywave always does its most.", "src": "bp"},
   abilityshield: {"n": "Ability Shield", "t": 2, "d": "Its Ability can't be changed, suppressed or ignored (Mold Breaker).", "src": "bp"},
   terrainextender: {"n": "Terrain Extender", "t": 2, "d": "Terrains it sets last about 8 rounds instead of 5.", "src": "bp"},
   heatrock: {"n": "Heat Rock", "t": 1, "d": "Harsh sunlight it brings lasts about 8 rounds instead of 5. Castform holding it becomes Sunny Castform, with Drought.", "src": "bp"},
@@ -805,7 +804,7 @@ const canLearnTM = (k, n) => OPS[k].tms.includes(n);
 const FIXED_V = { dragonrage: 55, sonicboom: 35, nightshade: 65, seismictoss: 65, psywave: 55, superfang: 80, endeavor: 45, finalgambit: 45, counter: 50,
   mirrorcoat: 50, metalburst: 55 };
 // variable-power moves: a typical power
-const VAR_P = { weight: 71, heavy: 71, gyroball: 71, electroball: 71, flail: 60, wringout: 71, hardpress: 71, storedpower: 40, punishment: 60, ragefist: 70,
+const VAR_P = { weight: 71, heavy: 71, gyroball: 71, electroball: 71, flail: 60, wringout: 71, hardpress: 71, ragefist: 100,
   eruption: 71, present: 45, spitup: 100, naturalgift: 80, fling: 40, trumpcard: 60, bide: 50 };
 function moveValue(k, m) { const M = MOVES[m], v = moveValue0(k, m); return M && M.c === "X" && M.pri > 0 ? v * 1.2 : v; }
 // a move's strikes (a 2-5-strike move: 3 on average, the engine's 2, 2, 2, 3, 3, 3, 4, 5), the most with Skill Link or Loaded Dice
@@ -818,7 +817,7 @@ function moveValue0(k, m) {
   if (M.c !== "X") {
     if (M.sp === "struggle") return 1;
     const hits = M.hit ? (M.hit[0] === M.hit[1] ? M.hit[0] : 3) : 1;
-    let p = ((m === "dragonenergy" && 71) || FIXED_V[M.sp] || (M.sp === "ragefist" ? M.p + 20 : VAR_P[M.sp]) || M.p) * hits * (M.a ? M.a / 100 : 1.05);
+    let p = ((m === "dragonenergy" && 71) || FIXED_V[M.sp] || (M.sp === "ragefist" ? M.p + 50 : VAR_P[M.sp]) || M.p) * hits * (M.a ? M.a / 100 : 1.05);
     if (M.sp === "uturn") p *= 1.15;                                     // hits, then makes room for a better matchup
     if (M.sp === "fakeout") p *= 1.2;
     // this game's rules: the doubling moves grow over a battle, Triple Axel's strikes rise (20, 40, 60), Pursuit hits switchers for
@@ -835,7 +834,8 @@ function moveValue0(k, m) {
     if (M.dr < 0 || M.sp === "steelbeam") p *= .9; else if (M.dr > 0) p *= 1.1;
     if (!FIXED_V[M.sp]) {
       if (op.types.includes(M.t)) p *= 1.5; else if (M.sp === "hiddenpower") p *= 1.15;   // (Hidden Power: its own first type until an attack is used on it, then that attack's)
-      p *= clamp(.55 + .45 * (M.c === "P" || (M.sp === "hiddenpower" && at > sa) ? at / Math.max(1, sa) : sa / Math.max(1, at)), .55, 1.25);
+      // (Hidden Power, Tera Blast, Present and Photon Geyser hit with whichever of Attack and Sp. Atk is higher)
+      p *= clamp(.55 + .45 * (["hiddenpower", "terablast", "present"].includes(M.sp) || m === "photongeyser" ? Math.max(at, sa) / Math.max(1, Math.min(at, sa)) : M.c === "P" ? at / Math.max(1, sa) : sa / Math.max(1, at)), .55, 1.25);
     }
     if (M.tg === "foes") p *= 1.15;
     if (M.ail && M.ac) p *= 1 + overStrikes(M.ac / 100, hits) / 4;   // (Twineedle: each strike can poison)

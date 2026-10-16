@@ -27,7 +27,7 @@ What it decides:
     Dynamic Punch); a Pokemon is compatible with one if any game of that generation lets it learn that move by machine
   * modern move data (power, accuracy, type, effects). Moves whose effect the battle engine doesn't model are left out of
     every learnset and TM list (EXCLUDE, and anything in an effect category without a handler in SPECIAL)
-  * a slot for every move: S1 light attacks (no cooldown), S2 mid-power attacks and every status move, S3 the big attacks
+  * a slot for every move: S1 light attacks and every 60-power attack (no cooldown), S2 mid-power attacks and every status move, S3 the big attacks
     (slot_class). A Pokémon knows one move per slot: it learns them by level and from TMs (a3b_kits.js).
   * rarity for the Safari Zone (3 to 5 stars); Legendary and Mythical Pokémon are never in its standard areas.
 """
@@ -360,8 +360,11 @@ SPECIAL.update({k: k.replace("-", "") for k in """after-you ally-switch assist b
 EXCLUDE = set()   # (every move has a rule now; Tera Blast is a Normal-type move here, physical when the user's Attack is higher)
 # variable power, fixed here: Magnitude's average, Return and Frustration at their best
 FIXED_POWER = {"magnitude": 70, "return": 102, "frustration": 102}
-# house rule (the owner's): Rage works like Rage Fist from its own 20 power: +50 for every hit the user has taken (up to 350)
+# house rule (the owner's): Rage works like Rage Fist: +50 for every hit the user has taken (up to 350); from 50 power, as do Punishment
+# and Stored Power, which work exactly like Rage Fist too (the owner's rule, 2026-10-16: META_FIX), all S2 moves
 SPECIAL["rage"] = "ragefist"
+SPECIAL["punishment"] = "ragefist"
+SPECIAL["stored-power"] = "ragefist"
 # house rule (the owner's): Whirlwind is a 60-power attack (special: it's a wind; Normal type, never misses, moves last, an S1 move)
 # that still blows the target away
 # Gen 8 and 9 moves PokeAPI has no effect data for
@@ -372,11 +375,13 @@ META_FIX = {
     "fissure": {"a": 90}, "horn-drill": {"a": 90}, "guillotine": {"a": 90}, "sheer-cold": {"a": 90},
     # Beat Up (the owner's rule, 2026-10-16): an ordinary 2-5-strike move, 25 power a strike and S2 like the others
     "beat-up": {"hit": [2, 5], "p": 25},
+    # the owner's rules, 2026-10-16: Triple Kick from 20 (20, 40 and 60, as Triple Axel: above), Rage, Punishment and Stored Power 50
+    "rage": {"p": 50}, "punishment": {"p": 50}, "stored-power": {"p": 50},
     "wave-crash": {"dr": -33}, "axe-kick": {"ail": "CNF", "ac": 30, "crash": 1}, "supercell-slam": {"crash": 1},
     "pounce": {"st": [["spe", -1]], "sc": 100, "sw": "target"}, "trailblaze": {"st": [["spe", 1]], "sc": 100, "sw": "self"},
     "chilling-water": {"st": [["atk", -1]], "sc": 100, "sw": "target"}, "alluring-voice": {"ail": "CNF", "ac": 100}, "psychic-noise": {}, "ice-spinner": {},
     "rage-fist": {}, "hard-press": {}, "temper-flare": {}, "raging-bull": {}, "snowscape": {}, "dragon-cheer": {"tg": "team"},
-    "triple-axel": {"p": 20, "hit": [3, 3]}, "triple-kick": {"p": 10, "hit": [3, 3]}, "hidden-power": {"p": 60}, "present": {"p": 65},
+    "triple-axel": {"p": 20, "hit": [3, 3]}, "triple-kick": {"p": 20, "hit": [3, 3]}, "hidden-power": {"p": 60}, "present": {"p": 65},
     "metal-burst": {"p": 1}, "scale-shot": {"st": [["spe", 1], ["def", -1]], "sc": 100, "sw": "self"},
     # the owner's rules (2026-10-10): a cooldown already stops spamming, so some drawbacks go or soften
     "focus-punch": {"a": 70}, "head-smash": {"dr": -33}, "last-resort": {"p": 70}, "beak-blast": {"ail": "BRN", "ac": 100},
@@ -509,20 +514,23 @@ def supported(mid):
 # ---------- which slot a move goes in (S1, S2 or S3) ----------
 # S1 has no cooldown, so it holds the light attacks; S3 has the longest cooldown and holds the big ones; S2 is everything between and
 # every status move. By the move's power (expected power for multi-strike moves and inaccurate ones):
-#   S1: up to 55 expected and 60 raw power, plus Sonic Boom; and Splash and Transform (all Magikarp and Ditto can do)
+#   S1: up to 55 expected and 60 raw power, and every single-strike 60-power attack (the owner's rule, 2026-10-16: Wing Attack, Bite,
+#       Aerial Ace...; Round stays S2 with the doubling moves), plus Sonic Boom; and Splash and Transform (all Magikarp and Ditto can do)
 #   S3: 90 raw power or more, one-hit KOs, Self-Destruct and Explosion, Hyper Beam, Focus Punch, Super Fang, Endeavor, Final Gambit
 #   S2: the rest, the fixed- and variable-damage moves (Dragon Rage, Night Shade, Low Kick, Gyro Ball, Flail...) and every status move
 SLOT_FIX = {"splash": 1, "transform": 3, "sonicboom": 1, "dragonrage": 2, "nightshade": 2, "seismictoss": 2, "psywave": 2,
             "superfang": 3, "endeavor": 3, "focuspunch": 3, "hyperbeam": 3, "selfdestruct": 3, "explosion": 3, "mistyexplosion": 3,
             "fissure": 3, "horndrill": 3, "guillotine": 3, "sheercold": 3, "finalgambit": 3, "struggle": 1, "weight": 2, "heavy": 2,
-            "gyroball": 2, "electroball": 2, "flail": 2, "wringout": 2, "hardpress": 2, "counter": 2, "mirrorcoat": 2, "storedpower": 1,
-            "punishment": 2, "ragefist": 2, "fakeout": 2, "tripleaxel": 2, "whirlwind": 1, "pursuit": 2, "metalburst": 2, "present": 2,
+            "gyroball": 2, "electroball": 2, "flail": 2, "wringout": 2, "hardpress": 2, "counter": 2, "mirrorcoat": 2,
+            "ragefist": 2, "revenge": 2, "assurance": 2, "venoshock": 2, "hex": 2, "fakeout": 2, "tripleaxel": 2, "whirlwind": 1, "pursuit": 2, "metalburst": 2, "present": 2,
             "eruption": 3, "hiddenpower": 1, "sketch": 2, "lastrespects": 2, "filletaway": 2, "shedtail": 2,
             "bide": 2, "spitup": 3, "naturalgift": 2, "fling": 2, "trumpcard": 2, "beatup": 2, "future": 3, "conversion": 2, "conversion2": 3,
             "ramp": 2}   # (the doubling moves: Rollout, Fury Cutter, Echoed Voice, Round; slots are looked up by a move's special rule first)
 # (Fake Out is a house rule: it works on any turn, not just the first, so it's an S2 move with a cooldown; so is Pursuit, which strikes
-# by itself whenever the other side switches a Pokémon out. The owner's rules: Stored Power is S1, and the doubling moves Rollout,
-# Fury Cutter, Echoed Voice and Round, which double every time they're used, are S2)
+# by itself whenever the other side switches a Pokémon out. The owner's rules: the moves like Rage Fist (Rage, Punishment, Stored
+# Power) are S2, and the doubling moves Rollout, Fury Cutter, Echoed Voice and Round, which double every time they're used, are S2;
+# and the 60-power moves that double in their moment (Revenge, Avalanche, Assurance, Barb Barrage, Infernal Parade) stay S2, with
+# Venoshock and Hex, which double the same way: the owner's picks, 2026-10-16)
 
 
 def slot_class(key, e):
@@ -534,7 +542,7 @@ def slot_class(key, e):
     expected = e["p"] * hits * (e["a"] or 100) / 100
     if e["p"] >= 90:
         return 3
-    if expected <= 55 and e["p"] * hits <= 60:
+    if expected <= 55 and e["p"] * hits <= 60 or e["p"] == 60 and hits == 1:
         return 1
     return 2
 
