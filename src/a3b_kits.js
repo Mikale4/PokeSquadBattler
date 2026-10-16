@@ -491,7 +491,7 @@ const ABILITY = {
   "lingering-aroma": ["Lingering Aroma", "A Pokémon that makes contact with it gets Lingering Aroma as its Ability.", { id: "MUMMY" }],
   "toxic-debris": ["Toxic Debris", "When a physical move hits it, poison spikes scatter on the attacker's side (Toxic Spikes).", { id: "TOXIC_DEBRIS" }],
   "sand-spit": ["Sand Spit", "When an attack hits it, it whips up a sandstorm.", { id: "SAND_SPIT" }],
-  "cotton-down": ["Cotton Down", "When an attack hits it, every other Pokémon on the field has its Speed lowered by 1.", { id: "COTTON_DOWN" }],
+  "cotton-down": ["Cotton Down", "When an attack hits it, every opposing Pokémon on the field has its Speed lowered by 1.", { id: "COTTON_DOWN" }],
   electromorphosis: ["Electromorphosis", "Being hit charges it: its next Electric-type move is twice as strong.", { id: "CHARGED" }],
   "wind-power": ["Wind Power", "Being hit by a wind move charges it: its next Electric-type move is twice as strong.", { id: "CHARGED", wind: 1 }],
   stamina: ["Stamina", "Every hit it takes raises its Defense by 1.", { id: "HIT_BOOST", stat: "def", n: 1 }],

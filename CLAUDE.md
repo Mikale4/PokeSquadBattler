@@ -3,7 +3,8 @@
 A phone-first squad battler with every Pokémon from Kanto to Paldea (all 1,025 species and their forms; every region, Kanto, Johto, Hoenn, Sinnoh, Unova, Kalos, Alola, Galar and Paldea, has a Journey),
 shipped as one self-contained file: `Pokemon Kanto Squad.html`.
 It was split out of the `C:\Games\Arknights Tactics` repo on 2026-10-05 and shares that repo's squad-battle engine. The old `pokemon/`
-folder there was deleted; its history (up to commit 9e60e37, branch `claude/swgoh-mobile-game-html-ajhk0t`) is still in that repo. Game details, the terminology table and the file list are in `README.md`.
+folder there was deleted; its history (up to commit 9e60e37, branch `claude/swgoh-mobile-game-html-ajhk0t`) is still in that repo.
+This folder is its own git repo (branch `main`), private on GitHub: `Mikale4/PokemonKantoSquad` (2026-10-16, with every resource, the soundtracks too: a push over ~2 GB goes up in parts). Commit and push only when the owner asks. Game details, the terminology table and the file list are in `README.md`.
 
 ## Never edit `Pokemon Kanto Squad.html` directly
 It's a build output. Edit the parts in `src/` and rebuild. `Pokemon Kanto Squad Reference.html` (every move, Ability, item and TM) is generated

@@ -1149,7 +1149,7 @@ function makeBattle(cfg) {
       const bz = pv(tar, "BERSERK");
       if (bz && crossed) { if (bz.shell) { for (const st of ["atk", "spa", "spe"]) stage(tar, tar, st, 1); for (const st of ["def", "sdf"]) stage(tar, tar, st, -1); } else stage(tar, tar, "spa", 1, "Berserk"); }
       if (pv(tar, "EJECT_HALF") && crossed && benchOf(tar.team).length && B.units.includes(tar)) { msg(`${Nm(tar)}'s ${tar.passives[0].name}!`); B.pivotQ.push({ uid: tar.uid }); }
-      if (pv(tar, "COTTON_DOWN")) { msg(`${Nm(tar)}'s Cotton Down!`); for (const x of B.units) if (x.alive && x !== tar) stage(tar, x, "spe", -1); }
+      if (pv(tar, "COTTON_DOWN")) { msg(`${Nm(tar)}'s Cotton Down!`); for (const x of B.units) if (x.alive && x.team !== tar.team) stage(tar, x, "spe", -1); }   // (the opposing side only: the owner's rule, 2026-10-16)
       if (pv(tar, "SAND_SPIT") && B.weather !== "sand") { B.weather = "sand"; B.wxEnd = fieldRounds(item(tar, "smoothrock") ? 8 : 5); msg(`${Nm(tar)}'s Sand Spit!`); if (WEATHER.sand) msg(WEATHER.sand.turn); ev({ k: "weather", w: "sand" }); }
       if (pv(tar, "SEED_SOWER") && !(B.terrain && B.terrain.t === "grassy")) setTerrain(tar, "grassy");
       if (pv(tar, "TOXIC_DEBRIS") && M.c === "P") { const hz = sideHz(att.team); if (hz.tspikes < 2) { hz.tspikes++; msg(psT("toxicspikes", "start", { TEAM: psTeam(att.team) })); hzEv(att.team); } }

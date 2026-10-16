@@ -260,7 +260,7 @@ function abilityValue(k, abKey, c = {}) {
     case "CONTACT_DROP": return meta.contact * .06;
     case "TOXIC_DEBRIS": return meta.phys * .05;
     case "SAND_SPIT": return .03;
-    case "COTTON_DOWN": return .04;
+    case "COTTON_DOWN": return .05;   // (the opposing side's Speed only, its own side's no longer: the owner's rule)
     case "CHARGED": return share(M => M.t === "Electric") * (A.wind ? .05 : .15);
     case "HIT_BOOST": return A.types ? DEF * A.types.reduce((a, t) => a + part(t), 0) * .2 + (A.noStatus ? status(A.noStatus) * .4 : 0) : .1;
     case "BERSERK": return (1 - phys) * .12 + (A.shell ? .05 : 0);
