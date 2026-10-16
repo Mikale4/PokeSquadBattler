@@ -1,0 +1,447 @@
+{
+ "_": "Home screen scenes: a crop of each FireRed/LeafGreen map in resources/tilemaps (the sheet's name after 'Maps (...) - ', and x, y, w, h in sheet pixels; pack_home.py snaps it to the map's 16 px tiles), and the Journey stage that unlocks it (null: always open). ground: sample walkable tiles (x, y in tiles of the crop) when the automatic guess misses; block / open list extra tiles (x, y, w, h in tiles of the crop) to fix the automatic walkable tiles.",
+ "maps": [
+  {
+   "key": "pallet",
+   "n": "Pallet Town",
+   "sheet": "Towns, Buildings, Etc.) - Pallet Town",
+   "crop": [
+    8,
+    24,
+    384,
+    320
+   ],
+   "unlock": null
+  },
+  {
+   "key": "viridian",
+   "n": "Viridian City",
+   "sheet": "Towns, Buildings, Etc.) - Viridian City",
+   "crop": [
+    232,
+    152,
+    448,
+    320
+   ],
+   "unlock": "Oak's Parcel"
+  },
+  {
+   "key": "forest",
+   "n": "Viridian Forest",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Viridian Forest",
+   "crop": [
+    424,
+    88,
+    448,
+    320
+   ],
+   "unlock": "Viridian Forest",
+   "ground": [
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     14,
+     13
+    ],
+    [
+     14,
+     17
+    ]
+   ]
+  },
+  {
+   "key": "pewter",
+   "n": "Pewter City",
+   "sheet": "Towns, Buildings, Etc.) - Pewter City",
+   "crop": [
+    104,
+    88,
+    448,
+    320
+   ],
+   "unlock": "Brock, the Rock-Solid Leader",
+   "ground": [
+    [
+     2,
+     5
+    ],
+    [
+     6,
+     6
+    ],
+    [
+     23,
+     4
+    ],
+    [
+     20,
+     6
+    ]
+   ]
+  },
+  {
+   "key": "moon",
+   "n": "Mt. Moon",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Mt. Moon",
+   "crop": [
+    264,
+    176,
+    448,
+    320
+   ],
+   "unlock": "Into Mt. Moon"
+  },
+  {
+   "key": "cerulean",
+   "n": "Cerulean City",
+   "sheet": "Towns, Buildings, Etc.) - Cerulean City",
+   "crop": [
+    136,
+    120,
+    448,
+    320
+   ],
+   "unlock": "Misty, the Tomboyish Mermaid"
+  },
+  {
+   "key": "vermilion",
+   "n": "Vermilion City",
+   "sheet": "Towns, Buildings, Etc.) - Vermilion City",
+   "crop": [
+    104,
+    56,
+    448,
+    320
+   ],
+   "unlock": "Lt. Surge, the Lightning American"
+  },
+  {
+   "key": "diglett",
+   "n": "Diglett's Cave",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Diglett's Cave",
+   "crop": [
+    264,
+    200,
+    448,
+    320
+   ],
+   "unlock": "Diglett's Cave"
+  },
+  {
+   "key": "tunnel",
+   "n": "Rock Tunnel",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Rock Tunnel",
+   "crop": [
+    176,
+    176,
+    448,
+    320
+   ],
+   "unlock": "Rock Tunnel",
+   "ground": [
+    [
+     1,
+     3
+    ],
+    [
+     9,
+     3
+    ],
+    [
+     14,
+     11
+    ],
+    [
+     2,
+     10
+    ],
+    [
+     6,
+     7
+    ]
+   ]
+  },
+  {
+   "key": "celadon",
+   "n": "Celadon City",
+   "sheet": "Towns, Buildings, Etc.) - Celadon City",
+   "crop": [
+    72,
+    56,
+    448,
+    320
+   ],
+   "unlock": "Erika, the Nature-Loving Princess",
+   "ground": [
+    [
+     1,
+     1
+    ],
+    [
+     15,
+     1
+    ],
+    [
+     2,
+     12
+    ],
+    [
+     16,
+     13
+    ],
+    [
+     8,
+     14
+    ],
+    [
+     21,
+     10
+    ]
+   ]
+  },
+  {
+   "key": "lavender",
+   "n": "Lavender Town",
+   "sheet": "Towns, Buildings, Etc.) - Lavender Town",
+   "crop": [
+    8,
+    24,
+    384,
+    320
+   ],
+   "unlock": "The Pokémon Tower"
+  },
+  {
+   "key": "fuchsia",
+   "n": "Fuchsia City",
+   "sheet": "Towns, Buildings, Etc.) - Fuchsia City",
+   "crop": [
+    168,
+    88,
+    448,
+    320
+   ],
+   "unlock": "Koga, the Poisonous Ninja Master"
+  },
+  {
+   "key": "safari",
+   "n": "Safari Zone",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Safari Zone",
+   "crop": [
+    232,
+    120,
+    448,
+    320
+   ],
+   "unlock": "The Safari Zone Warden",
+   "ground": [
+    [
+     5,
+     7
+    ],
+    [
+     11,
+     10
+    ],
+    [
+     20,
+     10
+    ],
+    [
+     25,
+     4
+    ],
+    [
+     10,
+     16
+    ]
+   ]
+  },
+  {
+   "key": "saffron",
+   "n": "Saffron City",
+   "sheet": "Towns, Buildings, Etc.) - Saffron City",
+   "crop": [
+    296,
+    184,
+    448,
+    320
+   ],
+   "unlock": "Sabrina, the Master of Psychic Pokémon",
+   "ground": [
+    [
+     12,
+     4
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     6,
+     13
+    ],
+    [
+     2,
+     13
+    ]
+   ]
+  },
+  {
+   "key": "seafoam",
+   "n": "Seafoam Islands",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Seafoam Islands",
+   "crop": [
+    40,
+    56,
+    448,
+    320
+   ],
+   "unlock": "Seafoam Islands",
+   "ground": [
+    [
+     3,
+     2
+    ],
+    [
+     10,
+     5
+    ],
+    [
+     14,
+     13
+    ],
+    [
+     20,
+     15
+    ],
+    [
+     5,
+     6
+    ]
+   ]
+  },
+  {
+   "key": "mansion",
+   "n": "Pokémon Mansion",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Pokémon Mansion",
+   "crop": [
+    40,
+    88,
+    448,
+    320
+   ],
+   "unlock": "Pokémon Mansion",
+   "ground": [
+    [
+     2,
+     10
+    ],
+    [
+     8,
+     4
+    ],
+    [
+     9,
+     12
+    ],
+    [
+     17,
+     10
+    ],
+    [
+     24,
+     4
+    ],
+    [
+     6,
+     11
+    ]
+   ]
+  },
+  {
+   "key": "cinnabar",
+   "n": "Cinnabar Island",
+   "sheet": "Towns, Buildings, Etc.) - Cinnabar Island",
+   "crop": [
+    8,
+    24,
+    384,
+    320
+   ],
+   "unlock": "Blaine, the Hotheaded Quiz Master"
+  },
+  {
+   "key": "plant",
+   "n": "Power Plant",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Power Plant",
+   "crop": [
+    160,
+    120,
+    448,
+    320
+   ],
+   "unlock": "The Power Plant"
+  },
+  {
+   "key": "victory",
+   "n": "Victory Road",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Victory Road",
+   "crop": [
+    16,
+    420,
+    448,
+    320
+   ],
+   "unlock": "Victory Road"
+  },
+  {
+   "key": "indigo",
+   "n": "Indigo Plateau",
+   "sheet": "Towns, Buildings, Etc.) - Indigo Plateau",
+   "crop": [
+    8,
+    24,
+    384,
+    320
+   ],
+   "unlock": "Champion Blue",
+   "ground": [
+    [
+     7,
+     9
+    ],
+    [
+     14,
+     9
+    ],
+    [
+     11,
+     9
+    ],
+    [
+     11,
+     11
+    ]
+   ]
+  },
+  {
+   "key": "unknown",
+   "n": "Cerulean Cave",
+   "sheet": "Caves, Forests, Oceans, Etc.) - Cerulean Cave",
+   "crop": [
+    176,
+    56,
+    448,
+    320
+   ],
+   "unlock": "Cerulean Cave 1F"
+  }
+ ]
+}

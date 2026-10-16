@@ -1,0 +1,2491 @@
+{
+"_": "Match every move in the game (src/a3a_dex.js MOVES) to its sound in the owner's Gen 3 move sound pack,",
+"absorb": {
+"f": "Absorb.mp3"
+},
+"accelerock": {
+"f": "Rock Throw.mp3"
+},
+"acid": {
+"f": "Acid.mp3"
+},
+"acidarmor": {
+"f": "Acid Armor.mp3"
+},
+"acidspray": {
+"f": "Acid.mp3"
+},
+"acrobatics": {
+"f": "Aerial Ace.mp3"
+},
+"acupressure": {
+"f": "Focus Energy.mp3"
+},
+"aerialace": {
+"f": "Aerial Ace.mp3"
+},
+"aeroblast": {
+"f": "Aeroblast.mp3"
+},
+"afteryou": {
+"f": "Growl.mp3"
+},
+"agility": {
+"f": "Agility.mp3"
+},
+"aircutter": {
+"f": "Air Cutter.mp3"
+},
+"airslash": {
+"f": "Air Cutter.mp3"
+},
+"alluringvoice": {
+"f": "Hyper Voice.mp3"
+},
+"allyswitch": {
+"f": "Agility.mp3"
+},
+"amnesia": {
+"f": "Amnesia.mp3"
+},
+"anchorshot": {
+"f": "Metal Claw.mp3"
+},
+"ancientpower": {
+"f": "Ancient Power.mp3"
+},
+"appleacid": {
+"f": "Absorb.mp3"
+},
+"aquacutter": {
+"f": "Waterfall.mp3"
+},
+"aquajet": {
+"f": "Waterfall.mp3"
+},
+"aquaring": {
+"f": "Water Sport.mp3"
+},
+"aquastep": {
+"f": "Waterfall.mp3"
+},
+"aquatail": {
+"f": "Waterfall.mp3"
+},
+"armorcannon": {
+"f": "Ember.mp3"
+},
+"armthrust": {
+"f": "Arm Thrust 1hit.mp3",
+"h": "Arm Thrust 1hit.mp3"
+},
+"aromatherapy": {
+"f": "Aromatherapy.mp3"
+},
+"aromaticmist": {
+"f": "Sweet Kiss.mp3"
+},
+"assist": {
+"f": "Assist.mp3"
+},
+"assurance": {
+"f": "Bite.mp3"
+},
+"astonish": {
+"f": "Astonish.mp3"
+},
+"astralbarrage": {
+"f": "Night Shade.mp3"
+},
+"attackorder": {
+"f": "Leech Life.mp3"
+},
+"attract": {
+"f": "Attract.mp3"
+},
+"aurasphere": {
+"f": "Focus Punch.mp3"
+},
+"aurawheel": {
+"f": "Thunder Punch.mp3"
+},
+"aurorabeam": {
+"f": "Aurora Beam.mp3"
+},
+"auroraveil": {
+"f": "Haze.mp3"
+},
+"autotomize": {
+"f": "Iron Defense.mp3"
+},
+"avalanche": {
+"f": "Ice Ball.mp3"
+},
+"axekick": {
+"f": "High Jump Kick.mp3"
+},
+"babydolleyes": {
+"f": "Charm.mp3"
+},
+"banefulbunker": {
+"f": "Toxic.mp3"
+},
+"barbbarrage": {
+"f": "Poison Sting.mp3"
+},
+"barrage": {
+"f": "Barrage 1hit.mp3",
+"h": "Barrage 1hit.mp3"
+},
+"barrier": {
+"f": "Barrier.mp3"
+},
+"batonpass": {
+"f": "Baton Pass.mp3"
+},
+"beakblast": {
+"f": "Peck.mp3"
+},
+"beatup": {
+"f": "Beat Up.mp3"
+},
+"belch": {
+"f": "Acid.mp3"
+},
+"bellydrum": {
+"f": "Belly Drum.mp3"
+},
+"bestow": {
+"f": "Growl.mp3"
+},
+"bide": {
+"f": "Bide.mp3"
+},
+"bind": {
+"f": "Bind.mp3"
+},
+"bite": {
+"f": "Bite.mp3"
+},
+"bitterblade": {
+"f": "Fire Punch.mp3"
+},
+"bittermalice": {
+"f": "Night Shade.mp3"
+},
+"blastburn": {
+"f": "Blast Burn.mp3"
+},
+"blazekick": {
+"f": "Blaze Kick.mp3"
+},
+"bleakwindstorm": {
+"f": "Gust.mp3"
+},
+"blizzard": {
+"f": "Blizzard.mp3"
+},
+"block": {
+"f": "Block.mp3"
+},
+"bloodmoon": {
+"f": "Swift.mp3"
+},
+"blueflare": {
+"f": "Ember.mp3"
+},
+"bodypress": {
+"f": "Body Slam.mp3"
+},
+"bodyslam": {
+"f": "Body Slam.mp3"
+},
+"boltbeak": {
+"f": "Thunder Punch.mp3"
+},
+"boltstrike": {
+"f": "Thunder Punch.mp3"
+},
+"boneclub": {
+"f": "Bone Club.mp3"
+},
+"bonemerang": {
+"f": "Bonemerang 1hit.mp3",
+"h": "Bonemerang 1hit.mp3"
+},
+"bonerush": {
+"f": "Bone Rush 1hit.mp3",
+"h": "Bone Rush 1hit.mp3"
+},
+"boomburst": {
+"f": "Hyper Voice.mp3"
+},
+"bounce": {
+"f": "Bounce.mp3"
+},
+"branchpoke": {
+"f": "Vine Whip.mp3"
+},
+"bravebird": {
+"f": "Sky Attack.mp3"
+},
+"breakingswipe": {
+"f": "Dragon Claw.mp3"
+},
+"brickbreak": {
+"f": "Brick Break.mp3"
+},
+"brine": {
+"f": "Water Pulse.mp3"
+},
+"brutalswing": {
+"f": "Crunch.mp3"
+},
+"bubble": {
+"f": "Bubble.mp3"
+},
+"bubblebeam": {
+"f": "Bubble Beam.mp3"
+},
+"bugbite": {
+"f": "Fury Cutter.mp3"
+},
+"bugbuzz": {
+"f": "Signal Beam.mp3"
+},
+"bulkup": {
+"f": "Bulk Up.mp3"
+},
+"bulldoze": {
+"f": "Magnitude.mp3"
+},
+"bulletpunch": {
+"f": "Meteor Mash.mp3"
+},
+"bulletseed": {
+"f": "Bullet Seed 1hit.mp3",
+"h": "Bullet Seed 1hit.mp3"
+},
+"burningbulwark": {
+"f": "Will O Wisp.mp3"
+},
+"burningjealousy": {
+"f": "Ember.mp3"
+},
+"burnup": {
+"f": "Overheat.mp3"
+},
+"calmmind": {
+"f": "Calm Mind.mp3"
+},
+"camouflage": {
+"f": "Camouflage.mp3"
+},
+"captivate": {
+"f": "Growl.mp3"
+},
+"ceaselessedge": {
+"f": "Bite.mp3"
+},
+"charge": {
+"f": "Charge.mp3"
+},
+"chargebeam": {
+"f": "Thunder Shock.mp3"
+},
+"charm": {
+"f": "Charm.mp3"
+},
+"chatter": {
+"f": "Gust.mp3"
+},
+"chillingwater": {
+"f": "Water Gun.mp3"
+},
+"chipaway": {
+"f": "Slash.mp3"
+},
+"chloroblast": {
+"f": "Absorb.mp3"
+},
+"circlethrow": {
+"f": "Seismic Toss.mp3"
+},
+"clamp": {
+"f": "Clamp.mp3"
+},
+"clangingscales": {
+"f": "Dragon Breath.mp3"
+},
+"clangoroussoul": {
+"f": "Dragon Dance.mp3"
+},
+"clearsmog": {
+"f": "Smog.mp3"
+},
+"closecombat": {
+"f": "Cross Chop.mp3"
+},
+"coaching": {
+"f": "Bulk Up.mp3"
+},
+"coil": {
+"f": "Wrap.mp3"
+},
+"collisioncourse": {
+"f": "Karate Chop.mp3"
+},
+"cometpunch": {
+"f": "Comet Punch 1hit.mp3",
+"h": "Comet Punch 1hit.mp3"
+},
+"comeuppance": {
+"f": "Bite.mp3"
+},
+"confide": {
+"f": "Growl.mp3"
+},
+"confuseray": {
+"f": "Confuse Ray.mp3"
+},
+"confusion": {
+"f": "Confusion.mp3"
+},
+"constrict": {
+"f": "Constrict.mp3"
+},
+"conversion": {
+"f": "Conversion.mp3"
+},
+"conversion2": {
+"f": "Conversion 2.mp3"
+},
+"copycat": {
+"f": "Mimic.mp3"
+},
+"copycat1": {
+"f": "Mimic.mp3"
+},
+"copycat3": {
+"f": "Mimic.mp3"
+},
+"coreenforcer": {
+"f": "Dragon Breath.mp3"
+},
+"cosmicpower": {
+"f": "Cosmic Power.mp3"
+},
+"cottonguard": {
+"f": "Growth.mp3"
+},
+"cottonspore": {
+"f": "Cotton Spore.mp3"
+},
+"counter": {
+"f": "Counter.mp3"
+},
+"courtchange": {
+"f": "Growl.mp3"
+},
+"covet": {
+"f": "Covet.mp3"
+},
+"crabhammer": {
+"f": "Crabhammer.mp3"
+},
+"craftyshield": {
+"f": "Sweet Kiss.mp3"
+},
+"crosschop": {
+"f": "Cross Chop.mp3"
+},
+"crosspoison": {
+"f": "Poison Tail.mp3"
+},
+"crunch": {
+"f": "Crunch.mp3"
+},
+"crushclaw": {
+"f": "Crush Claw.mp3"
+},
+"crushgrip": {
+"f": "Tackle.mp3"
+},
+"curse": {
+"f": "Curse.mp3"
+},
+"cut": {
+"f": "Cut.mp3"
+},
+"darkestlariat": {
+"f": "Crunch.mp3"
+},
+"darkpulse": {
+"f": "Bite.mp3"
+},
+"darkvoid": {
+"f": "Taunt.mp3"
+},
+"dazzlinggleam": {
+"f": "Charm.mp3"
+},
+"decorate": {
+"f": "Sweet Kiss.mp3"
+},
+"defendorder": {
+"f": "String Shot.mp3"
+},
+"defensecurl": {
+"f": "Defense Curl.mp3"
+},
+"defog": {
+"f": "Whirlwind.mp3"
+},
+"destinybond": {
+"f": "Destiny Bond.mp3"
+},
+"detect": {
+"f": "Detect.mp3"
+},
+"diamondstorm": {
+"f": "Rock Throw.mp3"
+},
+"dig": {
+"f": "Dig.mp3"
+},
+"direclaw": {
+"f": "Poison Sting.mp3"
+},
+"disable": {
+"f": "Disable.mp3"
+},
+"disarmingvoice": {
+"f": "Hyper Voice.mp3"
+},
+"discharge": {
+"f": "Thunderbolt.mp3"
+},
+"dive": {
+"f": "Dive.mp3"
+},
+"dizzypunch": {
+"f": "Dizzy Punch.mp3"
+},
+"doodle": {
+"f": "Growl.mp3"
+},
+"doomdesire": {
+"f": "Doom Desire.mp3"
+},
+"doubleedge": {
+"f": "Double Edge.mp3"
+},
+"doublehit": {
+"f": "Double Slap 1hit.mp3"
+},
+"doubleironbash": {
+"f": "Metal Claw.mp3"
+},
+"doublekick": {
+"f": "Double Kick 1hit.mp3",
+"h": "Double Kick 1hit.mp3"
+},
+"doubleshock": {
+"f": "Thunder Punch.mp3"
+},
+"doubleslap": {
+"f": "Double Slap 1hit.mp3",
+"h": "Double Slap 1hit.mp3"
+},
+"doubleteam": {
+"f": "Double Team.mp3"
+},
+"dracometeor": {
+"f": "Outrage.mp3"
+},
+"dragonascent": {
+"f": "Peck.mp3"
+},
+"dragonbreath": {
+"f": "Dragon Breath.mp3"
+},
+"dragoncheer": {
+"f": "Dragon Dance.mp3"
+},
+"dragonclaw": {
+"f": "Dragon Claw.mp3"
+},
+"dragondance": {
+"f": "Dragon Dance.mp3"
+},
+"dragondarts": {
+"f": "Dragon Claw.mp3"
+},
+"dragonenergy": {
+"f": "Dragon Breath.mp3"
+},
+"dragonhammer": {
+"f": "Dragon Claw.mp3"
+},
+"dragonpulse": {
+"f": "Dragon Breath.mp3"
+},
+"dragonrage": {
+"f": "Dragon Rage.mp3"
+},
+"dragonrush": {
+"f": "Dragon Claw.mp3"
+},
+"dragontail": {
+"f": "Dragon Claw.mp3"
+},
+"drainingkiss": {
+"f": "Sweet Kiss.mp3"
+},
+"drainpunch": {
+"f": "Mega Drain.mp3"
+},
+"dreameater": {
+"f": "Dream Eater.mp3"
+},
+"drillpeck": {
+"f": "Drill Peck.mp3"
+},
+"drillrun": {
+"f": "Drill Peck.mp3"
+},
+"drumbeating": {
+"f": "Vine Whip.mp3"
+},
+"dualchop": {
+"f": "Dragon Claw.mp3"
+},
+"dualwingbeat": {
+"f": "Wing Attack.mp3"
+},
+"dynamaxcannon": {
+"f": "Dragon Breath.mp3"
+},
+"dynamicpunch": {
+"f": "Dynamic Punch.mp3"
+},
+"earthpower": {
+"f": "Earthquake.mp3"
+},
+"earthquake": {
+"f": "Earthquake.mp3"
+},
+"echoedvoice": {
+"f": "Hyper Voice.mp3"
+},
+"eerieimpulse": {
+"f": "Thunder Wave.mp3"
+},
+"eeriespell": {
+"f": "Confusion.mp3"
+},
+"eggbomb": {
+"f": "Egg Bomb.mp3"
+},
+"electricterrain": {
+"f": "Charge.mp3"
+},
+"electrify": {
+"f": "Thunder Wave.mp3"
+},
+"electroball": {
+"f": "Shock Wave.mp3"
+},
+"electrodrift": {
+"f": "Thunder Shock.mp3"
+},
+"electroshot": {
+"f": "Thunder Shock.mp3"
+},
+"electroweb": {
+"f": "Thunder Wave.mp3"
+},
+"embargo": {
+"f": "Taunt.mp3"
+},
+"ember": {
+"f": "Ember.mp3"
+},
+"encore": {
+"f": "Encore.mp3"
+},
+"endeavor": {
+"f": "Endeavor.mp3"
+},
+"endure": {
+"f": "Endure.mp3"
+},
+"energyball": {
+"f": "Solar Beam.mp3"
+},
+"entrainment": {
+"f": "Growl.mp3"
+},
+"eruption": {
+"f": "Eruption.mp3"
+},
+"esperwing": {
+"f": "Confusion.mp3"
+},
+"eternabeam": {
+"f": "Dragon Breath.mp3"
+},
+"expandingforce": {
+"f": "Psychic.mp3"
+},
+"explosion": {
+"f": "Explosion.mp3"
+},
+"extrasensory": {
+"f": "Extrasensory.mp3"
+},
+"extremespeed": {
+"f": "Extreme Speed.mp3"
+},
+"facade": {
+"f": "Facade.mp3"
+},
+"fairylock": {
+"f": "Sweet Kiss.mp3"
+},
+"fairywind": {
+"f": "Gust.mp3"
+},
+"fakeout": {
+"f": "Fake Out.mp3"
+},
+"faketears": {
+"f": "Fake Tears.mp3"
+},
+"falsesurrender": {
+"f": "Bite.mp3"
+},
+"falseswipe": {
+"f": "False Swipe.mp3"
+},
+"featherdance": {
+"f": "Feather Dance.mp3"
+},
+"feint": {
+"f": "Fake Out.mp3"
+},
+"feintattack": {
+"f": "Feint Attack.mp3"
+},
+"fellstinger": {
+"f": "Leech Life.mp3"
+},
+"ficklebeam": {
+"f": "Dragon Breath.mp3"
+},
+"fierydance": {
+"f": "Ember.mp3"
+},
+"fierywrath": {
+"f": "Bite.mp3"
+},
+"filletaway": {
+"f": "Growl.mp3"
+},
+"finalgambit": {
+"f": "Memento.mp3"
+},
+"fireblast": {
+"f": "Fire Blast.mp3"
+},
+"firefang": {
+"f": "Fire Punch.mp3"
+},
+"firelash": {
+"f": "Fire Punch.mp3"
+},
+"firepledge": {
+"f": "Ember.mp3"
+},
+"firepunch": {
+"f": "Fire Punch.mp3"
+},
+"firespin": {
+"f": "Fire Spin.mp3"
+},
+"firstimpression": {
+"f": "Megahorn.mp3"
+},
+"fishiousrend": {
+"f": "Waterfall.mp3"
+},
+"fissure": {
+"f": "Fissure.mp3"
+},
+"flail": {
+"f": "Flail.mp3"
+},
+"flameburst": {
+"f": "Flamethrower.mp3"
+},
+"flamecharge": {
+"f": "Flame Wheel.mp3"
+},
+"flamethrower": {
+"f": "Flamethrower.mp3"
+},
+"flamewheel": {
+"f": "Flame Wheel.mp3"
+},
+"flareblitz": {
+"f": "Blaze Kick.mp3"
+},
+"flash": {
+"f": "Flash.mp3"
+},
+"flashcannon": {
+"f": "Steel Wing.mp3"
+},
+"flatter": {
+"f": "Flatter.mp3"
+},
+"fleurcannon": {
+"f": "Charm.mp3"
+},
+"fling": {
+"f": "Bite.mp3"
+},
+"flipturn": {
+"f": "Dive.mp3"
+},
+"floralhealing": {
+"f": "Sweet Kiss.mp3"
+},
+"flowershield": {
+"f": "Aromatherapy.mp3"
+},
+"flowertrick": {
+"f": "Vine Whip.mp3"
+},
+"fly": {
+"f": "Fly.mp3"
+},
+"flyingpress": {
+"f": "Karate Chop.mp3"
+},
+"focusblast": {
+"f": "Focus Punch.mp3"
+},
+"focusenergy": {
+"f": "Focus Energy.mp3"
+},
+"focuspunch": {
+"f": "Focus Punch.mp3"
+},
+"followme": {
+"f": "Follow Me.mp3"
+},
+"forcepalm": {
+"f": "Karate Chop.mp3"
+},
+"foresight": {
+"f": "Foresight.mp3"
+},
+"forestscurse": {
+"f": "Growth.mp3"
+},
+"foulplay": {
+"f": "Bite.mp3"
+},
+"freezedry": {
+"f": "Ice Beam.mp3"
+},
+"freezeshock": {
+"f": "Ice Punch.mp3"
+},
+"freezingglare": {
+"f": "Confusion.mp3"
+},
+"frenzyplant": {
+"f": "Frenzy Plant.mp3"
+},
+"frostbreath": {
+"f": "Powder Snow.mp3"
+},
+"frustration": {
+"f": "Frustration.mp3"
+},
+"furyattack": {
+"f": "Fury Attack 1hit.mp3",
+"h": "Fury Attack 1hit.mp3"
+},
+"furycutter": {
+"f": "Fury Cutter.mp3"
+},
+"furyswipes": {
+"f": "Fury Swipes 1hit.mp3",
+"h": "Fury Swipes 1hit.mp3"
+},
+"fusionbolt": {
+"f": "Thunder Punch.mp3"
+},
+"fusionflare": {
+"f": "Ember.mp3"
+},
+"futuresight": {
+"f": "Future Sight.mp3"
+},
+"gastroacid": {
+"f": "Acid.mp3"
+},
+"geargrind": {
+"f": "Metal Claw.mp3"
+},
+"gearup": {
+"f": "Iron Defense.mp3"
+},
+"geomancy": {
+"f": "Sweet Kiss.mp3"
+},
+"gigadrain": {
+"f": "Giga Drain.mp3"
+},
+"gigaimpact": {
+"f": "Hyper Beam.mp3"
+},
+"gigatonhammer": {
+"f": "Metal Claw.mp3"
+},
+"glaciallance": {
+"f": "Ice Punch.mp3"
+},
+"glaciate": {
+"f": "Ice Beam.mp3"
+},
+"glaiverush": {
+"f": "Dragon Claw.mp3"
+},
+"glare": {
+"f": "Glare.mp3"
+},
+"grassknot": {
+"f": "Ingrain.mp3"
+},
+"grasspledge": {
+"f": "Magical Leaf.mp3"
+},
+"grasswhistle": {
+"f": "Grass Whistle.mp3"
+},
+"grassyglide": {
+"f": "Leaf Blade.mp3"
+},
+"grassyterrain": {
+"f": "Ingrain.mp3"
+},
+"gravapple": {
+"f": "Vine Whip.mp3"
+},
+"gravity": {
+"f": "Agility.mp3"
+},
+"growl": {
+"f": "Growl.mp3"
+},
+"growth": {
+"f": "Growth.mp3"
+},
+"grudge": {
+"f": "Grudge.mp3"
+},
+"guardsplit": {
+"f": "Agility.mp3"
+},
+"guardswap": {
+"f": "Psych Up.mp3"
+},
+"guillotine": {
+"f": "Guillotine.mp3"
+},
+"gunkshot": {
+"f": "Sludge Bomb.mp3"
+},
+"gust": {
+"f": "Gust.mp3"
+},
+"gyroball": {
+"f": "Rapid Spin.mp3"
+},
+"hail": {
+"f": "Hail.mp3"
+},
+"hammerarm": {
+"f": "Karate Chop.mp3"
+},
+"harden": {
+"f": "Harden.mp3"
+},
+"hardpress": {
+"f": "Iron Tail.mp3"
+},
+"haze": {
+"f": "Haze.mp3"
+},
+"headbutt": {
+"f": "Headbutt.mp3"
+},
+"headcharge": {
+"f": "Tackle.mp3"
+},
+"headlongrush": {
+"f": "Dig.mp3"
+},
+"headsmash": {
+"f": "Rock Throw.mp3"
+},
+"healbell": {
+"f": "Heal Bell.mp3"
+},
+"healblock": {
+"f": "Agility.mp3"
+},
+"healingwish": {
+"f": "Wish.mp3"
+},
+"healorder": {
+"f": "String Shot.mp3"
+},
+"healpulse": {
+"f": "Recover.mp3"
+},
+"heartstamp": {
+"f": "Psycho Boost.mp3"
+},
+"heartswap": {
+"f": "Agility.mp3"
+},
+"heatcrash": {
+"f": "Body Slam.mp3"
+},
+"heatwave": {
+"f": "Heat Wave.mp3"
+},
+"heavyslam": {
+"f": "Body Slam.mp3"
+},
+"helpinghand": {
+"f": "Helping Hand.mp3"
+},
+"hex": {
+"f": "Night Shade.mp3"
+},
+"hiddenpower": {
+"f": "Hidden Power.mp3"
+},
+"highhorsepower": {
+"f": "Stomp.mp3"
+},
+"highjumpkick": {
+"f": "High Jump Kick.mp3"
+},
+"honeclaws": {
+"f": "Sharpen.mp3"
+},
+"hornattack": {
+"f": "Horn Attack.mp3"
+},
+"horndrill": {
+"f": "Horn Drill.mp3"
+},
+"hornleech": {
+"f": "Vine Whip.mp3"
+},
+"howl": {
+"f": "Howl.mp3"
+},
+"hurricane": {
+"f": "Twister.mp3"
+},
+"hydrocannon": {
+"f": "Hydro Cannon.mp3"
+},
+"hydropump": {
+"f": "Hydro Pump.mp3"
+},
+"hydrosteam": {
+"f": "Water Gun.mp3"
+},
+"hyperbeam": {
+"f": "Hyper Beam.mp3"
+},
+"hyperdrill": {
+"f": "Tackle.mp3"
+},
+"hyperfang": {
+"f": "Hyper Fang.mp3"
+},
+"hyperspacefury": {
+"f": "Bite.mp3"
+},
+"hyperspacehole": {
+"f": "Confusion.mp3"
+},
+"hypervoice": {
+"f": "Hyper Voice.mp3"
+},
+"hypnosis": {
+"f": "Hypnosis.mp3"
+},
+"iceball": {
+"f": "Ice Ball.mp3"
+},
+"icebeam": {
+"f": "Ice Beam.mp3"
+},
+"iceburn": {
+"f": "Ice Beam.mp3"
+},
+"icefang": {
+"f": "Ice Punch.mp3"
+},
+"icehammer": {
+"f": "Ice Punch.mp3"
+},
+"icepunch": {
+"f": "Ice Punch.mp3"
+},
+"iceshard": {
+"f": "Icicle Spear 1hit.mp3"
+},
+"icespinner": {
+"f": "Ice Ball.mp3"
+},
+"iciclecrash": {
+"f": "Ice Punch.mp3"
+},
+"iciclespear": {
+"f": "Icicle Spear 1hit.mp3",
+"h": "Icicle Spear 1hit.mp3"
+},
+"icywind": {
+"f": "Icy Wind.mp3"
+},
+"imprison": {
+"f": "Imprison.mp3"
+},
+"incinerate": {
+"f": "Ember.mp3"
+},
+"infernalparade": {
+"f": "Night Shade.mp3"
+},
+"inferno": {
+"f": "Ember.mp3"
+},
+"infestation": {
+"f": "Silver Wind.mp3"
+},
+"ingrain": {
+"f": "Ingrain.mp3"
+},
+"instruct": {
+"f": "Agility.mp3"
+},
+"iondeluge": {
+"f": "Thunder Wave.mp3"
+},
+"irondefense": {
+"f": "Iron Defense.mp3"
+},
+"ironhead": {
+"f": "Iron Tail.mp3"
+},
+"irontail": {
+"f": "Iron Tail.mp3"
+},
+"ivycudgel": {
+"f": "Vine Whip.mp3"
+},
+"jawlock": {
+"f": "Bite.mp3"
+},
+"jetpunch": {
+"f": "Waterfall.mp3"
+},
+"judgment": {
+"f": "Swift.mp3"
+},
+"jumpkick": {
+"f": "Jump Kick.mp3"
+},
+"junglehealing": {
+"f": "Growth.mp3"
+},
+"karatechop": {
+"f": "Karate Chop.mp3"
+},
+"kinesis": {
+"f": "Kinesis.mp3"
+},
+"kingsshield": {
+"f": "Iron Defense.mp3"
+},
+"knockoff": {
+"f": "Knock Off.mp3"
+},
+"kowtowcleave": {
+"f": "Bite.mp3"
+},
+"landswrath": {
+"f": "Dig.mp3"
+},
+"laserfocus": {
+"f": "Focus Energy.mp3"
+},
+"lashout": {
+"f": "Crunch.mp3"
+},
+"lastresort": {
+"f": "Tackle.mp3"
+},
+"lastrespects": {
+"f": "Lick.mp3"
+},
+"lavaplume": {
+"f": "Ember.mp3"
+},
+"leafage": {
+"f": "Vine Whip.mp3"
+},
+"leafblade": {
+"f": "Leaf Blade.mp3"
+},
+"leafstorm": {
+"f": "Petal Dance.mp3"
+},
+"leaftornado": {
+"f": "Absorb.mp3"
+},
+"leechlife": {
+"f": "Leech Life.mp3"
+},
+"leechseed": {
+"f": "Leech Seed.mp3"
+},
+"leer": {
+"f": "Leer.mp3"
+},
+"lick": {
+"f": "Lick.mp3"
+},
+"lifedew": {
+"f": "Rain Dance.mp3"
+},
+"lightscreen": {
+"f": "Light Screen.mp3"
+},
+"liquidation": {
+"f": "Crabhammer.mp3"
+},
+"lockon": {
+"f": "Lock On.mp3"
+},
+"lovelykiss": {
+"f": "Lovely Kiss.mp3"
+},
+"lowkick": {
+"f": "Low Kick.mp3"
+},
+"lowsweep": {
+"f": "Low Kick.mp3"
+},
+"luckychant": {
+"f": "Safeguard.mp3"
+},
+"luminacrash": {
+"f": "Confusion.mp3"
+},
+"lunarblessing": {
+"f": "Agility.mp3"
+},
+"lunardance": {
+"f": "Agility.mp3"
+},
+"lunge": {
+"f": "Megahorn.mp3"
+},
+"lusterpurge": {
+"f": "Luster Purge.mp3"
+},
+"machpunch": {
+"f": "Mach Punch.mp3"
+},
+"magicalleaf": {
+"f": "Magical Leaf.mp3"
+},
+"magiccoat": {
+"f": "Magic Coat.mp3"
+},
+"magicpowder": {
+"f": "Agility.mp3"
+},
+"magicroom": {
+"f": "Agility.mp3"
+},
+"magmastorm": {
+"f": "Ember.mp3"
+},
+"magnetbomb": {
+"f": "Metal Claw.mp3"
+},
+"magneticflux": {
+"f": "Charge.mp3"
+},
+"magnetrise": {
+"f": "Charge.mp3"
+},
+"magnitude": {
+"f": "Magnitude.mp3"
+},
+"makeitrain": {
+"f": "Steel Wing.mp3"
+},
+"malignantchain": {
+"f": "Acid.mp3"
+},
+"matblock": {
+"f": "Bulk Up.mp3"
+},
+"matchagotcha": {
+"f": "Absorb.mp3"
+},
+"meanlook": {
+"f": "Mean Look.mp3"
+},
+"meditate": {
+"f": "Meditate.mp3"
+},
+"mefirst": {
+"f": "Growl.mp3"
+},
+"megadrain": {
+"f": "Mega Drain.mp3"
+},
+"megahorn": {
+"f": "Megahorn.mp3"
+},
+"megakick": {
+"f": "Mega Kick.mp3"
+},
+"megapunch": {
+"f": "Mega Punch.mp3"
+},
+"memento": {
+"f": "Memento.mp3"
+},
+"metalburst": {
+"f": "Metal Claw.mp3"
+},
+"metalclaw": {
+"f": "Metal Claw.mp3"
+},
+"metalsound": {
+"f": "Metal Sound.mp3"
+},
+"meteorassault": {
+"f": "Karate Chop.mp3"
+},
+"meteorbeam": {
+"f": "Ancient Power.mp3"
+},
+"meteormash": {
+"f": "Meteor Mash.mp3"
+},
+"metronome": {
+"f": "Metronome.mp3"
+},
+"mightycleave": {
+"f": "Rock Throw.mp3"
+},
+"milkdrink": {
+"f": "Milk Drink.mp3"
+},
+"mimic": {
+"f": "Mimic.mp3"
+},
+"mindblown": {
+"f": "Ember.mp3"
+},
+"mindreader": {
+"f": "Mind Reader.mp3"
+},
+"minimize": {
+"f": "Minimize.mp3"
+},
+"miracleeye": {
+"f": "Agility.mp3"
+},
+"mirrorcoat": {
+"f": "Mirror Coat.mp3"
+},
+"mirrormove": {
+"f": "Feather Dance.mp3"
+},
+"mirrormove1": {
+"f": "Feather Dance.mp3"
+},
+"mirrormove3": {
+"f": "Feather Dance.mp3"
+},
+"mirrorshot": {
+"f": "Steel Wing.mp3"
+},
+"mist": {
+"f": "Mist.mp3"
+},
+"mistball": {
+"f": "Mist Ball.mp3"
+},
+"mistyexplosion": {
+"f": "Explosion.mp3"
+},
+"mistyterrain": {
+"f": "Mist.mp3"
+},
+"moonblast": {
+"f": "Moonlight.mp3"
+},
+"moongeistbeam": {
+"f": "Night Shade.mp3"
+},
+"moonlight": {
+"f": "Moonlight.mp3"
+},
+"morningsun": {
+"f": "Morning Sun.mp3"
+},
+"mortalspin": {
+"f": "Poison Sting.mp3"
+},
+"mountaingale": {
+"f": "Ice Punch.mp3"
+},
+"mudbomb": {
+"f": "Mud Slap.mp3"
+},
+"muddywater": {
+"f": "Muddy Water.mp3"
+},
+"mudshot": {
+"f": "Mud Shot.mp3"
+},
+"mudslap": {
+"f": "Mud Slap.mp3"
+},
+"mudsport": {
+"f": "Mud Sport.mp3"
+},
+"multiattack": {
+"f": "Tackle.mp3"
+},
+"mysticalfire": {
+"f": "Ember.mp3"
+},
+"mysticalpower": {
+"f": "Confusion.mp3"
+},
+"nastyplot": {
+"f": "Swords Dance.mp3"
+},
+"naturalgift": {
+"f": "Tackle.mp3"
+},
+"naturepower": {
+"f": "Growl.mp3"
+},
+"naturesmadness": {
+"f": "Charm.mp3"
+},
+"needlearm": {
+"f": "Needle Arm.mp3"
+},
+"nightdaze": {
+"f": "Bite.mp3"
+},
+"nightmare": {
+"f": "Nightmare.mp3"
+},
+"nightshade": {
+"f": "Night Shade.mp3"
+},
+"nightslash": {
+"f": "Slash.mp3"
+},
+"nobleroar": {
+"f": "Growl.mp3"
+},
+"noretreat": {
+"f": "Bulk Up.mp3"
+},
+"nuzzle": {
+"f": "Spark.mp3"
+},
+"oblivionwing": {
+"f": "Gust.mp3"
+},
+"obstruct": {
+"f": "Taunt.mp3"
+},
+"octazooka": {
+"f": "Octazooka.mp3"
+},
+"octolock": {
+"f": "Bulk Up.mp3"
+},
+"odorsleuth": {
+"f": "Odor Sleuth.mp3"
+},
+"ominouswind": {
+"f": "Night Shade.mp3"
+},
+"orderup": {
+"f": "Dragon Claw.mp3"
+},
+"originpulse": {
+"f": "Water Gun.mp3"
+},
+"outrage": {
+"f": "Outrage.mp3"
+},
+"overdrive": {
+"f": "Thunder Shock.mp3"
+},
+"overheat": {
+"f": "Overheat.mp3"
+},
+"painsplit": {
+"f": "Pain Split.mp3"
+},
+"paraboliccharge": {
+"f": "Thunder Shock.mp3"
+},
+"partingshot": {
+"f": "Taunt.mp3"
+},
+"payback": {
+"f": "Bite.mp3"
+},
+"payday": {
+"f": "Pay Day.mp3"
+},
+"peck": {
+"f": "Peck.mp3"
+},
+"perishsong": {
+"f": "Perish Song.mp3"
+},
+"petalblizzard": {
+"f": "Petal Dance.mp3"
+},
+"petaldance": {
+"f": "Petal Dance.mp3"
+},
+"phantomforce": {
+"f": "Shadow Ball.mp3"
+},
+"photongeyser": {
+"f": "Confusion.mp3"
+},
+"pinmissile": {
+"f": "Pin Missile 1hit.mp3",
+"h": "Pin Missile 1hit.mp3"
+},
+"plasmafists": {
+"f": "Thunder Punch.mp3"
+},
+"playnice": {
+"f": "Charm.mp3"
+},
+"playrough": {
+"f": "Charm.mp3"
+},
+"pluck": {
+"f": "Peck.mp3"
+},
+"poisonfang": {
+"f": "Poison Fang.mp3"
+},
+"poisongas": {
+"f": "Poison Gas.mp3"
+},
+"poisonjab": {
+"f": "Poison Sting.mp3"
+},
+"poisonpowder": {
+"f": "Poison Powder.mp3"
+},
+"poisonsting": {
+"f": "Poison Sting.mp3"
+},
+"poisontail": {
+"f": "Poison Tail.mp3"
+},
+"pollenpuff": {
+"f": "Silver Wind.mp3"
+},
+"poltergeist": {
+"f": "Shadow Ball.mp3"
+},
+"populationbomb": {
+"f": "Tackle.mp3"
+},
+"pounce": {
+"f": "Fury Cutter.mp3"
+},
+"pound": {
+"f": "Pound.mp3"
+},
+"powder": {
+"f": "String Shot.mp3"
+},
+"powdersnow": {
+"f": "Powder Snow.mp3"
+},
+"powergem": {
+"f": "Ancient Power.mp3"
+},
+"powersplit": {
+"f": "Agility.mp3"
+},
+"powerswap": {
+"f": "Psych Up.mp3"
+},
+"powertrick": {
+"f": "Agility.mp3"
+},
+"powertrip": {
+"f": "Bite.mp3"
+},
+"poweruppunch": {
+"f": "Karate Chop.mp3"
+},
+"powerwhip": {
+"f": "Vine Whip.mp3"
+},
+"precipiceblades": {
+"f": "Dig.mp3"
+},
+"present": {
+"f": "Present part 1.mp3"
+},
+"prismaticlaser": {
+"f": "Confusion.mp3"
+},
+"protect": {
+"f": "Protect.mp3"
+},
+"psybeam": {
+"f": "Psybeam.mp3"
+},
+"psyblade": {
+"f": "Psycho Boost.mp3"
+},
+"psychic": {
+"f": "Psychic.mp3"
+},
+"psychicfangs": {
+"f": "Crunch.mp3"
+},
+"psychicnoise": {
+"f": "Psywave.mp3"
+},
+"psychicterrain": {
+"f": "Psych Up.mp3"
+},
+"psychoboost": {
+"f": "Psycho Boost.mp3"
+},
+"psychocut": {
+"f": "Psycho Boost.mp3"
+},
+"psychoshift": {
+"f": "Agility.mp3"
+},
+"psychup": {
+"f": "Psych Up.mp3"
+},
+"psyshieldbash": {
+"f": "Psycho Boost.mp3"
+},
+"psyshock": {
+"f": "Psychic.mp3"
+},
+"psystrike": {
+"f": "Psychic.mp3"
+},
+"psywave": {
+"f": "Psywave.mp3"
+},
+"punishment": {
+"f": "Bite.mp3"
+},
+"purify": {
+"f": "Toxic.mp3"
+},
+"pursuit": {
+"f": "Pursuit.mp3"
+},
+"pyroball": {
+"f": "Fire Punch.mp3"
+},
+"quash": {
+"f": "Taunt.mp3"
+},
+"quickattack": {
+"f": "Quick Attack.mp3"
+},
+"quickguard": {
+"f": "Protect.mp3"
+},
+"quiverdance": {
+"f": "Teeter Dance.mp3"
+},
+"rage": {
+"f": "Rage.mp3"
+},
+"ragefist": {
+"f": "Shadow Punch.mp3"
+},
+"ragepowder": {
+"f": "Spore.mp3"
+},
+"ragingbull": {
+"f": "Horn Attack.mp3"
+},
+"ragingfury": {
+"f": "Fire Punch.mp3"
+},
+"raindance": {
+"f": "Rain Dance.mp3"
+},
+"rapidspin": {
+"f": "Rapid Spin.mp3"
+},
+"razorleaf": {
+"f": "Razor Leaf.mp3"
+},
+"razorshell": {
+"f": "Waterfall.mp3"
+},
+"razorwind": {
+"f": "Razor Wind.mp3"
+},
+"recover": {
+"f": "Recover.mp3"
+},
+"recycle": {
+"f": "Recycle.mp3"
+},
+"reflect": {
+"f": "Reflect.mp3"
+},
+"reflecttype": {
+"f": "Growl.mp3"
+},
+"refresh": {
+"f": "Refresh.mp3"
+},
+"relicsong": {
+"f": "Swift.mp3"
+},
+"rest": {
+"f": "Rest.mp3"
+},
+"retaliate": {
+"f": "Crush Claw.mp3"
+},
+"return": {
+"f": "Return.mp3"
+},
+"revelationdance": {
+"f": "Swift.mp3"
+},
+"revenge": {
+"f": "Revenge.mp3"
+},
+"reversal": {
+"f": "Reversal.mp3"
+},
+"revivalblessing": {
+"f": "Growl.mp3"
+},
+"risingvoltage": {
+"f": "Thunder Shock.mp3"
+},
+"roar": {
+"f": "Roar.mp3"
+},
+"roaroftime": {
+"f": "Dragon Breath.mp3"
+},
+"rockblast": {
+"f": "Rock Blast 1hit.mp3",
+"h": "Rock Blast 1hit.mp3"
+},
+"rockclimb": {
+"f": "Tackle.mp3"
+},
+"rockpolish": {
+"f": "Agility.mp3"
+},
+"rockslide": {
+"f": "Rock Slide.mp3"
+},
+"rocksmash": {
+"f": "Rock Smash.mp3"
+},
+"rockthrow": {
+"f": "Rock Throw.mp3"
+},
+"rocktomb": {
+"f": "Rock Tomb.mp3"
+},
+"rockwrecker": {
+"f": "Rock Throw.mp3"
+},
+"roleplay": {
+"f": "Role Play.mp3"
+},
+"rollingkick": {
+"f": "Rolling Kick.mp3"
+},
+"rollout": {
+"f": "Rollout.mp3"
+},
+"roost": {
+"f": "Recover.mp3"
+},
+"rototiller": {
+"f": "Mud Sport.mp3"
+},
+"round": {
+"f": "Sing.mp3"
+},
+"ruination": {
+"f": "Bite.mp3"
+},
+"sacredfire": {
+"f": "Sacred Fire.mp3"
+},
+"sacredsword": {
+"f": "Karate Chop.mp3"
+},
+"safeguard": {
+"f": "Safeguard.mp3"
+},
+"saltcure": {
+"f": "Rock Throw.mp3"
+},
+"sandattack": {
+"f": "Sand Attack.mp3"
+},
+"sandsearstorm": {
+"f": "Mud Slap.mp3"
+},
+"sandstorm": {
+"f": "Sandstorm.mp3"
+},
+"sandtomb": {
+"f": "Sand Tomb.mp3"
+},
+"scald": {
+"f": "Water Pulse.mp3"
+},
+"scaleshot": {
+"f": "Dragon Claw.mp3"
+},
+"scaryface": {
+"f": "Scary Face.mp3"
+},
+"scorchingsands": {
+"f": "Mud Slap.mp3"
+},
+"scratch": {
+"f": "Scratch.mp3"
+},
+"screech": {
+"f": "Screech.mp3"
+},
+"searingshot": {
+"f": "Ember.mp3"
+},
+"secretpower": {
+"f": "Secret Power.mp3"
+},
+"secretsword": {
+"f": "Focus Punch.mp3"
+},
+"seedbomb": {
+"f": "Bullet Seed 1hit.mp3"
+},
+"seedflare": {
+"f": "Absorb.mp3"
+},
+"seismictoss": {
+"f": "Seismic Toss.mp3"
+},
+"selfdestruct": {
+"f": "Self Destruct.mp3"
+},
+"shadowball": {
+"f": "Shadow Ball.mp3"
+},
+"shadowbone": {
+"f": "Lick.mp3"
+},
+"shadowclaw": {
+"f": "Shadow Punch.mp3"
+},
+"shadowforce": {
+"f": "Lick.mp3"
+},
+"shadowpunch": {
+"f": "Shadow Punch.mp3"
+},
+"shadowsneak": {
+"f": "Shadow Punch.mp3"
+},
+"sharpen": {
+"f": "Sharpen.mp3"
+},
+"shedtail": {
+"f": "Growl.mp3"
+},
+"sheercold": {
+"f": "Sheer Cold.mp3"
+},
+"shellsidearm": {
+"f": "Acid.mp3"
+},
+"shellsmash": {
+"f": "Withdraw.mp3"
+},
+"shelltrap": {
+"f": "Ember.mp3"
+},
+"shelter": {
+"f": "Iron Defense.mp3"
+},
+"shiftgear": {
+"f": "Iron Defense.mp3"
+},
+"shockwave": {
+"f": "Shock Wave.mp3"
+},
+"shoreup": {
+"f": "Sand Attack.mp3"
+},
+"signalbeam": {
+"f": "Signal Beam.mp3"
+},
+"silktrap": {
+"f": "String Shot.mp3"
+},
+"silverwind": {
+"f": "Silver Wind.mp3"
+},
+"simplebeam": {
+"f": "Growl.mp3"
+},
+"sing": {
+"f": "Sing.mp3"
+},
+"sketch": {
+"f": "Sketch.mp3"
+},
+"sketch1": {
+"f": "Sketch.mp3"
+},
+"sketch3": {
+"f": "Sketch.mp3"
+},
+"skillswap": {
+"f": "Skill Swap.mp3"
+},
+"skittersmack": {
+"f": "Fury Cutter.mp3"
+},
+"skullbash": {
+"f": "Skull Bash.mp3"
+},
+"skyattack": {
+"f": "Sky Attack.mp3"
+},
+"skydrop": {
+"f": "Peck.mp3"
+},
+"skyuppercut": {
+"f": "Sky Uppercut.mp3"
+},
+"slackoff": {
+"f": "Slack Off.mp3"
+},
+"slam": {
+"f": "Slam.mp3"
+},
+"slash": {
+"f": "Slash.mp3"
+},
+"sleeppowder": {
+"f": "Sleep Powder.mp3"
+},
+"sleeptalk": {
+"f": "Sleep Talk.mp3"
+},
+"sludge": {
+"f": "Sludge.mp3"
+},
+"sludgebomb": {
+"f": "Sludge Bomb.mp3"
+},
+"sludgewave": {
+"f": "Sludge Bomb.mp3"
+},
+"smackdown": {
+"f": "Rock Throw.mp3"
+},
+"smartstrike": {
+"f": "Horn Attack.mp3"
+},
+"smellingsalts": {
+"f": "Smelling Salts.mp3"
+},
+"smog": {
+"f": "Smog.mp3"
+},
+"smokescreen": {
+"f": "Smokescreen.mp3"
+},
+"snaptrap": {
+"f": "Vine Whip.mp3"
+},
+"snarl": {
+"f": "Bite.mp3"
+},
+"snatch": {
+"f": "Snatch.mp3"
+},
+"snipeshot": {
+"f": "Water Gun.mp3"
+},
+"snore": {
+"f": "Snore.mp3"
+},
+"snowscape": {
+"f": "Hail.mp3"
+},
+"soak": {
+"f": "Water Gun.mp3"
+},
+"softboiled": {
+"f": "Soft Boiled.mp3"
+},
+"solarbeam": {
+"f": "Solar Beam.mp3"
+},
+"solarblade": {
+"f": "Leaf Blade.mp3"
+},
+"sonicboom": {
+"f": "Sonic Boom.mp3"
+},
+"spacialrend": {
+"f": "Dragon Breath.mp3"
+},
+"spark": {
+"f": "Spark.mp3"
+},
+"sparklingaria": {
+"f": "Water Gun.mp3"
+},
+"spectralthief": {
+"f": "Lick.mp3"
+},
+"speedswap": {
+"f": "Psych Up.mp3"
+},
+"spicyextract": {
+"f": "Growth.mp3"
+},
+"spiderweb": {
+"f": "Spider Web.mp3"
+},
+"spikecannon": {
+"f": "Spike Cannon 1hit.mp3",
+"h": "Spike Cannon 1hit.mp3"
+},
+"spikes": {
+"f": "Spikes.mp3"
+},
+"spikyshield": {
+"f": "Growth.mp3"
+},
+"spinout": {
+"f": "Metal Claw.mp3"
+},
+"spiritbreak": {
+"f": "Sweet Kiss.mp3"
+},
+"spiritshackle": {
+"f": "Lick.mp3"
+},
+"spite": {
+"f": "Spite.mp3"
+},
+"spitup": {
+"f": "Spit Up.mp3"
+},
+"splash": {
+"f": "Splash.mp3"
+},
+"spore": {
+"f": "Spore.mp3"
+},
+"spotlight": {
+"f": "Growl.mp3"
+},
+"springtidestorm": {
+"f": "Charm.mp3"
+},
+"stealthrock": {
+"f": "Rock Throw.mp3"
+},
+"steameruption": {
+"f": "Water Gun.mp3"
+},
+"steamroller": {
+"f": "Leech Life.mp3"
+},
+"steelbeam": {
+"f": "Doom Desire.mp3"
+},
+"steelroller": {
+"f": "Metal Claw.mp3"
+},
+"steelwing": {
+"f": "Steel Wing.mp3"
+},
+"stickyweb": {
+"f": "String Shot.mp3"
+},
+"stockpile": {
+"f": "Stockpile.mp3"
+},
+"stomp": {
+"f": "Stomp.mp3"
+},
+"stompingtantrum": {
+"f": "Stomp.mp3"
+},
+"stoneaxe": {
+"f": "Rock Throw.mp3"
+},
+"stoneedge": {
+"f": "Rock Slide.mp3"
+},
+"storedpower": {
+"f": "Psybeam.mp3"
+},
+"stormthrow": {
+"f": "Seismic Toss.mp3"
+},
+"strangesteam": {
+"f": "Charm.mp3"
+},
+"strength": {
+"f": "Strength.mp3"
+},
+"strengthsap": {
+"f": "Growth.mp3"
+},
+"stringshot": {
+"f": "String Shot.mp3"
+},
+"struggle": {
+"f": "Struggle.mp3"
+},
+"strugglebug": {
+"f": "Silver Wind.mp3"
+},
+"stuffcheeks": {
+"f": "Growl.mp3"
+},
+"stunspore": {
+"f": "Stun Spore.mp3"
+},
+"submission": {
+"f": "Submission.mp3"
+},
+"substitute": {
+"f": "Substitute.mp3"
+},
+"suckerpunch": {
+"f": "Bite.mp3"
+},
+"sunnyday": {
+"f": "Sunny Day.mp3"
+},
+"sunsteelstrike": {
+"f": "Metal Claw.mp3"
+},
+"supercellslam": {
+"f": "Volt Tackle.mp3"
+},
+"superfang": {
+"f": "Super Fang.mp3"
+},
+"superpower": {
+"f": "Superpower.mp3"
+},
+"supersonic": {
+"f": "Supersonic.mp3"
+},
+"surf": {
+"f": "Surf.mp3"
+},
+"surgingstrikes": {
+"f": "Waterfall.mp3"
+},
+"swagger": {
+"f": "Swagger.mp3"
+},
+"swallow": {
+"f": "Swallow.mp3"
+},
+"sweetkiss": {
+"f": "Sweet Kiss.mp3"
+},
+"sweetscent": {
+"f": "Sweet Scent.mp3"
+},
+"swift": {
+"f": "Swift.mp3"
+},
+"switcheroo": {
+"f": "Trick.mp3"
+},
+"swordsdance": {
+"f": "Swords Dance.mp3"
+},
+"synchronoise": {
+"f": "Psywave.mp3"
+},
+"synthesis": {
+"f": "Synthesis.mp3"
+},
+"syrupbomb": {
+"f": "Absorb.mp3"
+},
+"tachyoncutter": {
+"f": "Steel Wing.mp3"
+},
+"tackle": {
+"f": "Tackle.mp3"
+},
+"tailglow": {
+"f": "Tail Glow.mp3"
+},
+"tailslap": {
+"f": "Tackle.mp3"
+},
+"tailwhip": {
+"f": "Tail Whip.mp3"
+},
+"tailwind": {
+"f": "Gust.mp3"
+},
+"takedown": {
+"f": "Take Down.mp3"
+},
+"takeheart": {
+"f": "Agility.mp3"
+},
+"tarshot": {
+"f": "Sandstorm.mp3"
+},
+"taunt": {
+"f": "Taunt.mp3"
+},
+"tearfullook": {
+"f": "Growl.mp3"
+},
+"teatime": {
+"f": "Growl.mp3"
+},
+"technoblast": {
+"f": "Swift.mp3"
+},
+"teeterdance": {
+"f": "Teeter Dance.mp3"
+},
+"telekinesis": {
+"f": "Agility.mp3"
+},
+"teleport": {
+"f": "Teleport.mp3"
+},
+"temperflare": {
+"f": "Blaze Kick.mp3"
+},
+"terablast": {
+"f": "Swift.mp3"
+},
+"terastarstorm": {
+"f": "Swift.mp3"
+},
+"terrainpulse": {
+"f": "Swift.mp3"
+},
+"thief": {
+"f": "Thief.mp3"
+},
+"thousandarrows": {
+"f": "Dig.mp3"
+},
+"thousandwaves": {
+"f": "Dig.mp3"
+},
+"thrash": {
+"f": "Thrash.mp3"
+},
+"throatchop": {
+"f": "Crunch.mp3"
+},
+"thunder": {
+"f": "Thunder.mp3"
+},
+"thunderbolt": {
+"f": "Thunderbolt.mp3"
+},
+"thundercage": {
+"f": "Thunder Shock.mp3"
+},
+"thunderclap": {
+"f": "Thunder Shock.mp3"
+},
+"thunderfang": {
+"f": "Thunder Punch.mp3"
+},
+"thunderouskick": {
+"f": "Karate Chop.mp3"
+},
+"thunderpunch": {
+"f": "Thunder Punch.mp3"
+},
+"thundershock": {
+"f": "Thunder Shock.mp3"
+},
+"thunderwave": {
+"f": "Thunder Wave.mp3"
+},
+"tickle": {
+"f": "Tickle.mp3"
+},
+"tidyup": {
+"f": "Growl.mp3"
+},
+"topsyturvy": {
+"f": "Taunt.mp3"
+},
+"torchsong": {
+"f": "Ember.mp3"
+},
+"torment": {
+"f": "Torment.mp3"
+},
+"toxic": {
+"f": "Toxic.mp3"
+},
+"toxicspikes": {
+"f": "Spikes.mp3"
+},
+"toxicthread": {
+"f": "Toxic.mp3"
+},
+"trailblaze": {
+"f": "Leaf Blade.mp3"
+},
+"transform": {
+"f": "Transform.mp3"
+},
+"triattack": {
+"f": "Tri Attack.mp3"
+},
+"trick": {
+"f": "Trick.mp3"
+},
+"trickortreat": {
+"f": "Confuse Ray.mp3"
+},
+"trickroom": {
+"f": "Psych Up.mp3"
+},
+"triplearrows": {
+"f": "Karate Chop.mp3"
+},
+"tripleaxel": {
+"f": "Ice Punch.mp3"
+},
+"tripledive": {
+"f": "Waterfall.mp3"
+},
+"triplekick": {
+"f": "Triple Kick 1hit.mp3",
+"h": "Triple Kick 1hit.mp3"
+},
+"tropkick": {
+"f": "Vine Whip.mp3"
+},
+"trumpcard": {
+"f": "Swift.mp3"
+},
+"twinbeam": {
+"f": "Confusion.mp3"
+},
+"twineedle": {
+"f": "Twineedle 1hit.mp3",
+"h": "Twineedle 1hit.mp3"
+},
+"twister": {
+"f": "Twister.mp3"
+},
+"upperhand": {
+"f": "Karate Chop.mp3"
+},
+"uproar": {
+"f": "Uproar.mp3"
+},
+"uturn": {
+"f": "Fury Cutter.mp3"
+},
+"vacuumwave": {
+"f": "Focus Punch.mp3"
+},
+"vcreate": {
+"f": "Fire Punch.mp3"
+},
+"venomdrench": {
+"f": "Acid Armor.mp3"
+},
+"venoshock": {
+"f": "Acid.mp3"
+},
+"vicegrip": {
+"f": "Vice Grip.mp3"
+},
+"victorydance": {
+"f": "Bulk Up.mp3"
+},
+"vinewhip": {
+"f": "Vine Whip.mp3"
+},
+"vitalthrow": {
+"f": "Vital Throw.mp3"
+},
+"voltswitch": {
+"f": "Spark.mp3"
+},
+"wakeupslap": {
+"f": "Double Slap 1hit.mp3"
+},
+"waterfall": {
+"f": "Waterfall.mp3"
+},
+"watergun": {
+"f": "Water Gun.mp3"
+},
+"waterpledge": {
+"f": "Water Pulse.mp3"
+},
+"waterpulse": {
+"f": "Water Pulse.mp3"
+},
+"watershuriken": {
+"f": "Water Gun.mp3"
+},
+"watersport": {
+"f": "Water Sport.mp3"
+},
+"waterspout": {
+"f": "Water Spout.mp3"
+},
+"wavecrash": {
+"f": "Waterfall.mp3"
+},
+"weatherball": {
+"f": "Weather Ball.mp3"
+},
+"whirlpool": {
+"f": "Whirlpool.mp3"
+},
+"whirlwind": {
+"f": "Whirlwind.mp3"
+},
+"wickedblow": {
+"f": "Bite.mp3"
+},
+"wideguard": {
+"f": "Protect.mp3"
+},
+"wildboltstorm": {
+"f": "Thunder Shock.mp3"
+},
+"wildcharge": {
+"f": "Volt Tackle.mp3"
+},
+"willowisp": {
+"f": "Will O Wisp.mp3"
+},
+"wingattack": {
+"f": "Wing Attack.mp3"
+},
+"wish": {
+"f": "Wish.mp3"
+},
+"withdraw": {
+"f": "Withdraw.mp3"
+},
+"wonderroom": {
+"f": "Agility.mp3"
+},
+"woodhammer": {
+"f": "Vine Whip.mp3"
+},
+"workup": {
+"f": "Bulk Up.mp3"
+},
+"worryseed": {
+"f": "Leech Seed.mp3"
+},
+"wrap": {
+"f": "Wrap.mp3"
+},
+"wringout": {
+"f": "Bind.mp3"
+},
+"xscissor": {
+"f": "Fury Cutter.mp3"
+},
+"yawn": {
+"f": "Yawn.mp3"
+},
+"zapcannon": {
+"f": "Zap Cannon.mp3"
+},
+"zenheadbutt": {
+"f": "Headbutt.mp3"
+},
+"zingzap": {
+"f": "Thunder Punch.mp3"
+}
+}

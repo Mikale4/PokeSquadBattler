@@ -1,0 +1,61 @@
+{
+ "_": "Johto's story key items (the owner's rule, 2026-10-16: what a scene hands you goes in the Bag, a keepsake with no use). Given by the Johto Journey's stages (src/a4b_johto.js, a stage's reward key). Ids start with jo_. Icons: resources/sprites/items; the EXPN Card and the GS Ball have none there, so they show a letter.",
+ "jo_lureball": {
+  "n": "Kurt's Lure Ball",
+  "d": "The Lure Ball Kurt gave you for chasing Team Rocket out of the Slowpoke Well. He makes them from Apricorns.",
+  "icon": "lure-ball.png"
+ },
+ "jo_squirtbottle": {
+  "n": "SquirtBottle",
+  "d": "The Goldenrod Flower Shop's watering bottle. The strange tree on Route 36 couldn't stand it.",
+  "icon": "squirtbottle.png"
+ },
+ "jo_secretpotion": {
+  "n": "SecretPotion",
+  "d": "The Cianwood pharmacy's special medicine. It brought Amphy, the Olivine Lighthouse's Ampharos, back to health.",
+  "icon": "secretpotion.png"
+ },
+ "jo_redscale": {
+  "n": "Red Scale",
+  "d": "A shiny red scale the red Gyarados left on the shore of the Lake of Rage.",
+  "icon": "red-scale.png"
+ },
+ "jo_basementkey": {
+  "n": "Basement Key",
+  "d": "The key the fake Radio Director dropped. It opened the way into the Goldenrod Underground's warehouse.",
+  "icon": "basement-key.png"
+ },
+ "jo_cardkey": {
+  "n": "Card Key",
+  "d": "The real Radio Director's card. It opened the shutter on the Radio Tower's third floor.",
+  "icon": "card-key.png"
+ },
+ "jo_clearbell": {
+  "n": "Clear Bell",
+  "d": "The Radio Director's thanks for saving his tower. Its chime opened the Tin Tower to you, and Suicune came.",
+  "icon": "clear-bell.png"
+ },
+ "jo_ssticket": {
+  "n": "S.S. Ticket",
+  "d": "Professor Elm's ticket for the S.S. Aqua, which sails from Olivine City to Vermilion City in Kanto.",
+  "icon": "ss-ticket.png"
+ },
+ "jo_expncard": {
+  "n": "EXPN Card",
+  "d": "From Lavender Town's radio station. It added the Poké Flute channel to your radio, and its tune woke the Snorlax at Vermilion City."
+ },
+ "jo_rainbowwing": {
+  "n": "Rainbow Wing",
+  "d": "A feather that shines every color, from the Tin Tower's Sage. It called Ho-Oh down to the tower's roof.",
+  "icon": "rainbow-wing.png"
+ },
+ "jo_silverwing": {
+  "n": "Silver Wing",
+  "d": "A feather that glitters silver, from an old man in Pewter City. It called Lugia up from the depths of the Whirl Islands.",
+  "icon": "silver-wing.png"
+ },
+ "jo_gsball": {
+  "n": "GS Ball",
+  "d": "The mysterious ball Kurt studied for so long. At the Ilex Forest shrine it opened, and Celebi stepped out."
+ }
+}

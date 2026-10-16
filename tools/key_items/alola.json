@@ -1,0 +1,62 @@
+{
+ "_": "Alola's story key items (the owner's rule, 2026-10-16: what a scene hands you goes in the Bag, a keepsake with no use), as Ultra Sun and Ultra Moon give them. Icons: resources/sprites/items (the pack has no Sparkling Stone, Trainer Passport, Sun or Moon Flute, or petals: those show the letter icon).",
+ "al_sparklingstone": {
+  "n": "Sparkling Stone",
+  "d": "The glittering stone Nebby found on the bridge on Mahalo Trail, the day Tapu Koko saved you both. Lillie gave it to you."
+ },
+ "al_passport": {
+  "n": "Trainer Passport",
+  "d": "Professor Kukui's gift in Iki Town: your Alola Trainer Passport, with room for every island's stamp."
+ },
+ "al_pokeballs": {
+  "n": "Kukui's Poké Balls",
+  "d": "The ten Poké Balls Professor Kukui gave you on Route 1 to catch your first wild Pokémon in Alola.",
+  "icon": "poke-ball.png"
+ },
+ "al_expshare": {
+  "n": "Exp. Share",
+  "d": "Professor Kukui's gift at the Trainers' School, for beating its students and Teacher Emily.",
+  "icon": "exp-share.png"
+ },
+ "al_fishingrod": {
+  "n": "Fishing Rod",
+  "d": "Captain Lana's gift after her trial at Brooklet Hill. She says you'll catch something big someday. Probably.",
+  "icon": "old-rod.png"
+ },
+ "al_moonflute": {
+  "n": "Moon Flute",
+  "d": "Lillie's gift before you sailed to Poni Island: one of the two flutes that call Alola's Legendary Pokémon at the Altar of the Sunne."
+ },
+ "al_sunflute": {
+  "n": "Sun Flute",
+  "d": "The other flute, waiting at the summit of Exeggutor Island. You and Lillie played the two together at the Altar of the Sunne."
+ },
+ "al_pinkpetal": {
+  "n": "Pink Petal",
+  "d": "Captain Mina's own petal, the first of the seven she wove into the Rainbow Flower for her trial."
+ },
+ "al_orangepetal": {
+  "n": "Orange Petal",
+  "d": "Captain Ilima's petal for Mina's trial, won at Hau'oli Cemetery."
+ },
+ "al_bluepetal": {
+  "n": "Blue Petal",
+  "d": "Captain Lana's petal for Mina's trial, given at Lush Jungle."
+ },
+ "al_greenpetal": {
+  "n": "Green Petal",
+  "d": "Captain Mallow's petal for Mina's trial, won at Lush Jungle."
+ },
+ "al_redpetal": {
+  "n": "Red Petal",
+  "d": "Captain Kiawe's petal for Mina's trial, won at Wela Volcano Park."
+ },
+ "al_yellowpetal": {
+  "n": "Yellow Petal",
+  "d": "Captain Sophocles's petal for Mina's trial, won at Hokulani Observatory."
+ },
+ "al_purplepetal": {
+  "n": "Purple Petal",
+  "d": "Captain Acerola's petal for Mina's trial. Kahuna Nanu handed it over for her, without a battle."
+ }
+}

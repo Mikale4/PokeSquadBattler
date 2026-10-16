@@ -1,0 +1,158 @@
+{
+ "_": "Home screen walkers: each player look's walk cycle on a sheet in resources/player sprites. region: the sprites are found inside it (x0, y0, x1, y1); grid: fixed cells (x0, y0, pitch x, pitch y, w, h). n frames per direction; order: which direction each row is (d u l r; a missing r mirrors l); cols: the sheet runs directions across columns instead. alias: looks without a sheet borrow another's. The player looks are Red and Leaf only for now (the owner's rule); the other heroes are kept in later/later_alias, switched off: move them back into walkers/alias (and AVATARS in a9a_screens.js) to bring them back. Lucas and Dawn's region now takes in their whole 4 x 4 block (it used to stop at 128 px, cutting off their bottom row). The owner renamed the sheets (\"Pokemon Trainer <name>.png\"); the later entries still have the old names, so check each sheet and its region when bringing it back.",
+ "walkers": {
+  "red": {
+   "sheet": "Pokemon Trainers Red and Leaf.png",
+   "grid": [
+    8,
+    42,
+    17,
+    33,
+    16,
+    32
+   ],
+   "n": 3,
+   "order": "dulr"
+  },
+  "leaf": {
+   "sheet": "Pokemon Trainers Red and Leaf.png",
+   "grid": [
+    8,
+    309,
+    17,
+    33,
+    16,
+    32
+   ],
+   "n": 3,
+   "order": "dulr"
+  }
+ },
+ "alias": {},
+ "later": {
+  "brendan": {
+   "sheet": "Game Boy Advance - Pokemon Emerald - Playable Characters - Brendan.png",
+   "region": [
+    0,
+    0,
+    46,
+    66
+   ],
+   "n": 3,
+   "order": "dul",
+   "cols": true
+  },
+  "may": {
+   "sheet": "Game Boy Advance - Pokemon Emerald - Playable Characters - May.png",
+   "region": [
+    20,
+    26,
+    84,
+    126
+   ],
+   "n": 3,
+   "order": "dlur"
+  },
+  "ethan": {
+   "sheet": "DS _ DSi - Pokemon HeartGold _ SoulSilver - Playable Characters - Ethan.png",
+   "region": [
+    0,
+    0,
+    66,
+    122
+   ],
+   "n": 3,
+   "order": "dlur"
+  },
+  "lyra": {
+   "sheet": "DS _ DSi - Pokemon HeartGold _ SoulSilver - Playable Characters - Lyra.png",
+   "region": [
+    0,
+    0,
+    92,
+    124
+   ],
+   "n": 3,
+   "order": "dlur"
+  },
+  "lucas": {
+   "sheet": "DS _ DSi - Pokemon Platinum - Playable Characters - Lucas.png",
+   "region": [
+    0,
+    0,
+    136,
+    136
+   ],
+   "n": 4,
+   "order": "dulr"
+  },
+  "dawn": {
+   "sheet": "DS _ DSi - Pokemon Platinum - Playable Characters - Dawn.png",
+   "region": [
+    0,
+    0,
+    136,
+    136
+   ],
+   "n": 4,
+   "order": "dulr"
+  },
+  "nate": {
+   "sheet": "DS _ DSi - Pokemon Black 2 _ White 2 - Overworld - Nate.png",
+   "grid": [
+    1,
+    1,
+    33,
+    33,
+    32,
+    32
+   ],
+   "n": 3,
+   "order": "udlr"
+  },
+  "rosa": {
+   "sheet": "DS _ DSi - Pokemon Black 2 _ White 2 - Overworld - Rosa.png",
+   "grid": [
+    1,
+    1,
+    33,
+    33,
+    32,
+    32
+   ],
+   "n": 3,
+   "order": "udlr"
+  },
+  "hilbert": {
+   "sheet": "DS _ DSi - Pokemon Black _ White - Friendly Characters - Hero (M_F) Overworld.png",
+   "region": [
+    4,
+    4,
+    100,
+    132
+   ],
+   "n": 3,
+   "order": "udlr"
+  },
+  "hilda": {
+   "sheet": "DS _ DSi - Pokemon Black _ White - Friendly Characters - Hero (M_F) Overworld.png",
+   "region": [
+    4,
+    144,
+    100,
+    272
+   ],
+   "n": 3,
+   "order": "udlr"
+  }
+ },
+ "later_alias": {
+  "kris": "lyra",
+  "calem": "red",
+  "elio": "red",
+  "victor": "red",
+  "serena": "leaf",
+  "selene": "leaf",
+  "gloria": "leaf"
+ }
+}

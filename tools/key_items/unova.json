@@ -1,0 +1,98 @@
+{
+ "_": "Unova's story key items (the owner's rule, 2026-10-16: what a scene hands you goes in the Bag, a keepsake with no use), both parts of the Journey (src/a4e_unova.js). Items the game has no Bag item for (Poké Balls, Max Revives, Protein...) are keepsakes too, as Kanto's Poké Balls are. Icons: resources/sprites/items; the C-Gear, Running Shoes, Colress Machine, Iron Key and DNA Splicers have none in the pack.",
+ "un_xtransceiver": {
+  "n": "Xtransceiver",
+  "d": "The video phone Mom gave you in Nuvema Town, so you can call Cheren and Bianca wherever you go.",
+  "icon": "xtransceiver.png"
+ },
+ "un_pokeballs": {
+  "n": "Juniper's Poké Balls",
+  "d": "The five Poké Balls Professor Juniper gave you on Route 1, after showing you how to catch a Pokémon.",
+  "icon": "poke-ball.png"
+ },
+ "un_runningshoes": {
+  "n": "Running Shoes",
+  "d": "Mom brought them to the Accumula Town gate, so you could keep up with Bianca."
+ },
+ "un_cgear": {
+  "n": "C-Gear",
+  "d": "Fennel's wireless device, your thanks for the Dream Mist in the Dreamyard. Two years later Bianca gave you a new one in Aspertia City."
+ },
+ "un_healballs": {
+  "n": "Heal Balls",
+  "d": "Three Heal Balls from the little girl whose Pokémon you won back from Team Plasma in Wellspring Cave.",
+  "icon": "heal-ball.png"
+ },
+ "un_ultraballs": {
+  "n": "Juniper's Ultra Balls",
+  "d": "The ten Ultra Balls Professor Juniper gave you and Cheren in the gate to Nimbasa City.",
+  "icon": "ultra-ball.png"
+ },
+ "un_bicycle": {
+  "n": "Bicycle",
+  "d": "The Day-Care Man's thank-you, after you saved his Pokémon from Team Plasma in Nimbasa City.",
+  "icon": "bicycle.png"
+ },
+ "un_oldgateau": {
+  "n": "Old Gateau",
+  "d": "The cake Cedric Juniper gave you at the foot of Dragonspiral Tower, before you went in after Team Plasma.",
+  "icon": "old-gateau.png"
+ },
+ "un_lightstone": {
+  "n": "Light Stone",
+  "d": "Kept in the Nacrene Museum all along, with Reshiram asleep inside it. In N's Castle it woke.",
+  "icon": "light-stone.png"
+ },
+ "un_fullrestore": {
+  "n": "Full Restore",
+  "d": "Bianca's gift on Route 8, after your battle by the Tubeline Bridge.",
+  "icon": "full-restore.png"
+ },
+ "un_maxrevives": {
+  "n": "Max Revives",
+  "d": "Three from Bianca on Route 10, before Victory Road; two years later, three more from Rood in the Giant Chasm.",
+  "icon": "max-revive.png"
+ },
+ "un_superrod": {
+  "n": "Super Rod",
+  "d": "Looker's gift in Nuvema Town, when he asked you to help find the Seven Sages.",
+  "icon": "super-rod.png"
+ },
+ "un_ragecandybar": {
+  "n": "RageCandyBar",
+  "d": "Professor Juniper's gift at Relic Castle: an old Mahogany Town sweet that wakes the Darmanitan statues.",
+  "icon": "ragecandybar.png"
+ },
+ "un_biancaballs": {
+  "n": "Bianca's Poké Balls",
+  "d": "The ten Poké Balls Bianca gave you in Aspertia City, two years after your first journey, with your new Pokédex.",
+  "icon": "poke-ball.png"
+ },
+ "un_protein": {
+  "n": "Protein",
+  "d": "Colress's thank-you on Route 4 for the data from your battle.",
+  "icon": "protein.png"
+ },
+ "un_lunarwing": {
+  "n": "Lunar Wing",
+  "d": "From the girl in the Strange House on the way to Lentimas Town. On Marvelous Bridge it called down Cresselia.",
+  "icon": "lunar-wing.png"
+ },
+ "un_colressmachine": {
+  "n": "Colress Machine",
+  "d": "Colress's device, given on Route 22. It woke the Crustle blocking Seaside Cave, then sparked and broke."
+ },
+ "un_ironkey": {
+  "n": "Iron Key",
+  "d": "It came with Regirock in the Underground Ruins, and opened the Iron Chamber, where Registeel waited."
+ },
+ "un_darkstone": {
+  "n": "Dark Stone",
+  "d": "N's gift in his castle, two years on. At the top of Dragonspiral Tower it woke as Zekrom.",
+  "icon": "dark-stone.png"
+ },
+ "un_dnasplicers": {
+  "n": "DNA Splicers",
+  "d": "Kyurem left them behind in the Giant Chasm. With them it can join with Zekrom again."
+ }
+}

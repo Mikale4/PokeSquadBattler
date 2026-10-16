@@ -1,0 +1,46 @@
+{
+ "_": "Paldea's story key items (the owner's rule, 2026-10-16: what a scene hands you goes in the Bag, a keepsake with no use), as Scarlet and its DLC give them. Icons: resources/sprites/items (the pack has no Rotom Phone or Tera Orb: those show the letter icon).",
+ "pa_rotomphone": {
+  "n": "Rotom Phone",
+  "d": "Mom's present on your first day at Naranja Academy: a phone with a Rotom inside that runs your apps."
+ },
+ "pa_pokeballs": {
+  "n": "Nemona's Poké Balls",
+  "d": "The Poké Balls Nemona gave you on Poco Path, when she showed you how to catch your first wild Pokémon.",
+  "icon": "poke-ball.png"
+ },
+ "pa_koraidonball": {
+  "n": "Koraidon's Poké Ball",
+  "d": "The Poké Ball Arven handed you at the Poco Path lighthouse. Koraidon once lived in the lab there; now it rides with you.",
+  "icon": "poke-ball.png"
+ },
+ "pa_teraorb": {
+  "n": "Tera Orb",
+  "d": "Nemona's gift at the foot of the academy's stairs, the day you first met Team Star. It holds the energy that makes a Pokémon shine like a gem."
+ },
+ "pa_scarletbook": {
+  "n": "Scarlet Book",
+  "d": "The book about Area Zero that Arven gave you at Research Station No. 2. The Professor's ID is inside it.",
+  "icon": "journal.png"
+ },
+ "pa_indigodisk": {
+  "n": "Indigo Disk",
+  "d": "Geeta's gift: an artifact a researcher left in Area Zero long ago. In the Zero Lab it sends the elevator down to the Underdepths.",
+  "icon": "dubious-disc.png"
+ },
+ "pa_sadasbook": {
+  "n": "Professor Sada's Scarlet Book",
+  "d": "The Professor's own Scarlet Book, from her own time. At Kitakami's Crystal Pool she traded it for Briar's book about the expedition.",
+  "icon": "journal.png"
+ },
+ "pa_sportball": {
+  "n": "Sport Ball",
+  "d": "Perrin's thanks for the photos of Area Zero's Paradox Pokémon: a Sport Ball, for your collection.",
+  "icon": "sport-ball.png"
+ },
+ "pa_kieransletter": {
+  "n": "Kieran's Letter",
+  "d": "The letter Mom handed you back home: Kieran is taking a break from Blueberry at home in Kitakami, and there are tickets for everyone.",
+  "icon": "letter.png"
+ }
+}

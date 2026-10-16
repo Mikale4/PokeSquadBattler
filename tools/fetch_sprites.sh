@@ -1,0 +1,35 @@
+#!/bin/sh
+# Download the sprites from Pokémon Showdown's sprite server and pack them for the build.
+#   tools/.showdown/gen5ani/<id>.gif       animated Black/White front sprites (opponents, menus)   } cache, gitignored;
+#   tools/.showdown/gen5ani-back/<id>.gif  animated Black/White back sprites (your side)           } packed by
+#   resources/sprites/pokemon sprites/front|back animated/<id>.png + anim.json                                                 } pack_sprites.py
+#   resources/sprites/trainer sprites/more trainers/<n>.png             FireRed/LeafGreen trainer sprites, plus the player looks
+# <id> is Showdown's species id: the lowercase name with everything but a-z0-9 removed (mrmime, nidoranf).
+# build.sh embeds the results into Pokemon Kanto Squad.html as data URIs, so the game stays a single file.
+set -e
+DIR=$(cd "$(dirname "$0")/.." && pwd)
+BASE=https://play.pokemonshowdown.com/sprites
+GIF="$DIR/tools/.showdown"
+mkdir -p "$GIF/gen5ani" "$GIF/gen5ani-back" "$DIR/resources/sprites/trainer sprites/more trainers"
+IDS=$(grep -o '"k":"[a-z0-9]*"' "$DIR/src/a3a_dex.js" | cut -d'"' -f4)
+get() { [ -s "$2" ] || curl -sf --retry 3 -o "$2" "$1" || echo "missing $1"; }
+for id in $IDS; do
+  get "$BASE/gen5ani/$id.gif" "$GIF/gen5ani/$id.gif" &
+  get "$BASE/gen5ani-back/$id.gif" "$GIF/gen5ani-back/$id.gif" &
+  wait
+done
+python3 "$DIR/tools/pack_sprites.py"
+for t in red leaf blue blue-gen3champion oak brock misty ltsurge erika koga sabrina blaine giovanni lorelei bruno agatha lance \
+  teamrocketgruntm teamrocketgruntf youngster lass bugcatcher hiker camper picnicker swimmerm swimmerf fisherman sailor gentleman \
+  scientist channeler blackbelt birdkeeper juggler tamer psychic beauty biker burglar cueball engineer pokemaniac supernerd rocker \
+  acetrainer acetrainerf mrfuji bill daisy aromalady battlegirl dragontamer expert kindler lady ninjaboy painter parasollady pokefan \
+  pokemonbreeder pokemonranger psychicf richboy tuber twins schoolkid gamer guitarist collector hexmaniac ruinmaniac; do
+  case $t in *-gen3*) f=$t; n=${t%%-gen3*}champion ;; *) f=$t-gen3; n=$t ;; esac
+  get "$BASE/trainers/$f.png" "$DIR/resources/sprites/trainer sprites/more trainers/$n.png"
+done
+# player looks (each in its own game's style) and a few faces from around Kanto
+for t in ethan lyra kris brendan may lucas dawn hilbert hilda nate rosa calem serena elio selene victor gloria nurse clerk jessiejames-gen1; do
+  get "$BASE/trainers/$t.png" "$DIR/resources/sprites/trainer sprites/more trainers/${t%%-gen1}.png"
+done
+ls "$DIR/resources/sprites/pokemon sprites/front animated" | wc -l; ls "$DIR/resources/sprites/pokemon sprites/back animated" | wc -l; ls "$DIR/resources/sprites/trainer sprites/more trainers" | wc -l
+du -sh "$DIR/resources/sprites"

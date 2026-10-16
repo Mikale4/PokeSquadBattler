@@ -1,0 +1,20 @@
+{
+  "name": "pokemon-kanto-squad",
+  "private": true,
+  "description": "Pokémon Kanto Squad: the 151 Kanto Pokémon in a phone-first squad battler, built as a single HTML file.",
+  "scripts": {
+    "build": "sh src/build.sh",
+    "test": "node tests/phone.js",
+    "test:data": "node tests/figures.js",
+    "test:balance": "node tests/sim.js",
+    "test:accounts": "node tests/accounts.js",
+    "test:stadium": "node tests/stadium.js",
+    "test:social": "node tests/social.js",
+    "test:demo": "node tests/demo.js",
+    "test:music": "node tests/music.js",
+    "serve": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

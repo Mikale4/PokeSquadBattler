@@ -1,0 +1,2 @@
+https://github.com/smogon/pokemon-showdown-client at cc6f5c24adaaf0a5eb89effbb580516bbf3e7286
+battle-animations-moves.ts: CC0. battle-animations.ts (the battle animation engine): MIT. The client as a whole: AGPLv3.

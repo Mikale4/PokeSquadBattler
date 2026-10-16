@@ -1,0 +1,2 @@
+https://github.com/smogon/pokemon-showdown at 51ad80fa5b264a28416b0d78667519a97ba2d2ee
+data/text: MIT.

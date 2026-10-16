@@ -1,0 +1,75 @@
+{
+ "_": "Hoenn's story key items (the owner's rule, 2026-10-16: what a scene hands you goes in the Bag, a keepsake with no use), as Emerald's scripts give them (pret/pokeemerald). Icons: resources/sprites/items; the pack has no Pokédex, Running Shoes or PokéNav, so those show a letter.",
+ "ho_pokedex": {
+  "n": "Pokédex",
+  "d": "Professor Birch's Pokédex, a gift at his lab after your first battle with his kid. It records every Pokémon you see and catch."
+ },
+ "ho_pokeballs": {
+  "n": "Poké Balls",
+  "d": "Five Poké Balls your rival gave you at Professor Birch's lab, to start filling your Pokédex.",
+  "icon": "poke-ball.png"
+ },
+ "ho_runningshoes": {
+  "n": "Running Shoes",
+  "d": "Mom's present as you set off from Littleroot Town to see your father in Petalburg City."
+ },
+ "ho_greatball": {
+  "n": "Great Ball",
+  "d": "The Devon researcher's thanks for saving their papers from Team Aqua in Petalburg Woods.",
+  "icon": "great-ball.png"
+ },
+ "ho_devongoods": {
+  "n": "Devon Goods",
+  "d": "Parts for Captain Stern's submarine, taken back from Team Aqua in Rusturf Tunnel and delivered to the Oceanic Museum.",
+  "icon": "devon-goods.png"
+ },
+ "ho_letter": {
+  "n": "Letter",
+  "d": "Mr. Stone's letter to his son Steven, delivered in Granite Cave.",
+  "icon": "letter.png"
+ },
+ "ho_pokenav": {
+  "n": "PokéNav",
+  "d": "The Devon Corporation's map and Trainer registry, a gift from its president, Mr. Stone."
+ },
+ "ho_oldrod": {
+  "n": "Old Rod",
+  "d": "A fisherman's gift on the pier at Dewford Town.",
+  "icon": "old-rod.png"
+ },
+ "ho_itemfinder": {
+  "n": "Itemfinder",
+  "d": "Your rival's gift on Route 110. It beeps when an item is hidden nearby.",
+  "icon": "itemfinder.png"
+ },
+ "ho_meteorite": {
+  "n": "Meteorite",
+  "d": "Professor Cozmo's Meteorite, which you took out of Team Magma's machine at the top of Mt. Chimney.",
+  "icon": "meteorite.png"
+ },
+ "ho_gogoggles": {
+  "n": "Go-Goggles",
+  "d": "Your rival's gift in Lavaridge Town. They keep the sand out of your eyes in Route 111's desert.",
+  "icon": "go-goggles.png"
+ },
+ "ho_goodrod": {
+  "n": "Good Rod",
+  "d": "A fisherman's gift on Route 118.",
+  "icon": "good-rod.png"
+ },
+ "ho_devonscope": {
+  "n": "Devon Scope",
+  "d": "Steven's gift on Route 120. It shows Pokémon that are hiding, like the Kecleon outside the Fortree Gym.",
+  "icon": "devon-scope.png"
+ },
+ "ho_magmaemblem": {
+  "n": "Magma Emblem",
+  "d": "Team Magma's emblem, dropped on Mt. Pyre's summit. It opened their hideout in Jagged Pass.",
+  "icon": "magma-emblem.png"
+ },
+ "ho_ssticket": {
+  "n": "S.S. Ticket",
+  "d": "Mr. Briney's ticket for the S.S. Tidal, which sails from Slateport and Lilycove. It came in the mail after you became Champion.",
+  "icon": "ss-ticket.png"
+ }
+}

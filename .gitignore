@@ -1,0 +1,5 @@
+dist/
+tools/.pokeapi/
+tools/.showdown/
+tests/shots/
+node_modules/
