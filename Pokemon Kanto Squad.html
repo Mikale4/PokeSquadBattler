@@ -13991,7 +13991,7 @@ function capAfter(nd) {
 // each part's Gym Badges in a Journey in parts (Part 1's are the region's own count, badgesIn/setBadges; the later parts' S.regions[id].pb)
 const partBadges = (id, part = 1) => part > 1 ? (((myRegions()[id] || {}).pb || {})[part] || 0) : badgesIn(id);
 function setPartBadges(id, part, n) { if (part <= 1) return setBadges(id, n); const r = regionRec(id); r.pb = r.pb || {}; r.pb[part] = Math.max(r.pb[part] || 0, n); }
-const capWho = c => c.nd.trainer.name.replace(/^Leader /, "");
+const capWho = c => c.nd.trainer ? c.nd.trainer.name.replace(/^Leader /, "") : c.nd.name;   // (a Journey's wild last stage: its own name, Mewtwo)
 const maxSanity = l => 80 + Math.floor(l * 1.5) + (S && S.recharge ? VIP_PERK(vip()).pp : 0);   // (VIP adds some)
 const SAN_MS = 30000;
 const pxpNeed = l => 100 + 50 * l;
@@ -14915,7 +14915,7 @@ function trainerLoss(i, region) {
     const st = trainerStarter(region, i), gt = gymTypesOf(region)[0], tys = OPS[st].types, r = seeded(hash("rescue:" + i + ":" + region));
     const weak = !!gt && (typeEff(gt, tys) > 1 || Math.max(...tys.map(t => typeEff(t, [gt]))) < 1);
     if (r() < Math.min(.95, (weak ? .75 : .4) + (regionHours(i) >= 3.5 ? .15 : 0))) {
-      const M = journeyMain(region), gym = M.find(nd => nd.id === chapter1End(region)) || M[0], caps = M.filter(isCapBattle);
+      const M = journeyMain(region), gym = M.find(nd => nd.id === chapter1End(region)) || M[0], caps = M.filter(x => isCapBattle(x) && x.trainer);
       const nd = weak ? gym : caps[Math.floor(r() * Math.min(4, caps.length))] || gym, others = regionStarters(region).filter(k => k !== st), ty = trainerType(i);
       out = { nd, at: M.indexOf(nd), k: others.find(k => OPS[grownAt(k, 100)].types.includes(ty)) || others[hash("rescuepick:" + i + region) % others.length] };
       // (a second loss later in the region, for about half of those who lost one: the last starter, the Professor's second gift)
@@ -20830,7 +20830,7 @@ function journeyCtx(p) {
     // (a Journey in parts: the part they're on, and its own Badges so far)
     if (PART_NAME[rid]) { part = ndPart(nd); RB = regionBadges(rid, part); b = M.slice(0, at).filter(x => ndPart(x) === part && x.badgeWin != null).length; }
     else if (RB && RB.length > 8) b = M.slice(0, at).filter(x => x.badgeWin != null).length;   // (Alola's stamps: all twelve, not their share of eight)
-    const boss = M.slice(at).find(isCapBattle) || M.filter(isCapBattle).pop();
+    const wall = x => isCapBattle(x) && x.trainer, boss = M.slice(at).find(wall) || M.filter(wall).pop();   // (a Trainer battle: a wild last stage has no one to name)
     leader = boss ? boss.trainer.name.replace(/^(Leaders?|Elite Four|Champion|Pokémon Trainer|Executive|(Magma|Aqua) (Leader|Admin)|Commanders?|Galactic Boss|(Island )?Kahuna|Captain|Team Skull (Boss|Admin)|Aether (Branch Chief|President)|Ultra Recon Squad|Team Rainbow Rocket Boss) /, "") : "the Champion";
   } else {
     // (a region with more trials than Badges, Alola's eleven: the share of its eight that's done)

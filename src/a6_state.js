@@ -63,7 +63,7 @@ function capAfter(nd) {
 // each part's Gym Badges in a Journey in parts (Part 1's are the region's own count, badgesIn/setBadges; the later parts' S.regions[id].pb)
 const partBadges = (id, part = 1) => part > 1 ? (((myRegions()[id] || {}).pb || {})[part] || 0) : badgesIn(id);
 function setPartBadges(id, part, n) { if (part <= 1) return setBadges(id, n); const r = regionRec(id); r.pb = r.pb || {}; r.pb[part] = Math.max(r.pb[part] || 0, n); }
-const capWho = c => c.nd.trainer.name.replace(/^Leader /, "");
+const capWho = c => c.nd.trainer ? c.nd.trainer.name.replace(/^Leader /, "") : c.nd.name;   // (a Journey's wild last stage: its own name, Mewtwo)
 const maxSanity = l => 80 + Math.floor(l * 1.5) + (S && S.recharge ? VIP_PERK(vip()).pp : 0);   // (VIP adds some)
 const SAN_MS = 30000;
 const pxpNeed = l => 100 + 50 * l;

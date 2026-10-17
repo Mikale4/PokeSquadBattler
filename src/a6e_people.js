@@ -208,7 +208,7 @@ function journeyCtx(p) {
     // (a Journey in parts: the part they're on, and its own Badges so far)
     if (PART_NAME[rid]) { part = ndPart(nd); RB = regionBadges(rid, part); b = M.slice(0, at).filter(x => ndPart(x) === part && x.badgeWin != null).length; }
     else if (RB && RB.length > 8) b = M.slice(0, at).filter(x => x.badgeWin != null).length;   // (Alola's stamps: all twelve, not their share of eight)
-    const boss = M.slice(at).find(isCapBattle) || M.filter(isCapBattle).pop();
+    const wall = x => isCapBattle(x) && x.trainer, boss = M.slice(at).find(wall) || M.filter(wall).pop();   // (a Trainer battle: a wild last stage has no one to name)
     leader = boss ? boss.trainer.name.replace(/^(Leaders?|Elite Four|Champion|Pokémon Trainer|Executive|(Magma|Aqua) (Leader|Admin)|Commanders?|Galactic Boss|(Island )?Kahuna|Captain|Team Skull (Boss|Admin)|Aether (Branch Chief|President)|Ultra Recon Squad|Team Rainbow Rocket Boss) /, "") : "the Champion";
   } else {
     // (a region with more trials than Badges, Alola's eleven: the share of its eight that's done)

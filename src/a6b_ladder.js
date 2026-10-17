@@ -316,7 +316,7 @@ function trainerLoss(i, region) {
     const st = trainerStarter(region, i), gt = gymTypesOf(region)[0], tys = OPS[st].types, r = seeded(hash("rescue:" + i + ":" + region));
     const weak = !!gt && (typeEff(gt, tys) > 1 || Math.max(...tys.map(t => typeEff(t, [gt]))) < 1);
     if (r() < Math.min(.95, (weak ? .75 : .4) + (regionHours(i) >= 3.5 ? .15 : 0))) {
-      const M = journeyMain(region), gym = M.find(nd => nd.id === chapter1End(region)) || M[0], caps = M.filter(isCapBattle);
+      const M = journeyMain(region), gym = M.find(nd => nd.id === chapter1End(region)) || M[0], caps = M.filter(x => isCapBattle(x) && x.trainer);
       const nd = weak ? gym : caps[Math.floor(r() * Math.min(4, caps.length))] || gym, others = regionStarters(region).filter(k => k !== st), ty = trainerType(i);
       out = { nd, at: M.indexOf(nd), k: others.find(k => OPS[grownAt(k, 100)].types.includes(ty)) || others[hash("rescuepick:" + i + region) % others.length] };
       // (a second loss later in the region, for about half of those who lost one: the last starter, the Professor's second gift)
