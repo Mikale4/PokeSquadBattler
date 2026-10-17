@@ -1,0 +1,46 @@
+# The playable game on GitHub Pages (https://mikale4.github.io/PokemonKantoSquad/): the built game as index.html, without the music
+# (the owner's pick, 2026-10-17; the soundtracks are too big for a Pages site). It fetches only that one file, never the 3.9 GB of
+# resources, and runs whenever a push to main changes the built game.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["Pokemon Kanto Squad.html", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /Pokemon Kanto Squad.html
+          sparse-checkout-cone-mode: false
+      - name: The game as the site's index.html
+        run: |
+          mkdir _site
+          cp "Pokemon Kanto Squad.html" _site/index.html
+          touch _site/.nojekyll
+          ls -la _site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
