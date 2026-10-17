@@ -76372,18 +76372,27 @@ function demoPanel() {
 }
 function demoPanel1() {
   const ds = readSave(DEMO_KEY);
+  // the region a new Demo starts in (the owner's rule, 2026-10-17: you choose; "Its pick" is its own, demoRegion: the region whose
+  // Pokémon make the strongest Stadium team)
+  const regs = REGION_IDS.filter(id => journeyOf(id));
+  const chips = () => `<button class="chip ${!DEMO.pickR ? "on" : ""}" data-r="">Its pick</button>` + regs.map(id => `<button class="chip ${DEMO.pickR === id ? "on" : ""}" data-r="${id}">${REGION_NAME[id]}</button>`).join("");
   const p = titlePanel(`<div class="eyebrow">Demo</div><h2>Watch the runner</h2>
     <p class="small dim">A runner plays Pokémon Kanto Squad like an expert Trainer, from a brand-new save to 100%: every Journey stage with 3 stars,
       every Explore area, every open wing of the Battle Tower, the Legend tier in Ranked and Link Battles, and a complete Pokédex.</p>
+    <div class="small" style="margin:8px 0 4px"><b>A new Demo starts in</b></div>
+    <div class="chips" id="tDemoReg">${chips()}</div>
+    <p class="tiny dim" style="margin:4px 0 8px">Its pick: the region whose Pokémon make the strongest Stadium team. Either way it goes on to every other region, one at a time.</p>
+    ${ds ? `<button class="btn wide" id="tDemoGo">Continue the Demo (${demoProgressText(ds)})</button><button class="btn ghost wide" id="tDemoNew">Start a new Demo</button>`
+      : `<button class="btn wide" id="tDemoNew">Start the Demo</button>`}
+    <button class="btn ghost wide" id="tDemoX">Cancel</button>
     <p class="tnote">It plays on its own Demo save, so your adventure is never touched. While it waits for PP or Tickets, it skips time forward on that save only.
       Change its speed from the bar at the top. Stop hands you its save to play yourself, Start hands it back, and Exit (while it's stopped) returns here.
       Keyboard: <b>\`</b> cycles the speed, <b>Q</b> stops and starts it.</p>
-    ${ds ? `<button class="btn wide" id="tDemoGo">Continue the Demo (${demoProgressText(ds)})</button><button class="btn ghost wide" id="tDemoNew">Start a new Demo</button>`
-      : `<button class="btn wide" id="tDemoNew">Start the Demo</button>`}
-    <button class="btn ghost wide" id="tDemoX">Cancel</button>`);
+`);
   if (!p) return;
   if ($("#tDemoGo")) $("#tDemoGo").onclick = () => { p.remove(); startDemo(false); };
-  $("#tDemoNew").onclick = () => { p.remove(); startDemo(true); };
+  $("#tDemoReg").onclick = e => { const b = e.target.closest("[data-r]"); if (!b) return; sfx("tap"); DEMO.pickR = b.dataset.r || null; $("#tDemoReg").innerHTML = chips(); };
+  $("#tDemoNew").onclick = () => { p.remove(); DEMO.region = DEMO.pickR || null; startDemo(true); };
   $("#tDemoX").onclick = () => p.remove();
 }
 
