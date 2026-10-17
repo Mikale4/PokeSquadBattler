@@ -704,7 +704,7 @@ const ALOLA_JOURNEY = {
           L("alhau", "It's me! I wanted to battle you here more than anything. Let's make it the best battle Alola's ever seen!"),
         ], post: [
           L("alkukui", "Woo! Alola, meet your first Champion! I'm so proud of you, cousin. And of you, Hau."),
-          L("narr", "Your Pokémon are entered into the Hall of Fame. They will now obey you all the way to Lv 100."),
+          L("narr", "Your Pokémon are entered into the Hall of Fame. Their level cap keeps rising with the rest of your Journey, and lifts to Lv 100 once it's done."),
         ] },
       ] },
     { id: "c15", title: "Alola's First Champion", env: "route", map: "route", reward: { orundum: 1500, permit: 5, rec4: 3 },

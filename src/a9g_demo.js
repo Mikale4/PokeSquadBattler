@@ -297,7 +297,8 @@ async function demoBreath() {
 // (DEMO_CAP: planning a Journey stage, where its Pokémon battle at most at the region's level cap: journeyProg)
 let DEMO_CAP = null;
 const dprog = k => DEMO_CAP && S.ops[k] && S.ops[k].lvl > DEMO_CAP ? { ...S.ops[k], lvl: DEMO_CAP } : S.ops[k];
-const withCap = async (nd, f) => { const was = DEMO_CAP; DEMO_CAP = stageCap(nd); try { return await f(); } finally { DEMO_CAP = was; } };
+const withLv = async (cap, f) => { const was = DEMO_CAP; DEMO_CAP = cap; try { return await f(); } finally { DEMO_CAP = was; } };
+const withCap = (nd, f) => withLv(stageCap(nd), f);
 async function simRun(ids, waves, n, goal, enemyStyle = "balanced", weather = null) {
   let win = 0, three = 0;
   for (let i = 0; i < n; i++) {
@@ -430,6 +431,11 @@ const ndWaves = nd => nodeWaves(nd).map(wv => convWave(wv, nd.lv, journeyG(nd)))
 const nodeSquad = nd => withCap(nd, () => squadFor(ndWaves(nd), nodeTurnGoal(nd), "balanced", nd.weather, { gen: journeyGen(nd) }));
 const nodeSim = (nd, n, goal) => withCap(nd, async () => simRun(await squadFor(ndWaves(nd), nodeTurnGoal(nd), "balanced", nd.weather, { gen: journeyGen(nd) }), ndWaves(nd), n, goal, "balanced", nd.weather));
 const towerWaves = (w, f) => { const T = towerFloor(w, f); return T.waves.map(wv => convWave(wv, T.lv, wingGen(w))); };
+// a Tower floor: the wing's region's Pokémon at most at the floor's cap (towerOk, towerCap), as on the team screen
+const towerSquad = (w, f) => withLv(towerCap(towerFloor(w, f)), () => squadFor(towerWaves(w, f), 0, "balanced", null, { gen: towerGen(w) }));
+const towerSim = (w, f, n) => withLv(towerCap(towerFloor(w, f)), async () => simRun(await squadFor(towerWaves(w, f), 0, "balanced", null, { gen: towerGen(w) }), towerWaves(w, f), n));
+// the wing's sixth-best Pokémon's level: a floor waits until six of them reach its cap
+const wingLv = w => Object.entries(S.ops).filter(([k]) => towerOk(k, w)).map(([, p]) => p.lvl).sort((a, b) => b - a)[5] || 0;
 const failKey = (k, n) => { DEMO.fails[k] = (DEMO.fails[k] || 0) + (n == null ? 1 : n); return DEMO.fails[k]; };   // (n = 0 reads the count)
 
 // ---------- power push: what the Demo does when a Battle Stadium climb stalls ----------
@@ -1176,7 +1182,7 @@ async function playHunt(h, l) {
 }
 async function playTower(w, f) {
   dsay(`Battle Tower · ${REGION_NAME[w]} Wing · Floor ${f}`, towerFloor(w, f).trainer.name);
-  const squad = await squadFor(towerWaves(w, f));
+  const squad = await towerSquad(w, f);
   await goTab("battle"); await tapAct("go", { v: "tower" }, "Battle Tower");
   if (towerOpenWings().length > 1 && UI.tw !== w) await tapAct("towerTab", { v: w }, REGION_NAME[w] + " Wing");
   await tapAct("towerGo", { w, f }, "Floor " + f);
@@ -1199,19 +1205,22 @@ async function ensureDefense() {
   await pickSquad(best);
   await closeAllModals();
 }
-async function playLadder() {
+// quick (the Stadium sessions between Journey stages, stadiumTurn): the opponent with the best expected points it has at least a 30%
+// chance against, and true once a battle is played, won or lost. It waits for a Ticket or a refresh as a player would, so a session
+// is its full 3 games (the owner's rule)
+async function playLadder(quick) {
   tickTimers();
-  const L = S.ladder;
+  const L = S.ladder, games = L.wins + L.losses;
   if (L.tickets <= 0) await skipTime(TICKET_MS - (Date.now() - L.tTime) + 1000, "Waiting for a Ticket");
   await ensureDefense();
   for (let tries = 0; tries < 3; tries++) {
     const opps = ladderOpps().map(i => ({ i, doc: modeDoc(ladderDoc(i), "ranked"), p: L.pop[i] }));
-    let best = null, be = 0;
+    let best = null, be = quick ? -Infinity : 0;
     for (const o of opps) {
       const waves = [o.doc.team.map(k => npcSpec(o.doc, k))], squad = await squadFor(waves, 0, o.doc.ai, null, { pvp: true });
       const win = (await simRun(squad, waves, DEMO.fast ? 4 : 5, 0, o.doc.ai)).win;
       const ev = win * eloDelta(L.pts, o.p, true, eloK(L.pts)) + (1 - win) * eloDelta(L.pts, o.p, false, eloK(L.pts));
-      if (win >= .5 && ev > be) { be = ev; best = { ...o, squad, win }; }
+      if (win >= (quick ? .3 : .5) && ev > be) { be = ev; best = { ...o, squad, win }; }
     }
     if (best) {
       dsay("Ranked Battle", `vs ${best.doc.name} · ${tierOf(best.p).n} ${best.p} · ${Math.round(best.win * 100)}% to win`);
@@ -1219,7 +1228,7 @@ async function playLadder() {
       const before = L.pts;
       await tapAct("ladderGo", { i: best.i }, "Battle");
       await pickSquad(best.squad); await settle(); await closeAllModals();
-      return L.pts > before;
+      return quick ? L.wins + L.losses > games : L.pts > before;
     }
     if (Date.now() - L.oppT < REFRESH_MS) await skipTime(REFRESH_MS - (Date.now() - L.oppT) + 1000, "Waiting to refresh the Trainers");
     dsay("Ranked Battles", "Looking for a beatable Trainer");
@@ -1227,14 +1236,14 @@ async function playLadder() {
   }
   return false;
 }
-// Link Battles: queue, draft (pick 5, ban 1), then battle on AUTO
-async function playRta() {
+// Link Battles: queue, draft (pick 5, ban 1), then battle on AUTO (quick: as playLadder's, at least a 30% chance)
+async function playRta(quick) {
   // check the odds against a typical opponent at this rating before queueing
   const sample = rtaOpponent(), mine = await squadFor([sample.team.map(k => npcSpec(sample, k))], 0, sample.ai, null, { pvp: true });
   const odds = (await simRun(mine, [sample.team.map(k => npcSpec(sample, k))], DEMO.fast ? 4 : 5, 0, sample.ai)).win;
   const P = S.demoPush, ready = rosterReady();
   if (ready && P.rta.day !== today()) P.rta = { day: today(), n: 0 };
-  if (ready ? P.rta.n >= 10 || odds < .3 : odds < .5 && S.rta.place === 0) return false;
+  if (quick ? odds < .3 : ready ? P.rta.n >= 10 || odds < .3 : odds < .5 && S.rta.place === 0) return false;
   if (ready) P.rta.n++;
   const built = k => S.ops[k].lvl >= levelCap(k) - 10;
   const pool = ready ? Object.keys(S.ops).filter(k => P.roster.includes(k) || built(k)) : Object.keys(S.ops);
@@ -1263,7 +1272,20 @@ async function playRta() {
     } else await new Promise(r => setTimeout(r, DEMO.fast ? 0 : 120));
   }
   await settle(); await closeAllModals();
-  return S.rta.games > games && S.rta.pts > before;
+  return S.rta.games > games && (quick || S.rta.pts > before);
+}
+// the Battle Stadium all through the Journey (the owner's rules, 2026-10-17): after every Journey stage it clears, a Stadium session
+// of 3 Ranked and 3 Link Battles (DEMO.stadQ, each mode once it's open) before it goes back to the story, a game each pass, the two
+// in turn (waiting for a Ticket when it's out); a mode that's closed or has no fair opponent sits the rest of the session out
+async function stadiumTurn(Q) {
+  const n = Object.keys(S.ops).length, open = { ranked: featOn("ranked") && n >= 1, link: featOn("link") && n >= 5 };
+  for (const k of ["ranked", "link"]) if (!open[k]) Q[k] = 0;
+  const order = ["ranked", "link"].filter(k => Q[k] > 0).sort((a, b) => Q[b] - Q[a] || (b === DEMO.stadTurn) - (a === DEMO.stadTurn));
+  for (const k of order) {
+    if (await (k === "ranked" ? playLadder(true) : playRta(true))) { Q[k]--; DEMO.stadTurn = k === "ranked" ? "link" : "ranked"; return true; }
+    Q[k] = 0;
+  }
+  return false;
 }
 // try the next piece of content the team can win; true if something was gained
 async function progress() {
@@ -1285,9 +1307,9 @@ async function progress() {
   if (DEMO.twNext !== false) for (const kind of DEMO.sideTurn === "explore" ? ["explore", "tower"] : ["tower", "explore"]) {
     if (kind === "tower") {
       const T = featOn("tower") ? towerOpenWings().filter(id => towerLeft(id) > 0).map(w => towerFloor(w, towerDone(w) + 1))
-        .filter(T => T.lv <= teamLv - 3 && failKey("tw" + T.id, 0) < 4).sort((a, b) => a.lv - b.lv)[0] : null;
+        .filter(T => towerCap(T) <= wingLv(T.wing) && failKey("tw" + T.id, 0) < 4).sort((a, b) => a.lv - b.lv)[0] : null;   // (six of the wing's Pokémon at its cap)
       if (!T) continue;
-      const r = await simRun(await squadFor(towerWaves(T.wing, T.f)), towerWaves(T.wing, T.f), 6);
+      const r = await towerSim(T.wing, T.f, 6);
       if (r.win >= .7 && await playTower(T.wing, T.f)) { DEMO.twNext = false; DEMO.sideTurn = "explore"; return true; }
       failKey("tw" + T.id);
     } else {
@@ -1299,6 +1321,9 @@ async function progress() {
       failKey("ex" + o.h.id + o.l);
     }
   }
+  // and a Stadium session after every Journey stage: 3 Ranked and 3 Link Battles before the story goes on (stadiumTurn)
+  const Q = DEMO.stadQ;
+  if (Q && Q.ranked + Q.link > 0) { if (await stadiumTurn(Q)) return true; DEMO.stadQ = null; }
   // the Journey, in order
   const nd = nextNode();
   if (nd) {
@@ -1314,7 +1339,7 @@ async function progress() {
       if (first) { tried[nd.id] = Math.max(tried[nd.id] || 0, mark); tried[nd.id + "@"] = day; dsay("Giving it a try", `${nd.id} ${nd.name}: ${Math.round(r.win * 100)}% in practice`); }
       const ok = await playNode(nd, first ? "Giving it a try" : nd.badgeWin != null ? "Gym battle" : nd.type === "boss" ? "Big battle" : "Journey");
       if (!ok) { failKey("node" + nd.id); DEMO.focus = nd.id; if (first) return true; }
-      if (ok) { DEMO.twNext = true; return true; }
+      if (ok) { DEMO.twNext = true; DEMO.stadQ = { ranked: 3, link: 3 }; return true; }
     } else if (DEMO.focus !== nd.id) { DEMO.focus = nd.id; dsay("Getting ready", `${nd.id} ${nd.name}: planning moves and held items for it (${Math.round(r.win * 100)}% for now)`); }   // (demoFoes)
   }
   // 3-star clears
@@ -1339,7 +1364,7 @@ async function progress() {
   }
   // Battle Tower
   for (const w of featOn("tower") ? towerOpenWings().filter(id => towerLeft(id) > 0) : []) {
-    const f = towerDone(w) + 1, r = await simRun(await squadFor(towerWaves(w, f)), towerWaves(w, f), 6);
+    const f = towerDone(w) + 1, r = await towerSim(w, f, 6);
     if (r.win >= .6 && await playTower(w, f)) return true;
   }
   // Battle Stadium
@@ -1470,7 +1495,7 @@ function startDemo(fresh) {
   const slot = DEMO_KEY;
   if (fresh) { try { localStorage.removeItem(slot); } catch (e) { /* storage unavailable */ } }
   const ds = readSave(slot);
-  DEMO.on = true; DEMO.paused = false; DEMO.gen++; DEMO.fails = {}; DEMO.record = {}; DEMO.errors = 0; DEMO.log = []; DEMO.focus = null; DEMO.tried = {};
+  DEMO.on = true; DEMO.paused = false; DEMO.gen++; DEMO.fails = {}; DEMO.record = {}; DEMO.errors = 0; DEMO.log = []; DEMO.focus = null; DEMO.tried = {}; DEMO.stadQ = null; DEMO.stadTurn = null;
   DEMO.skew = ds && ds.demoSkew || 0;
   window.Date = DemoDate;
   SESSION = { id: "demo", name: "Demo" };

@@ -425,7 +425,7 @@ const JOHTO_JOURNEY = {
           L("jlance", "I, Lance the dragon master, accept your challenge!"),
         ], post: [
           L("jlance", "Happy that I witnessed the rise of a great new Champion! You're the new Johto Champion. Come with me: your partners will be recorded in the Hall of Fame."),
-          L("narr", "Your Johto Pokémon are entered into the Hall of Fame. They will now obey you all the way to Lv 100."),
+          L("narr", "Your Johto Pokémon are entered into the Hall of Fame. Their level cap keeps rising with the rest of your Journey, and lifts to Lv 100 once it's done."),
         ] },
       ] },
     // Crystal's trip to Kanto (its own post-game, the owner's rule): the S.S. Aqua, Kanto's eight Gym Leaders with each one's

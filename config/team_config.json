@@ -13020,7 +13020,7 @@
    "id": "rain",
    "name": "Rain",
    "plan": "Rain Dance starts rain for 5 rounds (8 with a Damp Rock): Water moves hit ×1.5 and Fire moves ×0.5, Swift Swim doubles Speed, and Thunder and Hurricane never miss. A second, harder-hitting setter waits on the bench to bring it back once it's gone",
-   "weight": 78,
+   "weight": 59,
    "coverMaxSpeed": null,
    "subs": [
     {
@@ -13098,7 +13098,7 @@
   {
    "id": "sun",
    "name": "Sun",
-   "weight": 81,
+   "weight": 66,
    "coverMaxSpeed": null,
    "plan": "a Drought or Orichalcum Pulse Pokémon brings harsh sunlight as it comes in, for 5 rounds (8 with a Heat Rock): Fire moves hit ×1.5 and Water moves ×0.5, Chlorophyll gives Speed +2, Solar Beam and Solar Blade fire the same turn at ×1.5. A second, harder-hitting setter waits on the bench to bring it back once it's gone",
    "subs": [
@@ -13181,7 +13181,7 @@
   {
    "id": "sand",
    "name": "Sand",
-   "weight": 94,
+   "weight": 72,
    "coverMaxSpeed": null,
    "plan": "a Sand Stream Pokémon whips up a sandstorm as it comes in, for 5 rounds (8 with a Smooth Rock): everything but Rock, Ground and Steel types loses 1/16 of its HP a turn, Rock, Ground and Steel types get Sp. Def +1, Sand Rush gives Speed +2 and Sand Force powers up Rock, Ground and Steel moves. A second, harder-hitting setter waits on the bench to bring it back once it's gone",
    "subs": [
@@ -13264,7 +13264,7 @@
   {
    "id": "snow",
    "name": "Snow",
-   "weight": 91,
+   "weight": 88,
    "coverMaxSpeed": null,
    "plan": "a Snow Warning Pokémon brings the snow as it comes in (hail and snow are one weather here), for 5 rounds (8 with an Icy Rock): everything but Ice types loses 1/16 of its HP a turn, Ice types get Defense +1, Blizzard never misses, Aurora Veil can go up. A second, harder-hitting setter waits on the bench to bring it back once it's gone",
    "subs": [
@@ -13344,7 +13344,7 @@
    "id": "trickroom",
    "name": "Trick Room",
    "plan": "Trick Room flips the turn order for 5 rounds, so the slowest Pokémon move first and slow heavy hitters do the damage; the setter puts it up the moment it comes in, without using its turn, and its Room Service makes it last 8 rounds. The second setter waits on the bench until the room is down: coming in while it's up would end it",
-   "weight": 97,
+   "weight": 94,
    "coverMaxSpeed": 70,
    "subs": [
     {
@@ -13423,7 +13423,7 @@
    "id": "tailwind",
    "name": "Tailwind",
    "plan": "Tailwind gives the whole team Speed +2 for 4 rounds and the Pokémon out there +10% turn meter at once, so the attackers get their turns first; the setter has priority (Prankster or a priority move, and the Quick Claw) so it gets the wind going before the other side moves",
-   "weight": 84,
+   "weight": 75,
    "coverMaxSpeed": null,
    "subs": [
     {
@@ -13772,7 +13772,7 @@
   {
    "id": "psychic",
    "name": "Psychic Spam",
-   "weight": 69,
+   "weight": 72,
    "coverMaxSpeed": null,
    "plan": "a Psychic Surge Pokémon sets Psychic Terrain as it comes in, for 5 rounds (8 with a Terrain Extender): Psychic moves from Pokémon on the ground hit ×1.5, Expanding Force hits every foe at ×1.5, and priority moves can't touch the team's grounded Pokémon. A second, harder-hitting setter waits on the bench to bring it back once it's gone",
    "overlaps": [],
@@ -13819,7 +13819,7 @@
   {
    "id": "redirect",
    "name": "Follow Me",
-   "weight": 75,
+   "weight": 69,
    "coverMaxSpeed": null,
    "plan": "the redirector comes in first and its Follow Me, Rage Powder or Spotlight goes off by itself the moment it's out, without using its turn, pulling the attacks away while its partners set up for free",
    "overlaps": [
@@ -13933,7 +13933,7 @@
   {
    "id": "phazing",
    "name": "Hazard Phazing",
-   "weight": 75,
+   "weight": 66,
    "coverMaxSpeed": null,
    "plan": "entry hazards go up, then Dragon Tail, Circle Throw, Roar and Whirlwind keep dragging the foes out: every one dragged in takes the hazards again, loses its stat boosts and starts with an empty turn meter, while bulky Pokémon and healing hold on",
    "overlaps": [
@@ -14128,7 +14128,7 @@
    "id": "bo",
    "name": "Bulky Offense",
    "plan": "strong attackers that can take a hit too, so the team wins the trades",
-   "weight": 81,
+   "weight": 56,
    "coverMaxSpeed": null,
    "subs": [
     {
@@ -14324,7 +14324,7 @@
    "id": "stall",
    "name": "Stall",
    "plan": "screens, status, team healing and walls with recovery wear the other side down slowly with burns, poison and entry hazards",
-   "weight": 66,
+   "weight": 88,
    "coverMaxSpeed": null,
    "subs": [
     {
@@ -14500,7 +14500,7 @@
   {
    "id": "electric",
    "name": "Electric Terrain",
-   "weight": 66,
+   "weight": 50,
    "coverMaxSpeed": null,
    "plan": "an Electric Surge or Hadron Engine Pokémon sets Electric Terrain as it comes in, for 5 rounds (8 with a Terrain Extender): Electric moves from Pokémon on the ground hit ×1.5, nobody on the ground can fall asleep, and Quark Drive, Surge Surfer and an Electric Seed's holder get going. A second, harder-hitting setter waits on the bench to bring it back once it's gone, and one of the team always holds a Ring Target, so its Electric attacks still hit Ground types",
    "overlaps": [],

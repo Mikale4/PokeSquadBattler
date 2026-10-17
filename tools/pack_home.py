@@ -182,10 +182,13 @@ for k in keys:
     # the sheets are drawn at double size (every pixel is a 2 x 2 block, for 32 px tiles): halve them to the maps' scale
     sh = Image.open(f).convert("RGBA"); sh = sh.resize((sh.width // 2, sh.height // 2), Image.NEAREST)
     sh.save(os.path.join(OUT, "mons", k + ".png"), optimize=True)
-    # where its feet are in a 32 x 32 frame (the lowest opaque row facing down), so it stands on its tile
-    meta["foot"][k] = max(((sh.crop((i * 32, 0, i * 32 + 32, 32)).getbbox() or (0, 0, 0, 28))[3]) for i in range(4))
+    # its frame size: a quarter of the sheet (32 x 32 for most; the big ones' sheets are drawn bigger: Eternatus, Groudon, Wailord
+    # 64, Reshiram and Zekrom 40, Calyrex's riders 35; the game cuts them the same way)
+    z = sh.width // 4
+    # where its feet are in a frame (the lowest opaque row facing down), so it stands on its tile
+    meta["foot"][k] = max(((sh.crop((i * z, 0, i * z + z, z)).getbbox() or (0, 0, 0, z - 4))[3]) for i in range(4))
     # and how wide it is (big ones keep more room around them)
-    meta["wide"][k] = max(((lambda b: b[2] - b[0])(sh.crop((i * 32, r * 32, i * 32 + 32, r * 32 + 32)).getbbox() or (0, 0, 16, 0))) for i in range(4) for r in range(4))
+    meta["wide"][k] = max(((lambda b: b[2] - b[0])(sh.crop((i * z, r * z, i * z + z, r * z + z)).getbbox() or (0, 0, 16, 0))) for i in range(4) for r in range(4))
 print(len(keys) - len(missing), "Pokémon walk sheets", ("(missing: " + ", ".join(missing) + ")") if missing else "")
 
 # ---------- players ----------

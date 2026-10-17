@@ -713,7 +713,7 @@ const GALAR_JOURNEY = {
           L("narr", "Three days later. Rose has turned himself in. The Championship Match is back on, and the whole of Galar is watching."),
           L("galeon", "I've never lost an official match. Not once. Show me everything, and let's see if that changes today!"),
         ], post: [
-          L("narr", "Confetti falls over Wyndon Stadium. Leon raises your arm in front of everyone: the new Champion of Galar. Your Pokémon will now obey you all the way to Lv 100."),
+          L("narr", "Confetti falls over Wyndon Stadium. Leon raises your arm in front of everyone: the new Champion of Galar. Your Pokémon's level cap keeps rising with the rest of your Journey, and lifts to Lv 100 once it's done."),
         ] },
       ] },
     // (Sword and Shield's own post-game: Sordward and Shielbert. Sword's side: you battle Sordward, and Shielbert's battles are side

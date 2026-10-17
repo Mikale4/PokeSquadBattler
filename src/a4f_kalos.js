@@ -591,7 +591,7 @@ const KALOS_JOURNEY = {
           waves: [WK("hawlucha:64", "tyrantrum:65", "aurorus:65"), WK("gourgeist:65", "goodra:66", "gardevoir:68!")], pre: [
           L("diantha", "I've been waiting since Coumarine. Show me what you and your Pokémon have become!"),
         ], post: [
-          L("narr", "Diantha takes you up to the Hall of Fame, where your Kalos Pokémon are recorded for all time. From now on they'll obey you all the way to Lv 100."),
+          L("narr", "Diantha takes you up to the Hall of Fame, where your Kalos Pokémon are recorded for all time. Their level cap keeps rising with the rest of your Journey, and lifts to Lv 100 once it's done."),
         ] },
         { id: "i", type: "battle", name: "Lumiose City: AZ", reward: { key: "ka_honorofkalos" }, lv: 60, env: "city", music: "kaLumiose", trainer: TR("Pokémon Trainer AZ", "ka_az", "Champion. I would like to know what it is to be a Trainer. Please. Battle me.", "...So that is a Trainer. I feel free. Free of the man who built the weapon."),
           waves: [WK("torkoal:60", "golurk:60", "sigilyph:60!")], pre: [

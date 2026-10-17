@@ -387,7 +387,8 @@ function fillSlots(t, p, sl = {}) {
   if (/\{(wing|wfl|wn|wtop)\}/.test(t)) {
     const P = J && J.P, best = P ? P.best : p.lvl, ws = towerWings().filter(id => !P || !P.gens || P.gens === true || P.gens.has(REGION_IDS.indexOf(id) + 1));
     const w = ws.includes(J && J.rid) ? J.rid : ws[0] || "kanto", F = towerFloors(w);
-    Object.assign(val, { wing: REGION_NAME[w], wn: F.length, wfl: F.filter(T => T.lv <= best + 2).length, wtop: F.length ? F[F.length - 1].trainer.name : "Red" });
+    const wl = P && P.done ? trainerWingLv(P, w) : best;   // (their own Pokémon of that region, by the floors' caps: towerReach)
+    Object.assign(val, { wing: REGION_NAME[w], wn: F.length, wfl: F.filter(T => towerCap(T) <= wl).length, wtop: F.length ? F[F.length - 1].trainer.name : "Red" });
   }
   // the live events
   if (/\{(ev|rank|gems|jackpot|legend|fest|cur|vip|srv|lap)\}/.test(t)) {

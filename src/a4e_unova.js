@@ -1136,7 +1136,7 @@ const UNOVA_JOURNEY = {
           L("uiris2", "I used to be the Gym Leader in Opelucid, and now I'm the Champion. The Pokémon League is where people and Pokémon understand each other best. Let's battle!"),
         ], post: [
           L("ujuniper", "Congratulations, Champion! Two years ago, someone like you saved Unova. Now you have too."),
-          L("narr", "Your Pokémon are entered into the Hall of Fame. You are the Champion of Unova! They will now obey you all the way to Lv 100."),
+          L("narr", "Your Pokémon are entered into the Hall of Fame. You are the Champion of Unova! Their level cap keeps rising with the rest of your Journey, and lifts to Lv 100 once it's done."),
         ] },
       ] },
     { id: "c27", part: 2, title: "Two Years Later: After the League", env: "route", map: "sea", reward: { lmd: 30000, orundum: 1500 },

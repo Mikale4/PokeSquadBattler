@@ -424,12 +424,13 @@ function sweepHunt(id, l) {
 
 // ---------- Battle Tower ----------
 function launchTower(w, f) {
-  const T = towerFloor(w, f), ids = squadOrToast("tower");
+  const T = towerFloor(w, f), all = squadOrToast("tower"), ids = all && all.filter(k => towerOk(k, w));
+  if (all && !ids.length) { toast(`Only ${REGION_NAME[w]}'s Pokémon can battle in the ${REGION_NAME[w]} Wing.`); return; }
   if (!T || !ids || !towerOpen(w) || f !== towerDone(w) + 1) return;
   route("tower");
   S.stats.battles++;
   startBattle({
-    allies: allySpecs(ids), waves: T.waves.map(wv => convWave(wv, T.lv, wingGen(w))), env: T.env, bb: T.bb, title: `${REGION_NAME[w]} Wing · Floor ${f}`, sub: "Battle Tower", bgm: T.bgm || (f % 5 === 0 ? TOWER_STAR_THEME : TOWER_THEME), winBgm: T.winBgm || (f % 5 === 0 ? "gymWin" : "trainerWin"),
+    allies: ids.filter(owned).map(k => ({ op: k, prog: towerProg(k, T) })), waves: T.waves.map(wv => convWave(wv, T.lv, wingGen(w))), env: T.env,   // (the wing's region, at most the floor's cap) bb: T.bb, title: `${REGION_NAME[w]} Wing · Floor ${f}`, sub: "Battle Tower", bgm: T.bgm || (f % 5 === 0 ? TOWER_STAR_THEME : TOWER_THEME), winBgm: T.winBgm || (f % 5 === 0 ? "gymWin" : "trainerWin"),
     trainer: T.trainer.name, trainerSpr: T.trainer.spr, intro: T.trainer.intro, lose: T.trainer.lose, ball: T.trainer.ball,
     onWin() {
       S.towerW[w] = Math.max(towerDone(w), f); S.tower = Object.values(S.towerW).reduce((a, n) => a + n, 0); S.stats.wins++; S.daily.clear++;

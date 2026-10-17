@@ -226,7 +226,10 @@ const npcPowerEst = i => Math.round(110000 * Math.pow(npcMonLv(i) / 100, 2.9) * 
 // each Pokémon's CP on a Trainer's Registered Team (what the Stadium shows)
 const docCPs = d => d.team.map(k => Math.round(cpOf(opStats(k, d.prog[k], false, d.badges || 0).st, d.prog[k].sk)));
 // the Battle Tower floors a team of this level clears (in the wings of its regions' Journeys: gens; a trained team takes on a few levels more)
-const towerReach = (L, gens) => towerWings().filter(id => !gens || gens === true || gens.has(REGION_IDS.indexOf(id) + 1)).reduce((a, id) => a + towerFloors(id).filter(T => T.lv <= L + 2).length, 0);
+// a Trainer's Battle Tower floors: in each wing they've opened, those whose cap (2 under the floor's strongest) their own Pokémon of
+// that region reach (the owner's rules: region lock and floor caps, trainerWingLv); L alone (no progress): their best everywhere
+const trainerWingLv = (P, w) => P.done.includes(w) ? P.best : P.region === w ? P.lv : 0;
+const towerReach = (L, gens, P) => towerWings().filter(id => !gens || gens === true || gens.has(REGION_IDS.indexOf(id) + 1)).reduce((a, id) => a + towerFloors(id).filter(T => towerCap(T) <= (P ? trainerWingLv(P, id) : L)).length, 0);
 function npcValue(i, key) {
   const p = person(i), L = p.lvl;
   if (key === "power") return npcPowerEst(i);
@@ -381,7 +384,7 @@ const SERVER_RANKS = [
   { id: "dex", n: "Pokédex", d: `Pokémon caught for the National Pokédex, out of ${DEX_N}.`, me: () => dexCaught(), npc: i => npcValue(i, "dex"), exact: (d, v) => Math.max(v, d.roster.length) },
   { id: "ranked", n: "Ranked points", d: "Ranked Battle points right now.", me: () => S.ladder.pts, npc: i => S.ladder.pop[i] },
   { id: "vip", n: "VIP", d: "VIP level, from Recharges.", me: () => vip(), npc: i => npcVip(i) },
-  { id: "tower", n: "Battle Tower floors", d: "Battle Tower floors cleared, in every region's wing.", me: () => S.tower || 0, npc: i => towerReach(npcMonLv(i), trainerGens(i)),
+  { id: "tower", n: "Battle Tower floors", d: "Battle Tower floors cleared, in every region's wing.", me: () => S.tower || 0, npc: i => towerReach(npcMonLv(i), trainerGens(i), trainerProg(i)),
     exact: d => towerReach(d.team.reduce((a, k) => a + d.prog[k].lvl, 0) / d.team.length) },
   { id: "best", n: "Strongest Pokémon", d: "The CP of a Trainer's single strongest Pokémon.", me: () => Math.max(0, ...Object.keys(S.ops).map(k => power(k, S.ops[k]))), npc: i => Math.round(npcPowerEst(i) / 6 * 1.12),
     exact: d => Math.max(...docCPs(d)), show: "best" },

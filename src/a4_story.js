@@ -377,7 +377,7 @@ const STORY = [{
         ], post: [
           L("oak", "Congratulations! You are the new Pokémon League Champion! You've grown up so much since you first left Pallet Town."),
           L("oak", "Blue... You lost because you forgot to treat your Pokémon with trust and love. Without them, you will never become a Champ again."),
-          L("narr", "Your Pokémon are entered into the Hall of Fame. They will now obey you all the way to Lv 100."),
+          L("narr", "Your Pokémon are entered into the Hall of Fame. Their level cap keeps rising with the rest of your Journey, and lifts to Lv 100 once it's done."),
         ] },
       ] },
     // FireRed/LeafGreen's post-game (the owner's pick, 2026-10-16): Celio's Network Machine needs the Ruby and the Sapphire. Team Rocket

@@ -3,7 +3,7 @@
 //  HOME OVERWORLD — the home screen is a top-down FireRed/LeafGreen map where your trainer walks around with up to six
 //  of your Pokémon (their overworld sprites), your partner following right behind. Choose the area from those you've
 //  reached on the Journey, and who comes along (tap the partner's nameplate).
-//  Assets from tools/pack_home.py: RES_DATA.home.map (scenes), .mon (Pokémon walk sheets: 4 x 4 frames of 32 x 32, rows
+//  Assets from tools/pack_home.py: RES_DATA.home.map (scenes), .mon (Pokémon walk sheets: 4 x 4 frames, 32 x 32 for most, bigger for the big ones, rows
 //  facing down, left, right, up), .pl (player walk strips: rows down, up, left, right), .meta (walkable tiles, unlocks, sizes).
 // =====================================================================
 const HOME = RES_DATA.home && RES_DATA.home.meta ? RES_DATA.home : null;
@@ -162,8 +162,9 @@ function homeDraw(st, now) {
     if (e.kind === "mon") {
       const im = homeImg("mon", e.key); if (!im || !im.naturalWidth) continue;
       // following Pokémon keep stepping in place, faster while they walk
-      const f = Math.floor((now + e.ph) / (e.move ? 110 : 190)) % 4, row = { d: 0, l: 1, r: 2, u: 3 }[e.dir], foot = HOME.meta.foot[e.key] || 31;
-      g.drawImage(im, f * 32, row * 32, 32, 32, Math.round(bx - 16), Math.round(by - foot + 1 - hop), 32, 32);
+      // (a frame is a quarter of its sheet: 32 px for most, 64 for Eternatus, Groudon, Wailord... drawn at that size, feet on the tile)
+      const z = im.naturalWidth / 4, f = Math.floor((now + e.ph) / (e.move ? 110 : 190)) % 4, row = { d: 0, l: 1, r: 2, u: 3 }[e.dir], foot = HOME.meta.foot[e.key] || z - 1;
+      g.drawImage(im, f * z, row * z, z, z, Math.round(bx - z / 2), Math.round(by - foot + 1 - hop), z, z);
     } else {
       const im = homeImg("pl", e.key), m = HOME.meta.players[e.key]; if (!im || !im.naturalWidth || !m) continue;
       const row = { d: 0, u: 1, l: 2, r: 3 }[e.dir];

@@ -210,7 +210,7 @@ SCREENS.story = () => {
       <p class="small dim" style="margin-top:6px;max-width:42ch">${esc(ep.blurb)}</p>
       ${REGION_BADGES[rid] ? badgeCase(rid, "sm") : ""}
       ${parts ? `<p class="tiny dim" style="margin-top:6px">Two parts, each with its own Gym Badges and level caps: Part 1, ${esc(parts[0])}'s story, then Part 2, ${esc(parts[1])}'s. You're on <b>Part ${part}</b>.</p>` : ""}
-      <p class="tiny dim" style="margin-top:6px">Level cap for ${REGION_NAME[rid]}'s Pokémon${parts ? ` in Part ${part}` : ""}: <b>Lv ${regionCap(rid)}</b>${regionChamp(rid) ? " (Champion)" : cb ? (cb.lv < regionCap(rid) ? ` · the starting cap (${esc(capWho(cb))}'s strongest Pokémon is Lv ${cb.ace}, ${cb.nd.id} ${esc(cb.nd.name)})` : ` · 2 below ${esc(capWho(cb))}'s strongest Pokémon (Lv ${cb.ace}, ${cb.nd.id} ${esc(cb.nd.name)})`) : ""}</p>
+      <p class="tiny dim" style="margin-top:6px">Level cap for ${REGION_NAME[rid]}'s Pokémon${parts ? ` in Part ${part}` : ""}: <b>Lv ${regionCap(rid)}</b>${journeyDone(rid) ? " (the Journey is complete)" : cb ? (cb.lv < regionCap(rid) ? ` · the starting cap (${esc(capWho(cb))}'s strongest Pokémon is Lv ${cb.ace}, ${cb.nd.id} ${esc(cb.nd.name)})` : ` · 2 below ${esc(capWho(cb))}'s strongest Pokémon (Lv ${cb.ace}, ${cb.nd.id} ${esc(cb.nd.name)})`) : ""}</p>
       <p class="tiny dim">Only ${REGION_NAME[rid]}'s Pokémon battle in this Journey${rid === "kanto" ? " (the 151 from Gen 1; the Alolan and Galarian forms are their own regions')" : ""}; everywhere else, any Pokémon you own.</p>
     </section>
     ${ep.chapters.map((ch, i) => {
@@ -358,7 +358,7 @@ function nodeSheet(nd) {
     ${nd.catch && !S.dex.caught[nd.catch] ? `<div class="hint small" style="cursor:default">${IC.pokeball.replace("<svg", '<svg width="20" height="20"')}<span>First clear: catch <b>${esc(OPS[nd.catch].n)}</b>!</span></div>` : ""}
     ${nd.gift && !st ? `<div class="hint small" style="cursor:default">${IC.gift.replace("<svg", '<svg width="20" height="20"')}<span>First clear: receive <b>${esc(OPS[nd.gift].n)}</b>.</span></div>` : ""}
     ${nd.badgeWin != null && partBadges(nd.ep.id, ndPart(nd)) <= nd.badgeWin ? `<div class="hint small" style="cursor:default">${badgeSVG(nd.badgeWin, true, regionBadges(nd.ep.id, ndPart(nd))).replace("<svg", '<svg width="22" height="22"')}<span>Win to earn the <b>${regionBadges(nd.ep.id, ndPart(nd))[nd.badgeWin].n}</b>${nd.ep.id === "kanto" ? `: +5% ${BADGES[nd.badgeWin].sn} for your Pokémon` : " (your most Badges in one region raise your Pokémon's stats)"}.</span></div>` : ""}
-    ${isCapBattle(nd) && !st && !S.champion ? `<div class="hint small" style="cursor:default">${IC.star.replace("<svg", '<svg width="18" height="18"')}<span>Its strongest Pokémon is <b>Lv ${aceLevel(nd)}</b>${capBattle() && capBattle().nd === nd ? `, so your level cap is <b>Lv ${levelCap()}</b>` : ""}. Winning raises the cap to <b>Lv ${capAfter(nd)}</b>.</span></div>` : ""}
+    ${isCapBattle(nd) && !st && !journeyDone(nd.ep.id) ? `<div class="hint small" style="cursor:default">${IC.star.replace("<svg", '<svg width="18" height="18"')}<span>Its strongest Pokémon is <b>Lv ${aceLevel(nd)}</b>${capBattle() && capBattle().nd === nd ? `, so your level cap is <b>Lv ${levelCap()}</b>` : ""}. Winning raises the cap to <b>Lv ${capAfter(nd)}</b>.</span></div>` : ""}
     ${waves ? `<div class="stack" style="gap:4px"><div class="tiny dim">Star goals</div>
       ${["Win the battle", "None of your Pokémon faint", `Win within ${goal} of your turns`].map((m, k) => `<div class="mission">${k < st ? IC.star : IC.starOff}<span>${m}</span></div>`).join("")}</div>
       <div><div class="tiny dim" style="margin-bottom:4px">${st ? "Rewards" : "First clear"}${st < 3 ? " · first 3-star clear adds a Max Elixir" : ""}</div><div class="rewards" style="justify-content:flex-start">${rewardsHTML([...Object.entries(nodeDrops(nd, !st)).map(([k, n]) => ({ k, n })), ...(!st && nd.reward && nd.type !== "chest" && !nd.chest ? rwList(nd.reward) : [])])}</div></div>` : ""}
@@ -378,8 +378,9 @@ function nodeSheet(nd) {
 // leaves the team (teamDrag below).
 SCREENS.team = arg => {
   const key = arg.mode;
-  // (a Journey stage: its own region's Pokémon only, journeyOk)
-  const jnd = arg.launch && arg.launch.kind === "node" ? NODES[arg.launch.id] : null, fits = k => !jnd || journeyOk(k, jnd);
+  // (a Journey stage: its own region's Pokémon only, journeyOk; a Battle Tower floor its wing's, towerOk)
+  const jnd = arg.launch && arg.launch.kind === "node" ? NODES[arg.launch.id] : null, tw = arg.launch && arg.launch.kind === "tower" ? arg.launch.w || "kanto" : null;
+  const fits = k => (!jnd || journeyOk(k, jnd)) && (!tw || towerOk(k, tw));
   if (!UI.team || UI.team.key !== key) UI.team = { key, ids: (S.team[key] || []).filter(owned).filter(fits).slice(0, ROSTER), sel: null };
   const ids = UI.team.ids;
   const pool = Object.keys(S.ops).filter(fits).filter(k => UI.el === "all" || OPS[k].types.includes(UI.el)).sort((a, b) => power(b, S.ops[b]) - power(a, S.ops[a]));

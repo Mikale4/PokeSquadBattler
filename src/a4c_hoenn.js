@@ -508,7 +508,7 @@ const HOENN_JOURNEY = {
           L("hrival", "Wait! I came to give you some advice before you face... You already won? You're the Champion?!"),
           L("birch", "Congratulations! And look at your Pokédex. You've done my research proud!"),
           L("wallace", "Come. Let's record you and your partners in the Hall of Fame."),
-          L("narr", "Your Hoenn Pokémon are entered into the Hall of Fame. They will now obey you all the way to Lv 100."),
+          L("narr", "Your Hoenn Pokémon are entered into the Hall of Fame. Their level cap keeps rising with the rest of your Journey, and lifts to Lv 100 once it's done."),
         ] },
       ] },
     { id: "c11", title: "The Super-Ancient Pokémon", env: "sea", map: "sea", reward: { orundum: 2000, permit: 10, rec4: 5 },

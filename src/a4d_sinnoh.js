@@ -571,7 +571,7 @@ const SINNOH_JOURNEY = {
         ], post: [
           L("rowan", "Hm! You've done it. Your Pokédex, your partners, all of it. I'm proud to have given you your first Pokémon."),
           L("cynthia", "Come with me: your partners will be recorded in the Hall of Fame."),
-          L("narr", "Your Sinnoh Pokémon are entered into the Hall of Fame. They will now obey you all the way to Lv 100."),
+          L("narr", "Your Sinnoh Pokémon are entered into the Hall of Fame. Their level cap keeps rising with the rest of your Journey, and lifts to Lv 100 once it's done."),
         ] },
       ] },
     { id: "c13", title: "The Battle Zone and Spear Pillar", env: "volcano", map: "volcano", reward: { orundum: 2000, permit: 10, rec4: 5 },

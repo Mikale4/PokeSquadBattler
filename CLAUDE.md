@@ -125,8 +125,9 @@ The folder name has spaces: keep every path in shell scripts quoted, or relative
   Pokémon are picked for the Safari (t: when an area opened, so it never changes while open; `SAFARI_POOL`). Until all nine are open
   and done (`specialSafari`) the Safari Zone is the Whole Park alone (`safariAreas`, `eventAreas`, `evOpen`). A Journey stage takes its
   own region's Pokémon only (`journeyOk`, the team screen, `launchNode`, the Demo's `nodeSquad`), at most at the region's level cap
-  right now (`journeyProg`; the Demo plans with `withCap`/`dprog`); Explore, the Tower and the Stadium
-  take any. A Pokémon from a region you haven't opened waits for it (`grantOp` keeps it in `S.waitOps`; `evoOptions` holds the
+  right now (`journeyProg`; the Demo plans with `withCap`/`dprog`); a Battle Tower wing takes its own region's Pokémon only, at most
+  2 levels below each floor's strongest (`towerOk`, `towerCap`, `towerProg`; the Demo's `towerSquad`/`towerSim`, the Trainers'
+  `towerReach`/`trainerWingLv`: the owner's rules, 2026-10-17); Explore and the Stadium take any. A Pokémon from a region you haven't opened waits for it (`grantOp` keeps it in `S.waitOps`; `evoOptions` holds the
   evolution). Caps and Badges are per region (`levelCap(key)` by the Pokémon's region, `regionCap`, `badgesIn`/`setBadges`, the stat
   bonus `statBadges`: the most in one region). Outside the Journey the game follows your first region (`firstRegion`): its Professor
   writes your letters and owns your Pokédex, Investment Plan and Scratch-Off (`profName`/`profFull`/`profPic`), its store has the TM corner

@@ -14,30 +14,38 @@ function setDevicePref(k, v) { const d = devicePrefs(); d[k] = v; try { localSto
 const soundOn = () => S ? S.settings.sound !== false : devicePrefs().sound !== false;
 // The level cap follows the Journey's big battles: your Pokémon can grow up to 2 levels below the strongest Pokémon in your next
 // Gym Leader, rival, Giovanni, Elite Four or Champion battle (Brock's Onix is Lv 14, so the cap before him is Lv 12), never below
-// the cap you already had (after Misty's 21 → 19, Blue's level-20 team keeps it at 19). Beating the Champion lifts it to 100.
+// the cap you already had (after Misty's 21 → 19, Blue's level-20 team keeps it at 19). The post-game's battles go on raising it, and
+// it's 100 once the whole Journey is done (the owner's rule, 2026-10-17: no longer at the Champion).
 const CAP_BELOW = 2;
 const CAP_STEPS = {};
 // (a stage with noCap is a Trainer battle that doesn't set it: Unova's opening, the owner's rule, a4e_unova.js)
-const isCapBattle = nd => !!nd.trainer && !nd.noCap && (nd.type === "boss" || !!nd.rivalWaves);
+// (and a Journey's last stage, whatever it is: Mewtwo, Zygarde, Pecharunt..., so the cap keeps rising to the very end: the owner's
+// rule, 2026-10-17, as the cap no longer jumps to 100 at the Champion)
+const JOURNEY_LAST = {};
+const isCapBattle = nd => !!nd.trainer && !nd.noCap && (nd.type === "boss" || !!nd.rivalWaves)
+  || !!nd.ep && nd.id === (JOURNEY_LAST[nd.ep.id] || (JOURNEY_LAST[nd.ep.id] = journeyEnd(nd.ep.id)));
 // (every stage fields its waves as one team, three at a time: the wave-by-wave rule and the first chapter's softer stages are gone,
 // the owner's rule, 2026-10-16, as the Professor's gifts cover the early game: journeyLoss in a9c_meta.js. The engine can still bring
 // waves in one at a time, cfg.waveByWave and nextWave in a7_engine.js; nothing asks for it)
 
 const aceLevel = nd => Math.max(...nodeWaves(nd).map(w => convWave(w, nd.lv, journeyG(nd))).flat().map(s => s.LV || nd.lv));
 // Each region has its own caps (the Journey revamp): a Pokémon's cap is its own region's Journey's (genOf/regionOf in
-// a6i_servers.js), Lv 100 once that Journey's Champion is beaten, or while the region's Journey is still coming soon. With no
+// a6i_servers.js), Lv 100 once that whole Journey is done, or while the region's Journey is still coming soon. With no
 // Pokémon named: the Journey you're on. A Journey in parts (Unova's, PART_NAME in a4_story.js) has each part's own run of caps (the
 // owner's rule, 2026-10-15): the part you're on sets it (regionPart), from Lv 5 again in Part 2, and a part's stages battle at that
-// part's cap (stageCap); a part before the last keeps its highest cap once its battles are done (the Champion lifts the last to 100)
+// part's cap (stageCap); a part before the last keeps its highest cap once its battles are done (the last is 100 once the Journey's done)
 const partCapSteps = (ep, part = 1) => { if (!ep) return []; const k = ep.id + ":" + part;
   return CAP_STEPS[k] || (CAP_STEPS[k] = ep.chapters.filter(ch => (ch.part || 1) === part).flatMap(ch => ch.nodes).filter(isCapBattle).map(nd => ({ nd, ace: aceLevel(nd), lv: aceLevel(nd) - CAP_BELOW }))); };
 const capSteps = (id = "kanto", part) => partCapSteps(journeyOf(id), part || regionPart(id));
 const capRegion = key => key && OPS[key] ? (S && S.region && gensOf(key).length > 1 && gensOf(key).includes(REGION_IDS.indexOf(S.region) + 1) ? S.region : regionOf(key)) : (S && S.region) || "kanto";   // (a Pokémon of two regions: the one you're on, when it's one of them)
 const regionChamp = id => id === "kanto" ? !!S.champion : !!(myRegions()[id] || {}).champ;
-// the battle that sets a region's cap right now (null once its Champion is beaten), and the cap
-const regionCapBattle = id => !journeyOf(id) || regionChamp(id) ? null : (capSteps(id).find(c => !nodeStars(c.nd.id)) || null);
+// a region's whole Journey cleared, post-game and all (its last stage)
+const journeyDone = id => { const e = journeyEnd(id); return !!e && nodeStars(e) > 0; };
+// the battle that sets a region's cap right now (null once its whole Journey is done), and the cap. The Champion doesn't lift it to
+// 100 any more (the owner's rule, 2026-10-17): the post-game's battles go on raising it, and it's 100 once the Journey is complete
+const regionCapBattle = id => !journeyOf(id) || journeyDone(id) ? null : (capSteps(id).find(c => !nodeStars(c.nd.id)) || null);
 function partCap(ep, part = 1) {
-  if (!ep || regionChamp(ep.id)) return 100;
+  if (!ep || journeyDone(ep.id)) return 100;
   let cap = 5;
   for (const c of partCapSteps(ep, part)) { cap = Math.max(cap, c.lv); if (!nodeStars(c.nd.id)) return cap; }
   return part < epParts(ep) ? cap : 100;
@@ -506,13 +514,20 @@ function nextNode() {
   return null;
 }
 // the Pokémon a Journey stage takes: its own region's (the owner's rule: each Journey is locked to its region's Pokémon; Kanto's
-// are Gen 1's, regional forms their region's); the PvP modes, Explore and the Battle Tower take any you own
+// are Gen 1's, regional forms their region's); the PvP modes and Explore take any you own, the Battle Tower its wing's (towerOk)
 const journeyGen = nd => regionGen(nd.ep.id);
 // (the owner's rule, 2026-10-15) in a Journey stage every Pokémon you bring battles at most at that region's level cap right now: a
 // Lv 70 Steelix, evolved from a Kanto Onix, fights Falkner at Lv 7. Only for that battle: its real level, Exp. and the rest don't change
 // (in a Journey in parts, that part's own cap: stageCap)
 const journeyProg = (k, nd) => { const p = S.ops[k], cap = stageCap(nd); return p && p.lvl > cap ? { ...p, lvl: cap } : p; };
 const journeyOk = (k, nd) => gensOf(k).includes(journeyGen(nd));
+// the Battle Tower (the owner's rules, 2026-10-17): a wing takes its own region's Pokémon only (towerOk, as journeyOk: gensOf), and a
+// floor's cap is 2 levels below its strongest opposing Pokémon (towerCap, CAP_BELOW, as a Journey battle's): for you, the Demo
+// (towerSquad/towerSim) and the Trainers (towerReach, trainerWingLv)
+const towerGen = w => REGION_IDS.indexOf(w) + 1;
+const towerOk = (k, w) => gensOf(k).includes(towerGen(w));
+const towerCap = T => Math.max(1, T.lv - CAP_BELOW);
+const towerProg = (k, T) => { const p = S.ops[k], cap = towerCap(T); return p && p.lvl > cap ? { ...p, lvl: cap } : p; };
 
 // ---------- features open as the adventure goes on ----------
 // A new Trainer starts with their first region's Professor and the Journey; everything else opens on the way, a little at a time, each with a
