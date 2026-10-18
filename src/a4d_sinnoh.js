@@ -75,13 +75,13 @@ const SINNOH_JOURNEY = {
         ], post: [
           L("rowan", "So. You chose your partners and battled at once. Look after them. We'll speak again in Sandgem Town."),
         ] },
-        { id: "d", type: "story", name: "Lake Verity", reward: { key: "si_runningshoes" }, music: "siLake", pre: [
+        { id: "d", type: "story", name: "Lake Verity", music: "siLake", pre: [
           L("narr", "Mom gives you Running Shoes, and Barry drags you to Lake Verity: he's heard a Legendary Pokémon lives in the lake."),
           L("cyrus", "...This lake's calm is a lie. One day I will hold time and space in my hands, and make a world without such lies. Excuse me."),
           L("narr", "The man in the gray suit walks off. Something in the lake seems to be watching you, but neither of you has a single Poké Ball."),
           L("barry", "No Poké Balls? Then it can't be caught today! To Sandgem, to the Professor's lab! Last one there pays a fine!"),
         ] },
-        { id: "e", type: "story", name: "Sandgem Town: Professor Rowan's Lab", reward: { key: "si_pokeballs" }, music: "siLab", pre: [
+        { id: "e", type: "story", name: "Sandgem Town: Professor Rowan's Lab", reward: { permit: 5 }, music: "siLab", pre: [
           L("rowan", "Ninety percent of all Pokémon are linked to evolution in some way. I study that. To study it, I need a record of every Pokémon in Sinnoh."),
           L("rowan", "That is what this Pokédex is for. I'm giving it to you. Go and see every Pokémon in this region, and come back to tell me about them."),
           LR("sassist", () => `I'll show you around Sandgem! And on Route 202 I'll show you how to catch a Pokémon. Here, take these Poké Balls.`),
@@ -92,7 +92,7 @@ const SINNOH_JOURNEY = {
         { id: "g", type: "side", name: "Lake Verity's Shore", lv: 4, env: "route", wild: 1, catch: "starly", music: "siLake", waves: [WS("bidoof:3", "bidoof:4"), WS("starly:4!")], pre: [
           L("narr", "Starly flock along Lake Verity's shore. On their own they're weak, but a flock of them puts up a fight."),
         ], post: [L("narr", "Gotcha! Starly was caught!")] },
-        { id: "h", type: "story", name: "Jubilife City", reward: { key: "si_townmap" }, music: "siJubilife", pre: [
+        { id: "h", type: "story", name: "Jubilife City", music: "siJubilife", pre: [
           L("narr", "Jubilife City, the biggest city in Sinnoh: the TV station, the Trainers' School, the Pokétch Company, and crowds everywhere."),
           L("looker", "Ah, you are a Trainer, yes? I am... a detective. Call me Looker. There is a group calling itself Team Galactic. If you see them, be careful."),
           L("barry", "There you are! Mom's Parcel? For me? Thanks! Here, a Town Map. The first Gym is in Oreburgh City. Race you!"),
@@ -127,7 +127,7 @@ const SINNOH_JOURNEY = {
         { id: "b", type: "battle", name: "Route 204", lv: 6, env: "route", wild: 1, catch: "budew", music: "siRoute203", waves: [WS("starly:5", "bidoof:5"), WS("budew:5", "kricketot:5")], pre: [
           L("narr", "Route 204 runs north out of Jubilife through the Ravaged Path. Budew doze in the grass, their buds closed tight against the cold."),
         ], post: [L("narr", "Gotcha! Budew was caught! When its bud opens, the scent of its pollen spreads.")] },
-        { id: "c", type: "battle", name: "Floaroma Meadow: Team Galactic", reward: { key: ["si_workskey", "si_honey"] }, lv: 13, env: "route", music: "siFloaroma", trainer: TR("Team Galactic Grunts", "si_grunt", "This guy's got Honey, and we want it! Scram, kid!", "We got beat... Fine, we're going back to the Windworks!"),
+        { id: "c", type: "battle", name: "Floaroma Meadow: Team Galactic", lv: 13, env: "route", music: "siFloaroma", trainer: TR("Team Galactic Grunts", "si_grunt", "This guy's got Honey, and we want it! Scram, kid!", "We got beat... Fine, we're going back to the Windworks!"),
           waves: [WS("stunky:13"), WS("zubat:11", "zubat:11")], pre: [
           L("narr", "Floaroma Town is full of flowers. A girl is crying: her father went to work at the Valley Windworks, and men in space suits locked him in."),
           L("narr", "In Floaroma Meadow, two Grunts are shaking down an old man for his Honey."),
@@ -177,7 +177,7 @@ const SINNOH_JOURNEY = {
           L("narr", "Team Galactic's building in Eterna City has a statue of a Pokémon out front. A Grunt looks remarkably like Looker in a wig."),
           L("looker", "Psst! It is I, in disguise. They have taken a bicycle shop owner's Clefairy. Up the stairs! I will keep watch."),
         ] },
-        { id: "m", type: "boss", name: "Galactic Eterna Building: Commander Jupiter", reward: { key: "si_bicycle" }, lv: 23, env: "plant", music: "siGalactic", trainer: TR("Commander Jupiter", "si_jupiter", "You beat our Grunts? Then I'll give you the beating they couldn't.", "Not bad... It's no fun losing. We're done with this building anyway."),
+        { id: "m", type: "boss", name: "Galactic Eterna Building: Commander Jupiter", lv: 23, env: "plant", music: "siGalactic", trainer: TR("Commander Jupiter", "si_jupiter", "You beat our Grunts? Then I'll give you the beating they couldn't.", "Not bad... It's no fun losing. We're done with this building anyway."),
           waves: [WS("zubat:21", "skuntank:23!@sitrusberry")], pre: [
           L("jupiter", "I'm Jupiter, a Commander of Team Galactic. We were studying the Pokémon of Sinnoh's myths here. Children shouldn't poke their noses into adults' work."),
         ], post: [L("narr", "Jupiter abandons the building, and her Grunts scramble after her. The Clefairy is freed, and its owner, Rad Rickshaw, gives you a Bicycle.")] },
@@ -192,7 +192,7 @@ const SINNOH_JOURNEY = {
           L("narr", "You slather Honey on a golden tree in the meadow and wait. A day later, something is buzzing around it."),
         ], post: [L("narr", "Gotcha! Combee was caught! Its three faces each gather nectar from a different flower.")] },
         // (the Grand Underground, Brilliant Diamond/Shining Pearl's: its Hideaways' Pokémon scale with your Badges, at the canon levels)
-        { id: "p1", type: "side", name: "Grand Underground: Grassland Cave", reward: { key: "si_explorerkit" }, lv: 18, env: "forest", wild: 1, catch: "cherubi", music: "siUnderground", waves: [WS("kricketot:16", "budew:17"), WS("cherubi:18", "combee:17")], pre: [
+        { id: "p1", type: "side", name: "Grand Underground: Grassland Cave", lv: 18, env: "forest", wild: 1, catch: "cherubi", music: "siUnderground", waves: [WS("kricketot:16", "budew:17"), WS("cherubi:18", "combee:17")], pre: [
           L("narr", "The Underground Man in Eterna City gives you an Explorer Kit. Below Sinnoh runs a maze of tunnels, the Grand Underground, with hideaways where Pokémon live."),
           L("narr", "In the Grassland Cave, grass grows under a glowing ceiling. A Cherubi is nibbling at the small berry on its head."),
         ], post: [L("narr", "Gotcha! Cherubi was caught! Its berry is full of nutrients for evolving.")] },
@@ -297,7 +297,7 @@ const SINNOH_JOURNEY = {
           L("narr", "A small explosion shakes the Great Marsh. A Galactic Grunt runs out of it, heading east along Route 213. You give chase."),
           L("looker", "There! The one in the space suit! I will block the way; you battle him!"),
         ] },
-        { id: "g", type: "story", name: "Valor Lakefront: Cynthia", reward: { key: "si_secretpotion" }, music: "siValor", pre: [
+        { id: "g", type: "story", name: "Valor Lakefront: Cynthia", music: "siValor", pre: [
           L("cynthia", "You chased off Team Galactic again? You're quite something. Here, take this SecretPotion: it will cure the Psyduck on Route 210."),
           L("cynthia", "Three Pokémon live in Sinnoh's three lakes, they say: one of knowledge, one of emotion, one of willpower. I wonder what Team Galactic wants with lakes..."),
         ] },
@@ -451,7 +451,7 @@ const SINNOH_JOURNEY = {
           L("saturn", "The red button frees the three of them. The Boss made a second chain... for something on Mt. Coronet. I don't know if this is right anymore."),
           L("narr", "Azelf, Mesprit and Uxie flash out of their cages, and away to their lakes."),
         ] },
-        { id: "e", type: "chest", name: "Looker's Black Flute", reward: { key: "si_blackflute", lmd: 3000 }, music: "siHQ", pre: [
+        { id: "e", type: "chest", name: "Looker's Black Flute", reward: { lmd: 3000 }, music: "siHQ", pre: [
           L("narr", "Cyrus's Master Ball catches any Pokémon without fail. Looker meets you at the door."),
           L("looker", "The Boss has gone to Spear Pillar, at Mt. Coronet's peak. I will try to follow. Take this Black Flute; it may help."),
         ] },
@@ -606,7 +606,7 @@ const SINNOH_JOURNEY = {
         { id: "g", type: "side", name: "Stark Mountain: Heatran", lv: 70, env: "volcano", weather: "sun", wild: 1, catch: "heatran", waves: [WS("heatran:70!")], music: "siStark", pre: [
           L("narr", "With the Magma Stone back in its place, the heat deep in Stark Mountain rises. Heatran crawls out of the lava, its feet cutting into the rock."),
         ], post: [L("narr", "Gotcha! Heatran was caught! Its blood boils like magma.")] },
-        { id: "h", type: "side", name: "Fullmoon Island: Cresselia", reward: { key: "si_lunarwing" }, lv: 50, env: "forest", wild: 1, catch: "cresselia", music: "siForest", waves: [WS("cresselia:50!")], pre: [
+        { id: "h", type: "side", name: "Fullmoon Island: Cresselia", lv: 50, env: "forest", wild: 1, catch: "cresselia", music: "siForest", waves: [WS("cresselia:50!")], pre: [
           L("narr", "A sailor's son in Canalave can't wake from his nightmares. On Fullmoon Island, a Pokémon glowing like the crescent moon waits by the lake."),
         ], post: [L("narr", "Gotcha! Cresselia was caught! Its Lunar Wing chases nightmares away, and the boy wakes up smiling.")] },
         { id: "j", type: "side", name: "Ramanas Park: the Discovery Room", lv: 70, env: "cave", wild: 1, catch: "regirock", music: "siRamanas", waves: [WS("regirock:70!")], pre: [
@@ -675,11 +675,11 @@ const SINNOH_JOURNEY = {
         { id: "o3", type: "side", name: "Grand Underground: Swampy Cave", lv: 60, env: "forest", wild: 1, catch: "tangrowth", music: "siUnderground", waves: [WS("quagsire:58", "whiscash:59"), WS("tangrowth:60!")], pre: [
           L("narr", "Since the National Pokédex, new Pokémon have come into the Grand Underground. In the Swampy Cave, a mass of vines is dragging itself through the mud: Tangrowth."),
         ], post: [L("narr", "Gotcha! Tangrowth was caught! Its vines grow back as fast as they're cut.")] },
-        { id: "o4", type: "side", name: "Newmoon Island: Darkrai", reward: { key: "si_membercard" }, lv: 50, env: "forest", wild: 1, catch: "darkrai", music: "siChateau", waves: [WS("darkrai:50!")], pre: [
+        { id: "o4", type: "side", name: "Newmoon Island: Darkrai", lv: 50, env: "forest", wild: 1, catch: "darkrai", music: "siChateau", waves: [WS("darkrai:50!")], pre: [
           L("narr", "With a Member Card, the Harbor Inn in Canalave lets you stay the night. You dream of an island no map shows, and in the morning the sailor's son says his old nightmares came from there: Newmoon Island."),
           L("narr", "At the heart of the island's dark forest, a shadow with one blue eye is waiting: Darkrai, which brings nightmares to those it touches."),
         ], post: [L("narr", "Gotcha! Darkrai was caught!")] },
-        { id: "o5", type: "side", name: "Flower Paradise: Shaymin", reward: { key: "si_oaksletter" }, lv: 30, env: "forest", wild: 1, catch: "shaymin", music: "siFloaroma", waves: [WS("shaymin:30!")], pre: [
+        { id: "o5", type: "side", name: "Flower Paradise: Shaymin", lv: 30, env: "forest", wild: 1, catch: "shaymin", music: "siFloaroma", waves: [WS("shaymin:30!")], pre: [
           L("oak", "I have a letter for you! Come to the north end of Route 224. Write something on the white rock there, and see what happens."),
           L("narr", "The rock opens a path along the sea to a field of flowers: Flower Paradise. A small hedgehog of a Pokémon peeks out of the blossoms."),
         ], post: [L("narr", "Gotcha! Shaymin was caught! It breaks down toxins in the air and turns them into flowers.")] },
@@ -702,7 +702,7 @@ const SINNOH_JOURNEY = {
           L("narr", "Gotcha! Palkia was caught! Time and space are at peace."),
           L("narr", "You've done it: the Sinnoh Journey is complete."),
         ] },
-        { id: "s", type: "side", name: "Hall of Origin: Arceus", reward: { key: "si_azureflute" }, lv: 80, env: "plateau", wild: 1, catch: "arceus", music: "siOrigin", waves: [WS("arceus:80!")], pre: [
+        { id: "s", type: "side", name: "Hall of Origin: Arceus", lv: 80, env: "plateau", wild: 1, catch: "arceus", music: "siOrigin", waves: [WS("arceus:80!")], pre: [
           LJ("narr", "With Dialga and Palkia caught, you play the Azure Flute at Spear Pillar. A staircase of light rises into the sky, to the Hall of Origin.", "siAzure"),
           L("narr", "At its top waits the Pokémon said to have shaped the universe out of nothing, before time and space began: Arceus, the Original One."),
         ], post: [L("narr", "Gotcha! Arceus was caught!")] },

@@ -563,6 +563,7 @@ function drawFloats(K) {
   g.globalAlpha = 1;
 }
 function floatText(uid, s, cls) {
+  if (S && !setv("dmgNums") && /^[+-]?[\d,.]+[KM]?$/.test(s)) return;   // (Trainer Card, Options: damage and healing numbers; words like SUB stay)
   const recent = BT.floats.filter(f => f.uid === uid && BT.clock - f.t0 < 650).length;
   BT.floats.push({ uid, s, cls, t0: BT.clock, dur: cls === "crit" ? 1300 : 1100, row: recent * 1.25, dx: (recent % 2 ? 1 : -1) * Math.min(recent, 3) * 10 });
 }
@@ -582,7 +583,7 @@ function frame(now) {
   if (BT.orbit) { t.yaw += dt * .00028; }
   const kk = 1 - Math.exp(-dt / 1000 * BT.camK);
   for (const key of ["tx", "ty", "tz", "dist", "fov", "roll", "pitch", "yaw"]) c[key] += (t[key] - c[key]) * kk;
-  BT.shake *= Math.exp(-dt / 1000 * 7); if (BT.shake < .3) BT.shake = 0;
+  BT.shake *= Math.exp(-dt / 1000 * 7); if (BT.shake < .3 || S && !setv("shake")) BT.shake = 0;   // (Trainer Card, Options: screen shake)
   BT.shx = (R() - .5) * BT.shake; BT.shy = (R() - .5) * BT.shake;
   // bars ease
   for (const vu of BT.vus.values()) { vu.lag += (vu.hp - vu.lag) * (1 - Math.exp(-dt / 350)); vu.tm += (vu.tmT - vu.tm) * (1 - Math.exp(-dt / 120)); }

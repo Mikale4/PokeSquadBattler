@@ -70,7 +70,7 @@ const UNOVA_JOURNEY = {
         ], post: [
           L("narr", "Books on the floor, the bed pushed aside, the TV tipped over. Cheren heals both your Pokémon and sighs at the mess."),
         ] },
-        { id: "c", type: "battle", name: "Your Room: Cheren", lv: 4, reward: { key: "un_xtransceiver" }, env: "lab", get trainer() { return cherenTR("I'm going to be Champion one day. This is where I start.", "Hm. I see. I'll have to think about this."); },
+        { id: "c", type: "battle", name: "Your Room: Cheren", lv: 4, env: "lab", get trainer() { return cherenTR("I'm going to be Champion one day. This is where I start.", "Hm. I see. I'll have to think about this."); },
           rivalWaves: () => [[{ op: cherenMon(0), LV: 4, moves: { snivy: ["tackle", "leer"], tepig: ["tackle", "tailwhip"], oshawott: ["tackle", "tailwhip"] }[cherenMon(0)] }]], pre: [
           L("ucheren", "My turn. My Pokémon has the type advantage over yours, so don't expect this to be easy."),
         ], post: [
@@ -83,7 +83,7 @@ const UNOVA_JOURNEY = {
         ] },
         // (the owner's rule, 2026-10-15: Route 1 and Route 2 field one wild Pokémon for each one you can have there, as Black/White's
         // own wild battles are one-on-one: up to three at once beat a lone Lv 5 starter every time)
-        { id: "e", type: "battle", name: "Route 1", lv: 3, env: "route", wild: 1, catch: "lillipup", reward: { key: "un_pokeballs" }, waves: [WU("lillipup:3")], pre: [
+        { id: "e", type: "battle", name: "Route 1", lv: 3, env: "route", wild: 1, catch: "lillipup", reward: { permit: 5 }, waves: [WU("lillipup:3")], pre: [
           L("ujuniper", "Watch: my Minccino weakens a wild Patrat first, then... a Poké Ball! See? Now you try. Here are five Poké Balls."),
           L("ubianca", "A race to Accumula Town! Whoever catches the most Pokémon wins! Ready, go!"),
         ], post: [L("narr", "Gotcha! Lillipup was caught! The long fur around its face senses what's going on around it.")] },
@@ -99,7 +99,7 @@ const UNOVA_JOURNEY = {
           waves: [WU("purrloin:7!")], pre: [
           L("un", "As long as Pokémon are kept in Poké Balls, they'll never be perfect beings. I'll show you what I mean."),
         ], post: [L("un", "I have to change the world. To free every Pokémon. ...Goodbye.")] },
-        { id: "h", type: "battle", name: "Route 2", lv: 5, env: "route", wild: 1, catch: "purrloin", reward: { key: "un_runningshoes" }, waves: [WU("patrat:4", "purrloin:5")], pre: [
+        { id: "h", type: "battle", name: "Route 2", lv: 5, env: "route", wild: 1, catch: "purrloin", waves: [WU("patrat:4", "purrloin:5")], pre: [
           L("umom", "Wait up! You forgot these: Running Shoes. Now you'll be able to keep up with Bianca."),
           L("narr", "Route 2 runs north to Striaton City. A Purrloin is watching you from the grass, waiting to see what you'll drop."),
         ], post: [L("narr", "Gotcha! Purrloin was caught! It lures people in with its cute act, then steals their things.")] },
@@ -132,7 +132,7 @@ const UNOVA_JOURNEY = {
       ] },
     { id: "c2", part: 1, title: "The Dreamyard and Wellspring Cave", env: "forest", map: "forest", reward: { lmd: 4000, orundum: 300 },
       nodes: [
-        { id: "a", type: "battle", name: "The Dreamyard: Team Plasma", lv: 10, reward: { key: "un_cgear" }, env: "forest", trainer: plasmaTR("Team Plasma needs this Munna's Dream Mist. Out of the way!", "We lost... to a kid!"),
+        { id: "a", type: "battle", name: "The Dreamyard: Team Plasma", lv: 10, env: "forest", trainer: plasmaTR("Team Plasma needs this Munna's Dream Mist. Out of the way!", "We lost... to a kid!"),
           waves: [WU("patrat:10"), WU("purrloin:10")], pre: [
           L("narr", "With Cut you reach the back of the Dreamyard. Bianca is there, hiding behind a wall: two people in grey are kicking a Munna."),
           L("ugrunt", "Come on, make Dream Mist! Team Plasma's going to use it to make people let go of their Pokémon!"),
@@ -153,7 +153,7 @@ const UNOVA_JOURNEY = {
           rivalWaves: () => [WU("purrloin:12", cherenMon(0) + ":14!@oranberry")], pre: [
           L("ucheren", "I've been thinking about what it takes to be Champion. Strength. Nothing else matters. Battle me."),
         ] },
-        { id: "f", type: "battle", name: "Wellspring Cave: Team Plasma", lv: 12, reward: { key: "un_healballs" }, env: "cave", trainer: plasmaTR("This little girl's Pokémon is liberated now. Go home!", "You... you're not normal."),
+        { id: "f", type: "battle", name: "Wellspring Cave: Team Plasma", lv: 12, reward: { permit: 3 }, env: "cave", trainer: plasmaTR("This little girl's Pokémon is liberated now. Go home!", "You... you're not normal."),
           waves: [WU("patrat:12"), WU("patrat:12", "patrat:12")], pre: [
           L("narr", "Two Team Plasma Grunts run past with a preschooler's Pokémon and vanish into Wellspring Cave. Cheren follows you in."),
           L("ucheren", "Stealing a child's Pokémon and calling it liberation? Let's go. I'll battle beside you."),
@@ -283,7 +283,7 @@ const UNOVA_JOURNEY = {
         { id: "i", type: "side", name: "Relic Castle: the Cover Fossil", lv: 22, env: "cave", weather: "sand", wild: 1, gift: "tirtouga", giftLv: 25, waves: [WU("sandile:21", "yamask:22")], pre: [
           L("narr", "Deep in Relic Castle's sand, a Backpacker has dug up two fossils and can only carry one home. The wild Pokémon don't like her digging."),
         ], post: [L("narr", "You choose the Cover Fossil. At the Nacrene Museum it comes back to life: Tirtouga, a sea turtle from a hundred million years ago.")] },
-        { id: "j", type: "battle", name: "Nimbasa City: Team Plasma", lv: 18, reward: { key: ["un_ultraballs", "un_bicycle"], tm: tmId("strength", 5) }, env: "city", trainer: plasmaTR("Hand over the Day Care's Pokémon! It's for their own good!", "Retreat! Retreat!"),
+        { id: "j", type: "battle", name: "Nimbasa City: Team Plasma", lv: 18, reward: { permit: 10, tm: tmId("strength", 5) }, env: "city", trainer: plasmaTR("Hand over the Day Care's Pokémon! It's for their own good!", "Retreat! Retreat!"),
           waves: [WU("watchog:18", "trubbish:18")], pre: [
           L("narr", "In the gate to Nimbasa City, Professor Juniper gives you and Cheren ten Ultra Balls. In the city, two Grunts have cornered the Day-Care Man."),
         ], post: [L("narr", "The Day-Care Man gives you a Bicycle to say thank you."), L("narr", "North of the Battle Institute, a man gives you HM04 Strength.")] },
@@ -486,7 +486,7 @@ const UNOVA_JOURNEY = {
       ] },
     { id: "c9", part: 1, title: "Dragonspiral Tower and Relic Castle", env: "tower", map: "tower", reward: { lmd: 11000, orundum: 600 },
       nodes: [
-        { id: "a", type: "battle", name: "Dragonspiral Tower: Team Plasma", lv: 34, reward: { key: "un_oldgateau" }, env: "tower", trainer: plasmaTR("Our king is awakening the dragon! Nobody disturbs him!", "No... the king..."),
+        { id: "a", type: "battle", name: "Dragonspiral Tower: Team Plasma", lv: 34, env: "tower", trainer: plasmaTR("Our king is awakening the dragon! Nobody disturbs him!", "No... the king..."),
           waves: [WU("watchog:34"), WU("liepard:34")], pre: [
           L("ucedric", "Dragonspiral Tower is the oldest building in Unova. Team Plasma broke through the wall! Here, an Old Gateau. Be careful in there."),
           L("ubrycen", "Cheren and I will hold them off down here. Go up!"),
@@ -533,14 +533,14 @@ const UNOVA_JOURNEY = {
           L("ualder", "Ghetsis. Whatever you're planning, you won't get away with it."),
           L("ughetsis", "Ah, the Champion. We'll see."),
         ] },
-        { id: "n", type: "story", name: "Nacrene Museum: the Light Stone", reward: { key: "un_lightstone" }, env: "lab", pre: [
+        { id: "n", type: "story", name: "Nacrene Museum: the Light Stone", env: "lab", pre: [
           L("ulenora", "The Dragon Skull Team Plasma tried to steal wasn't what they were after. It was this: the Light Stone. It's been in our museum all along."),
           L("ujuniper", "The Light Stone holds Reshiram, the dragon of truth. It's yours. If anyone can wake it, it's you."),
         ] },
       ] },
     { id: "c10", part: 1, title: "Opelucid City", env: "city", map: "city", reward: { lmd: 12000, orundum: 600, dragonscale: 1 },
       nodes: [
-        { id: "a", type: "battle", name: "Route 8: Bianca", lv: 40, reward: { key: "un_fullrestore" }, env: "route", weather: "rain", get trainer() { return biancaTR("I'm going to help the Professor with her research! But first, one more battle with you!", "Thank you. That was my best battle ever."); },
+        { id: "a", type: "battle", name: "Route 8: Bianca", lv: 40, env: "route", weather: "rain", get trainer() { return biancaTR("I'm going to help the Professor with her research! But first, one more battle with you!", "Thank you. That was my best battle ever."); },
           rivalWaves: () => [WU("stoutland:38", biancaMonkey(1) + ":38", "musharna:38"), WU(biancaMon(2) + ":40!")], pre: [
           L("narr", "Rain is always falling on Route 8 and the Moor of Icirrus. Bianca is waiting at the Tubeline Bridge gate."),
           L("ubianca", "I've decided something. I'm not going to be the strongest Trainer. I'm going to work with Professor Juniper. But I still want to battle you!"),
@@ -580,7 +580,7 @@ const UNOVA_JOURNEY = {
       ] },
     { id: "c11", part: 1, title: "Victory Road", env: "cave", map: "cave", reward: { lmd: 13000, orundum: 600 },
       nodes: [
-        { id: "a", type: "battle", name: "Route 10: Cheren", lv: 45, reward: { key: "un_maxrevives" }, env: "route", get trainer() { return cherenTR("I know what I want now. Not just strength. Strength to protect people. Let's battle!", "...I'm glad it was you. Go. Stop N."); },
+        { id: "a", type: "battle", name: "Route 10: Cheren", lv: 45, env: "route", get trainer() { return cherenTR("I know what I want now. Not just strength. Strength to protect people. Let's battle!", "...I'm glad it was you. Go. Stop N."); },
           rivalWaves: () => [WU("unfezant:43@scopelens", cherenMonkey(1) + ":43@" + ({ pansage: "miracleseed", pansear: "charcoal", panpour: "mysticwater" })[cherenMonkey()]), WU("liepard:43@sitrusberry", cherenMon(2) + ":45!@leftovers")], pre: [
           L("narr", "Route 10 leads to the Badge Check Gates and Victory Road. Cheren is on the bridge."),
           L("ucheren", "Before you go to the League... I want to see how strong we've both become."),
@@ -670,7 +670,7 @@ const UNOVA_JOURNEY = {
       ] },
     { id: "c13", part: 1, title: "After the Credits", env: "route", map: "sea", reward: { lmd: 25000, orundum: 1200 },
       nodes: [
-        { id: "a", type: "story", name: "Nuvema Town: the Seven Sages", reward: { key: "un_superrod" }, env: "city", pre: [
+        { id: "a", type: "story", name: "Nuvema Town: the Seven Sages", env: "city", pre: [
           L("ulooker", "Your mother's twin? No, no. I am Looker, of the International Police. The Seven Sages are still at large. Will you help me find them? Here, a Super Rod."),
           L("ucedric", "And I've upgraded your Pokédex to the National Pokédex. Pokémon from far away have started turning up in eastern Unova."),
           L("narr", "One by one, you find the Sages: Rood on Route 18, Gorm in the Dreamyard, Zinzolin in the Cold Storage, Giallo on Route 14. None of them fights. Looker takes them away."),
@@ -679,7 +679,7 @@ const UNOVA_JOURNEY = {
           waves: [WU("watchog:63", "scrafty:63"), WU("liepard:62", "garbodor:62", "liepard:62")], pre: [
           L("usage", "I am Bronius. I won't be caught so easily. Grunts!"),
         ], post: [L("usage", "...I see. Ghetsis lied to all of us. I'll go quietly.")] },
-        { id: "c", type: "battle", name: "Relic Castle: Ryoku's Lookout", lv: 64, reward: { key: "un_ragecandybar" }, env: "cave", weather: "sand", trainer: plasmaTR("Lord Ryoku's catching the sun Pokémon for Ghetsis. You can't come in!", "Ghetsis is gone? Then what are we doing here?"),
+        { id: "c", type: "battle", name: "Relic Castle: Ryoku's Lookout", lv: 64, env: "cave", weather: "sand", trainer: plasmaTR("Lord Ryoku's catching the sun Pokémon for Ghetsis. You can't come in!", "Ghetsis is gone? Then what are we doing here?"),
           waves: [WU("krookodile:64")], pre: [
           L("ujuniper", "There's a Pokémon at the very bottom of Relic Castle that people used to worship as the sun. Ryoku went down there. Be careful. Oh, and take this RageCandyBar!"),
         ], post: [L("usage", "I am Ryoku. Volcarona would have been Ghetsis's... but Ghetsis is finished. Looker, I'm yours.")] },
@@ -732,7 +732,7 @@ const UNOVA_JOURNEY = {
         ] },
         // (Hugh's starter is the one strong against yours: the first rival battle is below the games' Lv 5, as in the other Journeys,
         // README, House rules: Lv 4, where every starter wins 98-100%; Challenge Mode's is Lv 6)
-        { id: "b", type: "battle", name: "Aspertia Outlook: Hugh", lv: 4, reward: { key: "un_biancaballs" }, env: "city", get trainer() { return hughTR("My partner and I are going to beat you, then Team Plasma!", "Argh! We lost? ...We'll get stronger. Both of us."); },
+        { id: "b", type: "battle", name: "Aspertia Outlook: Hugh", lv: 4, reward: { permit: 10 }, env: "city", get trainer() { return hughTR("My partner and I are going to beat you, then Team Plasma!", "Argh! We lost? ...We'll get stronger. Both of us."); },
           rivalWaves: () => [[{ op: hughMon(0), LV: 4, moves: { snivy: ["tackle", "leer"], tepig: ["tackle", "tailwhip"], oshawott: ["tackle", "tailwhip"] }[hughMon(0)] }]], pre: [
           L("ubianca", "A battle already? Okay! Have fun, both of you!"),
         ], post: [L("ubianca", "Here's a Pokédex for each of you, and ten Poké Balls. The Professor wants to know about every Pokémon in Unova. Good luck!")] },
@@ -755,7 +755,7 @@ const UNOVA_JOURNEY = {
         ] },
         { id: "g", type: "battle", name: "Aspertia Gym: Youngster Pedro", lv: 10, env: "gym", trainer: TR("Youngster Pedro", "un_youngster", "Our Gym Leader's new, but he's tough. You'll see!", "He really is tough... I mean, you are!"),
           waves: [WU("patrat:10", "lillipup:10")] },
-        { id: "h", type: "boss", name: "Aspertia Gym: Cheren", lv: 14, env: "gym", badgeWin: 0, get reward() { return { tm: [tmId("workup", 5), tmId("return", 5)], key: "un_cgear" }; },
+        { id: "h", type: "boss", name: "Aspertia Gym: Cheren", lv: 14, env: "gym", badgeWin: 0, get reward() { return { tm: [tmId("workup", 5), tmId("return", 5)] }; },
           trainer: TR("Leader Cheren", "un_cheren2", "I'm Cheren, the Aspertia Gym Leader. Two years ago I was a Trainer like you. Now I want to help you find what you're looking for. Let's begin!", "You found it, I think. The Basic Badge is yours."),
           waves: [WU("patrat:12+", "pidove:12+"), WU("lillipup:14!@oranberry")], pre: [
           L("ucheren2", "I used to think strength was everything. A wise man showed me what it's for. I'll show you what I learned."),
@@ -810,7 +810,7 @@ const UNOVA_JOURNEY = {
       ] },
     { id: "c17", part: 2, title: "Route 4 and Nimbasa City", env: "volcano", map: "volcano", reward: { lmd: 7000, orundum: 400 },
       nodes: [
-        { id: "a", type: "boss", name: "Route 4: Colress", lv: 25, reward: { key: "un_protein" }, env: "city", trainer: TR("Colress", "un_colress", "I study how to draw out a Pokémon's full strength. Will you help my research?", "Fascinating! Your Pokémon grow stronger with you. I'll remember this."),
+        { id: "a", type: "boss", name: "Route 4: Colress", lv: 25, env: "city", trainer: TR("Colress", "un_colress", "I study how to draw out a Pokémon's full strength. Will you help my research?", "Fascinating! Your Pokémon grow stronger with you. I'll remember this."),
           waves: [WU("magnemite:23", "klink:25!")], pre: [
           L("narr", "A sleeping Crustle blocks Route 4. Colress points a strange machine at it, and it wakes up and wanders off."),
           L("ucolress", "Science can wake a Pokémon or bring out its power. Let's see what yours can do."),
@@ -936,7 +936,7 @@ const UNOVA_JOURNEY = {
           L("uskyla", "Twist Mountain and the Tubeline Bridge are closed. After this, I'll fly you and the Professor to Lentimas Town!"),
           L("narr", "Flying types are weak to Electric, Ice and Rock moves. Skarmory is part Steel: Fire and Electric moves work best."),
         ], post: [L("uskyla", "Here, TM62 Acrobatics!")] },
-        { id: "g", type: "story", name: "Lentimas Town", reward: { key: "un_lunarwing" }, env: "volcano", pre: [
+        { id: "g", type: "story", name: "Lentimas Town", env: "volcano", pre: [
           L("ujuniper", "Two years ago, Reshiram and Zekrom each chose a hero. Now Unova is getting colder. Drayden, the mayor of Opelucid, knows the old legends. We must ask him."),
           L("narr", "In a strange house on the way, a girl who isn't quite there gives you a Lunar Wing."),
         ] },
@@ -1024,7 +1024,7 @@ const UNOVA_JOURNEY = {
         { id: "d", type: "battle", name: "Route 22", lv: 42, env: "route", wild: 1, catch: "mienfoo", waves: [WU("amoonguss:39", "mienfoo:40"), WU("mienfoo:42", "amoonguss:39")], pre: [
           L("narr", "Route 22 climbs from Humilau toward the Giant Chasm. Mienfoo practise their kicks on the rocks."),
         ], post: [L("narr", "Gotcha! Mienfoo was caught! It strikes faster than the eye can follow.")] },
-        { id: "e", type: "side", name: "Route 22: Terrakion", lv: 45, reward: { key: "un_colressmachine" }, env: "route", wild: 1, catch: "terrakion", waves: [WU("terrakion:45!")], pre: [
+        { id: "e", type: "side", name: "Route 22: Terrakion", lv: 45, env: "route", wild: 1, catch: "terrakion", waves: [WU("terrakion:45!")], pre: [
           L("narr", "In the middle of Route 22, a grey Pokémon as solid as a mountain stands in your way. Then Colress walks up, holding a machine."),
           L("ucolress", "For you: the Colress Machine. It can wake something sleeping in Seaside Cave. I'm curious what you'll do with it."),
         ], post: [L("narr", "Gotcha! Terrakion was caught! It smashed the rocks so the others could escape the fire.")] },
@@ -1062,7 +1062,7 @@ const UNOVA_JOURNEY = {
       ] },
     { id: "c25", part: 2, title: "The Giant Chasm", env: "ice", map: "cave", reward: { lmd: 16000, orundum: 800 },
       nodes: [
-        { id: "a", type: "battle", name: "Giant Chasm: the Crater Forest", lv: 51, reward: { key: "un_maxrevives" }, env: "ice", weather: "hail", trainer: TR("Team Plasma Grunt", "un_grunt2", "You're too late! The Frigate's landed!", "...Too late for me."),
+        { id: "a", type: "battle", name: "Giant Chasm: the Crater Forest", lv: 51, env: "ice", weather: "hail", trainer: TR("Team Plasma Grunt", "un_grunt2", "You're too late! The Frigate's landed!", "...Too late for me."),
           waves: [WU("weezing:51", "muk:51")], pre: [
           L("urood", "We came to help. The old Team Plasma owes Unova that much. Take these Max Revives. We'll hold the others back. Go!"),
         ] },
@@ -1166,7 +1166,7 @@ const UNOVA_JOURNEY = {
         { id: "g", type: "side", name: "Nacrene City: Uxie", lv: 65, env: "city", wild: 1, catch: "uxie", waves: [WU("uxie:65!")], pre: [
           L("narr", "The third light floats outside the Nacrene Museum, eyes closed: Uxie."),
         ], post: [L("narr", "Gotcha! Uxie was caught!")] },
-        { id: "h", type: "side", name: "Clay Tunnel: Regirock", lv: 65, reward: { key: "un_ironkey" }, env: "cave", wild: 1, catch: "regirock", waves: [WU("regirock:65!")], pre: [
+        { id: "h", type: "side", name: "Clay Tunnel: Regirock", lv: 65, env: "cave", wild: 1, catch: "regirock", waves: [WU("regirock:65!")], pre: [
           L("narr", "Under Clay Tunnel lie the Underground Ruins. A hint on a statue opens a hidden chamber, and a body of stone stirs."),
         ], post: [L("narr", "Gotcha! Regirock was caught! It leaves you the Iron Key: the Iron Chamber can open now.")] },
         { id: "i", type: "side", name: "Underground Ruins: Registeel", lv: 65, env: "cave", wild: 1, catch: "registeel", waves: [WU("registeel:65!")], pre: [
@@ -1187,7 +1187,7 @@ const UNOVA_JOURNEY = {
         { id: "n", type: "side", name: "The Nature Preserve: Haxorus", lv: 60, env: "forest", wild: 1, catch: "haxorus", waves: [WU("fraxure:57", "fraxure:58"), WU("haxorus:60!")], pre: [
           L("narr", "With Professor Juniper's Permit, a plane takes you from Mistralton to the Nature Preserve. A golden Haxorus is waiting in the clearing."),
         ], post: [L("narr", "Gotcha! Haxorus was caught! Its scales shine gold.")] },
-        { id: "o", type: "boss", name: "N's Castle: N", lv: 75, reward: { key: "un_darkstone" }, env: "tower", trainer: TR("N", "un_n", "Thank you for coming. Zekrom and I want to know: what kind of Trainer are you now?", "...I understand. Zekrom wants to go with you. It's sleeping now, as a stone."),
+        { id: "o", type: "boss", name: "N's Castle: N", lv: 75, env: "tower", trainer: TR("N", "un_n", "Thank you for coming. Zekrom and I want to know: what kind of Trainer are you now?", "...I understand. Zekrom wants to go with you. It's sleeping now, as a stone."),
           waves: [WU("zekrom:75!")], pre: [
           L("narr", "A Zoroark leads you from Victory Road into the ruins of N's Castle. N is waiting in the throne room."),
           L("un", "Two years ago a Trainer showed me that people and Pokémon belong together. I wanted to thank them. You'll do."),
@@ -1195,7 +1195,7 @@ const UNOVA_JOURNEY = {
         { id: "p", type: "boss", name: "Dragonspiral Tower: Zekrom", lv: 70, env: "tower", wild: 1, catch: "zekrom", waves: [WU("zekrom:70!")], pre: [
           L("narr", "At the top of Dragonspiral Tower, the Dark Stone crackles with lightning and wakes. Zekrom, the dragon of ideals, wants to see your ideals for itself."),
         ], post: [L("narr", "Gotcha! Zekrom was caught! The dragon of ideals has chosen you.")] },
-        { id: "q", type: "boss", name: "Giant Chasm: Kyurem", lv: 70, reward: { key: "un_dnasplicers" }, env: "ice", weather: "hail", wild: 1, catch: "kyurem", waves: [WU("kyurem:70!")], pre: [
+        { id: "q", type: "boss", name: "Giant Chasm: Kyurem", lv: 70, env: "ice", weather: "hail", wild: 1, catch: "kyurem", waves: [WU("kyurem:70!")], pre: [
           L("narr", "In the back cavern of the Giant Chasm, Kyurem is resting where Ghetsis chained it. Cheren and Bianca arrive behind you."),
           L("ubianca", "It's lonely, I think. It's been waiting for something to fill the empty part of it."),
         ], post: [

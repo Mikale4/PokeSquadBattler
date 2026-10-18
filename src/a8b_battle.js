@@ -81,7 +81,7 @@ async function throwBall(vu, kind = "poke", vol = .45) {
 const CUTIN_COL = { Normal: "grey", Fire: "orange", Water: "blue", Electric: "gold", Grass: "mint", Ice: "sky", Fighting: "red", Poison: "purple", Ground: "brown",
   Flying: "sky", Psychic: "purple", Bug: "lime", Rock: "brown", Ghost: "purple", Dragon: "blue", Dark: "grey", Steel: "steel", Fairy: "purple" };
 function cutIn(vu, skillName, type) {
-  const wrap = $(".bwrap"); if (!wrap) return;
+  const wrap = $(".bwrap"); if (!wrap || S && !setv("cutins")) return;   // (Trainer Card, Options: S3 cut-ins)
   const d = (950 / BT.speed / 1000).toFixed(2) + "s";
   const el = document.createElement("div"), strip = RES_DATA.cutin && RES_DATA.cutin[CUTIN_COL[type] || "grey"];
   el.className = "cutin"; el.style.setProperty("--ec", tcol(type));

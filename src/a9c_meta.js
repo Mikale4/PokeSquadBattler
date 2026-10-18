@@ -388,7 +388,10 @@ SCREENS.settings = () => {
       <span class="small dim">Sound effects and cries</span>${chipRow("setSound", st.sound ? 1 : 0, [[1, "On"], [0, "Off"]])}
       <span class="small dim">Battle speed</span>${chipRow("setSpeed", st.speed, [[1, "1×"], [2, "2×"], [3, "3×"]])}
       <span class="small dim">Start battles on Auto</span>${chipRow("setAuto", st.auto ? 1 : 0, [[1, "On"], [0, "Off"]])}
-      <span class="small dim">Auto-battle tactics <span class="tiny">(hold one to see what it does)</span></span>${chipRow("setAi", st.ai, AI_STYLES.map(k => [k, AI_NAME[k]]), AI_TIP)}</section>
+      <span class="small dim">Auto-battle tactics <span class="tiny">(hold one to see what it does)</span></span>${chipRow("setAi", st.ai, AI_STYLES.map(k => [k, AI_NAME[k]]), AI_TIP)}
+      <span class="small dim">S3 move cut-ins <span class="tiny">(the Pokémon's picture that sweeps across for its big move)</span></span>${chipRow("setTog2", setv("cutins") ? 1 : 0, [[1, "On"], [0, "Off"]]).replace(/data-v=/g, 'data-k="cutins" data-v=')}
+      <span class="small dim">Screen shake</span>${chipRow("setTog2", setv("shake") ? 1 : 0, [[1, "On"], [0, "Off"]]).replace(/data-v=/g, 'data-k="shake" data-v=')}
+      <span class="small dim">Damage numbers</span>${chipRow("setTog2", setv("dmgNums") ? 1 : 0, [[1, "On"], [0, "Off"]]).replace(/data-v=/g, 'data-k="dmgNums" data-v=')}</section>
     <section class="panel stack" style="gap:10px"><h3>Union Room</h3>
       <span class="small dim">Union Room chat on the home screen</span>${chipRow("setTog2", setv("ticker") ? 1 : 0, [[1, "On"], [0, "Off"]]).replace(/data-v=/g, 'data-k="ticker" data-v=')}
       <span class="small dim">Message pop-ups</span>${chipRow("setTog2", setv("whisperToasts") ? 1 : 0, [[1, "On"], [0, "Off"]]).replace(/data-v=/g, 'data-k="whisperToasts" data-v=')}

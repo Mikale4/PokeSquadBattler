@@ -73,7 +73,7 @@ const STORY = [{
           L("blue", "Okay! I'll make my Pokémon battle to toughen it up! Gramps, see ya!"),
           L("oak", "Well done. The bond between Trainer and Pokémon grows with every battle."),
         ] },
-        { id: "c", type: "battle", name: "Route 1", lv: 3, env: "route", wild: 1, catch: "pidgey", reward: { key: "pokeball" }, waves: [W("pidgey:3", "rattata:3")], pre: [
+        { id: "c", type: "battle", name: "Route 1", lv: 3, env: "route", wild: 1, catch: "pidgey", reward: { permit: 5 }, waves: [W("pidgey:3", "rattata:3")], pre: [
           L("narr", "Tall grass rustles on Route 1. Wild Pokémon live here; Trainers who walk the grass meet them."),
           L("oak", "Weaken a wild Pokémon and you can catch it. Take these Poké Balls!"),
         ], post: [L("narr", "Gotcha! The wild Pidgey was caught!")] },
@@ -133,7 +133,7 @@ const STORY = [{
       ] },
     { id: "c3", title: "Vermilion City", env: "city", map: "city", badge: 2, reward: { lmd: 5000, orundum: 300, thunderstone: 1 },
       nodes: [
-        { id: "a", type: "story", name: "The Pokémaniac's Cottage", reward: { key: "ssticket" }, pre: [
+        { id: "a", type: "story", name: "The Pokémaniac's Cottage", pre: [
           L("bill", "Hiya! I'm a Pokémon... No, I'm not! Call me Bill! I'm a true Pokémaniac!"),
           L("bill", "I fused myself with a Pokémon by accident. Help me run the Cell Separation System, would you?"),
           L("narr", "With a whir, Bill steps out of the teleporter, human again."),
@@ -200,7 +200,7 @@ const STORY = [{
           waves: [W("gastly:24", "gastly:24"), W("haunter:26", "cubone:25")], pre: [
           L("narr", "Ghost types shrug off Normal and Fighting moves completely. Psychic and Ghost moves hit them hard."),
         ] },
-        { id: "c", type: "boss", name: "The Restless Soul", lv: 30, env: "tower", wild: 1, reward: { key: "pokeflute" }, waves: [W("marowak:30!")], pre: [
+        { id: "c", type: "boss", name: "The Restless Soul", lv: 30, env: "tower", wild: 1, waves: [W("marowak:30!")], pre: [
           L("narr", "Be gone... Be gone..."),
           L("narr", "The ghost is Cubone's mother, Marowak. Calm its spirit so it can rest."),
         ], post: [L("narr", "The Marowak's spirit is calmed. It fades away peacefully."), L("fuji", "Thank you. Take this Poké Flute; its tune can wake even the deepest sleeper.")] },
@@ -282,7 +282,7 @@ const STORY = [{
           waves: [W("magmar:47+", "rapidash:47+"), W("ninetales:47+", "arcanine:48!")], pre: [
           L("blaine", "Hah! You better have Burn Heal! The sun burns hot in my Gym: Water moves are weaker here."),
         ], post: [L("blaine", "The Volcano Badge heightens the Attack of your Pokémon, and they'll obey you up to Lv 56. Take this TM too: TM38, Fire Blast!"), L("sci", "And here is your Aerodactyl, revived from the Old Amber!")] },
-        { id: "h", type: "story", name: "One Island", reward: { tm: tmId("rocksmash", 3), key: "tripass" }, pre: [
+        { id: "h", type: "story", name: "One Island", reward: { tm: tmId("rocksmash", 3) }, pre: [
           L("narr", "Bill is waiting at the Pokémon Center. \"Want to come with me to One Island? My friend Celio is building a machine to link far-off lands.\""),
           L("narr", "Bill hands you a Tri-Pass, and the Seagallop ferry carries you south to the Sevii Islands. Celio asks one favour: take a Meteorite to the Game Corner owner on Two Island."),
           L("narr", "But the owner isn't there. His daughter Lostelle went to pick Berries in the forest on Three Island, and hasn't come back."),
@@ -396,7 +396,7 @@ const STORY = [{
           L("grunt", "The boss is gone, but the warehouse is still there... Goldeen need log. Yes, nah, Chansey."),
           L("narr", "Their muttering sounds like a password. For what, you can't tell yet."),
         ] },
-        { id: "c", type: "story", name: "The Ruby Path", reward: { key: "rainbowpass" }, pre: [
+        { id: "c", type: "story", name: "The Ruby Path", pre: [
           L("narr", "Past the grunts, a passage winds down into the heart of the volcano: the Ruby Path. Dotted letters on its walls show the way."),
           L("narr", "At the very bottom, something glows red. The Ruby!"),
           L("celio", "The Ruby! Thank you. Here, let me upgrade your Tri-Pass: with this Rainbow Pass, the ferries will take you to every one of the Sevii Islands."),

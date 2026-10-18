@@ -485,13 +485,12 @@ SCREENS.depot = () => {
   const tab = UI.depotTab;
   const extra = ["gball", "uball", "mticket", "bottlecap", "goldbottlecap", "wticket", "dice", "luckydice", "golddice", "tkey", "seamap", "fticket", "luckybag", "luckybag2", "choicebox", "starpiece"];
   const items = ["rec1", "rec2", "rec3", "rec4", "rare", "summ", ...STONES, "permit", "prime", "cert", "tokens", "free10", "gold5", ...extra].filter(k => ![...extra, "free10", "gold5"].includes(k) || have(k) > 0);
-  const held = HELD_KEYS.filter(k => (S.held[k] || 0) > 0), keys = Object.keys(S.keys || {}).filter(id => KEY_ITEMS[id]);
+  const held = HELD_KEYS.filter(k => (S.held[k] || 0) > 0);
   return `<div class="stack">
     <div class="spread">${back("go", "Home", 'data-v="home"')}<span class="eyebrow">Bag</span></div>
     <h2>Bag</h2>
-    <div class="tabs2"><button class="${tab === "items" ? "on" : ""}" data-act="depotTab" data-t="items">Items</button><button class="${tab === "held" ? "on" : ""}" data-act="depotTab" data-t="held">Held items · ${held.reduce((a, k) => a + S.held[k], 0)}</button>${keys.length ? `<button class="${tab === "keys" ? "on" : ""}" data-act="depotTab" data-t="keys">Key Items · ${keys.length}</button>` : ""}</div>
-    ${tab === "keys" ? `<div class="baglist">${keys.map(id => `<div class="bagrow"><span class="ri">${keyIcon(id)}</span><div style="flex:1;min-width:0"><b>${esc(keyName(id))}</b><div class="tiny dim">${esc(KEY_ITEMS[id].d || "A keepsake from your Journey.")}</div></div></div>`).join("")}</div>`
-      : tab === "items" ? `<div class="baglist">${items.map(k => `<div class="bagrow"><span class="ri">${itemIcon(k)}</span><div style="flex:1;min-width:0"><b>${esc(ITEMS[k].n)}</b><div class="tiny dim">${esc(ITEMS[k].d || "")}</div></div><span class="num">×${fmt(have(k))}</span></div>`).join("")}</div>`
+    <div class="tabs2"><button class="${tab === "items" ? "on" : ""}" data-act="depotTab" data-t="items">Items</button><button class="${tab === "held" ? "on" : ""}" data-act="depotTab" data-t="held">Held items · ${held.reduce((a, k) => a + S.held[k], 0)}</button></div>
+    ${tab === "items" ? `<div class="baglist">${items.map(k => `<div class="bagrow"><span class="ri">${itemIcon(k)}</span><div style="flex:1;min-width:0"><b>${esc(ITEMS[k].n)}</b><div class="tiny dim">${esc(ITEMS[k].d || "")}</div></div><span class="num">×${fmt(have(k))}</span></div>`).join("")}</div>`
       : held.length ? `<div class="baglist">${held.map(k => `<div class="bagrow"><span class="ri">${heldIcon(k)}</span><div style="flex:1;min-width:0"><b>${esc(HELD[k].n)}</b><div class="tiny dim">${esc(HELD[k].d)}</div></div><span class="num">×${S.held[k]}${heldUsed(k) ? `<small class="dim"> (${heldUsed(k)} held)</small>` : ""}</span></div>`).join("")}</div><p class="tiny dim">Give held items to Pokémon from their summary (Item tab).</p>`
       : '<p class="small dim">No held items yet. Explore wild areas, or trade BP at the BP Exchange.</p>'}
   </div>`;

@@ -77,7 +77,7 @@ const gaGymTR = (n, f, intro, lose) => TR("Gym Trainer " + n, f ? "ga_stafff" : 
 // a Gym Leader's stage, for the music while its scene plays (a10_boot.js): the Gym Leader's Theme, Spikemuth's own street for Piers
 const galarHall = nd => /Piers/.test((nd.trainer || {}).name || "") ? "gaSpikemuth" : "gaLeaderTheme";
 // What a stage's scenes hand you is its `reward`, given on its first clear (the owner's rule, 2026-10-16): items, held items, a TM, a
-// Pokémon, and story key items (ga_*, tools/key_items/galar.json). gaTM: a Gen 8 TM by its move (tmId in a6_state.js loads after this file)
+// Pokémon (Poké Balls are Safari Balls; no keepsakes). gaTM: a Gen 8 TM by its move (tmId in a6_state.js loads after this file)
 const gaTM = mv => (TMS.find(t => t[3] === mv && t[1] === 8) || [])[0];
 // Leon's gift in Motostoke: the item that powers up your starter's moves
 const GALAR_STARTER_ITEM = { grookey: "miracleseed", scorbunny: "charcoal", sobble: "mysticwater" };
@@ -88,7 +88,7 @@ const GALAR_JOURNEY = {
   chapters: [
     { id: "c1", title: "Postwick and Wedgehurst", env: "route", map: "route", reward: { lmd: 3000, orundum: 300 },
       nodes: [
-        { id: "a", type: "story", name: "Postwick: The Champion's Exhibition", music: "gaExhibition", reward: { key: "ga_dadsbag" }, pre: [
+        { id: "a", type: "story", name: "Postwick: The Champion's Exhibition", music: "gaExhibition", pre: [
           L("narr", "Postwick, the smallest town in Galar: a few farmhouses, a lot of Wooloo, and the gate to a forest nobody is allowed into."),
           L("narr", "On your Rotom Phone, Champion Leon's Charizard wins another exhibition match in Wyndon, and the crowd goes wild. Chairman Rose of the Pokémon League waves from the stands."),
           L("gamom", "Hop's at the door again. Leon's coming home today, and he's bringing you both a present! Take your dad's old bag and hat. Off you go."),
@@ -143,7 +143,7 @@ const GALAR_JOURNEY = {
           L("gasonia", "Leon! You're late. As usual. Oh, these two are your new Trainers? Here: a Pokédex each. My gran's the professor, and she lives across Route 2. Go and see her."),
           L("gahop", "Professor Magnolia! She's the one who studies Dynamax. Come on!"),
         ] },
-        { id: "m", type: "battle", name: "Route 2: Novice Trainers", lv: 6, env: "route", music: "gaEyesYoungster", reward: { key: "ga_pokeballs" },
+        { id: "m", type: "battle", name: "Route 2: Novice Trainers", lv: 6, env: "route", music: "gaEyesYoungster", reward: { permit: 20 },
           trainer: TR("Youngster Jake, Lass Lauren and Youngster Benjamin", "ga_youngster", "We started our Gym Challenge practice today! You too? Let's see whose Pokémon are better!", "Aww. You're going to be great in the Gym Challenge."),
           waves: [WGA("skwovet:6"), WGA("chewtle:6"), WGA("blipbug:5"), WGA("nickit:7")], pre: [
           L("galeon", "Here's a Trainer tip: every Trainer you meet on a route is a lesson. And here's twenty Poké Balls. Go and catch some friends!"),
@@ -165,11 +165,12 @@ const GALAR_JOURNEY = {
           L("gamagnolia", "So you're the two Leon has told me about. Leon dear, endorse them for the Gym Challenge. You won't regret it."),
           L("galeon", "An endorsement from the Champion is a big deal, Professor. Hop, you and your friend can show me with a battle. Out in the garden!"),
         ] },
-        { id: "s", type: "story", name: "Professor Magnolia's House: Two Wishing Stars", music: "gaWedgehurst", reward: { key: "ga_campinggear" }, pre: [
+        { id: "s", type: "story", name: "Professor Magnolia's House: Two Wishing Stars", music: "gaWedgehurst", reward: { tm: gaTM("swift") }, pre: [
           L("galeon", "Right! I'll endorse you both for the Gym Challenge. Win eight Badges in the stadiums, then face me for the title!"),
           L("narr", "Two Wishing Stars fall from the sky into the garden, glowing red. Professor Magnolia picks them up with a smile."),
           L("gamagnolia", "The Wishing Stars hold Galar's Dynamax energy. It's that energy that lets the Gym Leaders' Pokémon grow giant in the stadiums. Keep your eyes open, you two."),
           L("narr", "Next morning, your mom meets you at Wedgehurst Station with camping gear and a hug. The train leaves for Motostoke and the Gym Challenge."),
+          L("gahop", "Wait, before we go! Here, TM40, Swift. A present from your rival!"),
         ] },
       ] },
     { id: "c2", title: "The Wild Area and Motostoke", env: "route", map: "route", reward: { lmd: 4000, orundum: 300, moonstone: 1 },
@@ -211,7 +212,7 @@ const GALAR_JOURNEY = {
       nodes: [
         { id: "a", type: "battle", name: "Route 3: Schoolkids", lv: 13, env: "route", music: "gaRoute3", trainer: TR("Schoolgirl Hannah and New Schoolboys Marvin and Peter", "ga_schoolkidf", "Our teacher says Gym Challengers are the best practice there is!", "We'll study harder next time!"),
           waves: [WGA("pancham:13"), WGA("budew:12", "gossifleur:12"), WGA("sizzlipede:13", "dottler:14")] },
-        { id: "b", type: "story", name: "Route 3: Sonia and the Legend", music: "gaOldLegend", reward: { key: "ga_escaperope" }, pre: [
+        { id: "b", type: "story", name: "Route 3: Sonia and the Legend", music: "gaOldLegend", pre: [
           L("gasonia", "Want to hear a story? Long ago, the Darkest Day came over Galar. A great black storm. Two young heroes stood up to it with a sword and a shield, and they saved Galar."),
           L("gasonia", "Gran says it's just a legend. I'm not so sure. Here: an Escape Rope. Every researcher needs one."),
         ] },
@@ -250,7 +251,7 @@ const GALAR_JOURNEY = {
           waves: [WGA("gossifleur:16"), WGA("budew:16", "oddish:17"), WGA("bounsweet:17", "oddish:17")], pre: [
           L("narr", "Turffield's Gym Mission: herd twenty Wooloo through the pitch, while a Yamper barks them the wrong way and Milo's Gym Trainers stand in your way."),
         ] },
-        { id: "n", type: "boss", name: "Turffield Stadium: Gym Leader Milo", lv: 20, env: "gym", badgeWin: 0, reward: { tm: gaTM("magicalleaf"), key: "ga_grassuniform" },
+        { id: "n", type: "boss", name: "Turffield Stadium: Gym Leader Milo", lv: 20, env: "gym", badgeWin: 0, reward: { tm: gaTM("magicalleaf") },
           trainer: TR("Gym Leader Milo", "ga_milo", "My Pokémon and I grow strong together on the farm, like the wheat. Let's see if you can stand up to a good, strong breeze!", "You've been well raised! Here's the Grass Badge, as you've earned it."),
           waves: [WGA("gossifleur:19"), DYN("eldegoss:20!")], pre: [
           L("gamilo", "Leon endorsed you? Then you'll know what this is: a real Gym battle, in front of a real crowd. Don't hold back, mind!"),
@@ -278,7 +279,7 @@ const GALAR_JOURNEY = {
         { id: "f", type: "side", chest: 1, name: "Route 5: The Pokémon Nursery's Toxel", reward: { op: "toxel", lmd: 2000 }, music: "gaRoute3", pre: [
           L("narr", "The Nursery worker on Route 5 has a Toxel nobody came back for. \"It's a handful,\" she says, \"but it'll grow up into something wonderful with the right Trainer.\""),
         ] },
-        { id: "g", type: "battle", name: "Route 5: Team Yell", lv: 18, env: "route", music: "gaYellAppears", reward: { key: "ga_rotombike" }, trainer: yellTR("This doctor's not crossing the bridge! Nobody gets to Hulbury unless Marnie gets there first!", "Ugh, come on! Marnie's never gonna let us hear the end of this..."),
+        { id: "g", type: "battle", name: "Route 5: Team Yell", lv: 18, env: "route", music: "gaYellAppears", trainer: yellTR("This doctor's not crossing the bridge! Nobody gets to Hulbury unless Marnie gets there first!", "Ugh, come on! Marnie's never gonna let us hear the end of this..."),
           waves: [WGA("zigzagoongalar:17", "thievul:18"), WGA("sableye:18")], post: [
           L("narr", "The doctor Team Yell was blocking is the inventor of the Rotom Bike. He gives you one, by way of a thank-you."),
         ] },
@@ -289,11 +290,11 @@ const GALAR_JOURNEY = {
           L("garoseinc", "Ah, Leon's challenger! Bede's just been to see me. Off you go to the stadium, and join me at the Captain's Table for dinner afterwards!"),
           L("gaoleana", "Chairman, your schedule. We're leaving."),
         ] },
-        { id: "j", type: "battle", name: "Hulbury Stadium: Gym Trainers", lv: 21, env: "gym", music: "gaGymMission", reward: { key: "ga_lcnessa" }, trainer: gaGymTR("Julia, Heather and Lynn", true, "Nessa's at the lighthouse, and her Gym Mission's all switches and waterfalls. Good luck!", "Splash! You're through."),
+        { id: "j", type: "battle", name: "Hulbury Stadium: Gym Trainers", lv: 21, env: "gym", music: "gaGymMission", trainer: gaGymTR("Julia, Heather and Lynn", true, "Nessa's at the lighthouse, and her Gym Mission's all switches and waterfalls. Good luck!", "Splash! You're through."),
           waves: [WGA("tympole:21"), WGA("krabby:20", "corphish:20"), WGA("remoraid:20", "chewtle:21")], pre: [
           L("narr", "Nessa meets you at the lighthouse, gives you her League Card and dares you to make it through her Gym's pipes and switches."),
         ] },
-        { id: "k", type: "boss", name: "Hulbury Stadium: Gym Leader Nessa", lv: 24, env: "sea", badgeWin: 1, reward: { tm: gaTM("whirlpool") },
+        { id: "k", type: "boss", name: "Hulbury Stadium: Gym Leader Nessa", lv: 24, env: "sea", badgeWin: 1, reward: { tm: [gaTM("whirlpool"), gaTM("retaliate")] },
           trainer: TR("Gym Leader Nessa", "ga_nessa", "I'm Nessa, and I'm going to wash you right out of the Gym Challenge. Ready to be swept away?", "You're even stronger than I heard. The Water Badge is yours!"),
           waves: [WGA("goldeen:22", "arrokuda:23"), GMX("drednaw:24!")], pre: [
           L("ganessa", "My Drednaw's been looking forward to this. Don't keep it waiting!"),
@@ -301,6 +302,7 @@ const GALAR_JOURNEY = {
         ], post: [
           L("ganessa", "And take TM36 with it: Whirlpool. A souvenir from Hulbury!"),
           L("narr", "At the Captain's Table, Chairman Rose talks about Galar's energy, and the future. Then Oleana hurries him away, and Sonia frowns."),
+          L("gasonia", "What is the Chairman really up to? ...Oh, sorry. Here, TM79, Retaliate. For the road."),
         ] },
         { id: "l", type: "battle", name: "Galar Mine No. 2: Trainers", lv: 22, env: "cave", music: "gaMine", trainer: TR("Workers Francis and Yvonne, and Rail Staff Vincent", "ga_worker", "The second mine's flooded in places. Watch your step, and your Pokémon!", "Right, through you go."),
           waves: [WGA("carkol:21"), WGA("roggenrola:20", "timburr:21"), WGA("drilbur:22", "onix:23")] },
@@ -331,7 +333,7 @@ const GALAR_JOURNEY = {
         { id: "c", type: "side", name: "Motostoke Outskirts: Hatenna", lv: 24, env: "city", wild: 1, catch: "hatenna", music: "gaMotostoke", waves: [WGA("koffing:22"), WGA("hatenna:24")], pre: [
           L("narr", "A Hatenna peeks out from behind a pipe. It can sense people's feelings, and it runs from anyone who's angry."),
         ], post: [L("narr", "Gotcha! Hatenna was caught! It only trusts Trainers with calm hearts.")] },
-        { id: "d", type: "boss", name: "Budew Drop Inn: Marnie", lv: 26, env: "city", music: "gaMarnie", reward: { key: "ga_lckabu" }, trainer: marnieTR("You and me, we're rivals now. Let's see if you're worth all the fuss.", "Hmph. Fine. You've got a good team. Here, Kabu's League Card: you'll need it."),
+        { id: "d", type: "boss", name: "Budew Drop Inn: Marnie", lv: 26, env: "city", music: "gaMarnie", trainer: marnieTR("You and me, we're rivals now. Let's see if you're worth all the fuss.", "Hmph. Fine. You've got a good team. Here, Kabu's League Card: you'll need it."),
           waves: [WGA("croagunk:24", "scraggy:24"), WGA("morpeko:26!")], pre: [
           L("narr", "Back at the Budew Drop Inn, Marnie is waiting in the lobby with her Morpeko on her shoulder. It looks hungry. It always looks hungry."),
         ] },
@@ -384,7 +386,7 @@ const GALAR_JOURNEY = {
       ] },
     { id: "c7", title: "Route 6 and Stow-on-Side", env: "route", map: "route", reward: { lmd: 7000, orundum: 500, sunstone: 1 },
       nodes: [
-        { id: "a", type: "battle", name: "Route 6: Team Yell", lv: 30, env: "route", music: "gaYellAppears", reward: { key: "ga_lcopal" }, trainer: yellTR("You again? Team Yell's not letting you past this bridge!", "Aww, man! We've gotta tell Marnie... no, wait, we'd better not tell Marnie."),
+        { id: "a", type: "battle", name: "Route 6: Team Yell", lv: 30, env: "route", music: "gaYellAppears", trainer: yellTR("You again? Team Yell's not letting you past this bridge!", "Aww, man! We've gotta tell Marnie... no, wait, we'd better not tell Marnie."),
           waves: [WGA("stunky:29", "linoonegalar:30"), WGA("liepard:30")], pre: [
           L("narr", "On the bridge out of Hammerlocke, two Team Yell Grunts block the way. Hop catches up, but he can't bring himself to battle."),
         ], post: [
@@ -469,7 +471,7 @@ const GALAR_JOURNEY = {
         { id: "f", type: "side", name: "Glimwood Tangle: Galarian Ponyta (Shield)", lv: 35, env: "forest", wild: 1, catch: "ponytagalar", music: "gaGlimwood", waves: [WGA("shiinotic:34"), WGA("ponytagalar:35")], pre: [
           L("narr", "In Shield, a Ponyta with a mane like a rainbow mist walks through the glowing woods. Galar's Ponyta live in the Glimwood Tangle."),
         ], post: [L("narr", "Gotcha! Galarian Ponyta was caught! Its mane is full of healing power.")] },
-        { id: "g", type: "story", name: "Ballonlea Stadium: Marnie", music: "gaBallonlea", reward: { key: "ga_lcmarnie" }, pre: [
+        { id: "g", type: "story", name: "Ballonlea Stadium: Marnie", music: "gaBallonlea", pre: [
           L("narr", "Ballonlea is a village of glowing trees and fairy lights deep in the forest. Marnie is in the stadium lobby with her Morpeko."),
           L("gamarnie", "Here, my League Card. We're proper rivals now, you and me. Opal's quiz is weird. Just so you know."),
         ] },
@@ -513,7 +515,7 @@ const GALAR_JOURNEY = {
         { id: "g", type: "side", name: "Steamdrift Way: Snom", lv: 35, env: "ice", wild: 1, catch: "snom", music: "gaCirchester", waves: [WGA("vanillite:34"), WGA("snom:35")], pre: [
           L("narr", "A Snom munches on the frost on a branch. Snow seems to collect on its back."),
         ], post: [L("narr", "Gotcha! Snom was caught! It eats the snow on the ground to grow.")] },
-        { id: "h", type: "story", name: "Circhester: The Hero's Bath", music: "gaCirchester", reward: { key: "ga_lcgordie" }, pre: [
+        { id: "h", type: "story", name: "Circhester: The Hero's Bath", music: "gaCirchester", pre: [
           L("narr", "Circhester is a town of old stone and hot springs. The Hero's Bath steams in the town square, where the hero of legend is said to have rested."),
           L("gahop", "I lost to the Gym Leader. Again. Here, take the League Card. I'm going to rethink my whole team. Again!"),
         ] },
@@ -688,7 +690,7 @@ const GALAR_JOURNEY = {
         { id: "h", type: "side", name: "Slumbering Weald: Galarian Weezing", lv: 46, env: "forest", wild: 1, catch: "weezinggalar", music: "gaDeepForest", waves: [WGA("stunfiskgalar:45"), WGA("weezinggalar:46")], pre: [
           L("narr", "A Weezing with chimneys on its heads breathes in the Weald's polluted air, and breathes out clean air."),
         ], post: [L("narr", "Gotcha! Galarian Weezing was caught! It purifies the air of factories, Galar's gift to the world.")] },
-        { id: "i", type: "story", name: "Slumbering Weald: The Rusted Sword and Shield", music: "gaFog", reward: { key: "ga_rustedsword" }, pre: [
+        { id: "i", type: "story", name: "Slumbering Weald: The Rusted Sword and Shield", music: "gaFog", pre: [
           L("narr", "Two great Pokémon appear in the fog, and vanish again. Sonia arrives in time to see the space where they were."),
           L("gasonia", "Zacian and Zamazenta. Those are their names. The heroes' Pokémon... It was them, all along!"),
           L("narr", "At an ancient stone altar in the heart of the Weald lie a rusted sword and a rusted shield. You take the sword. Hop takes the shield."),
@@ -857,7 +859,7 @@ const GALAR_JOURNEY = {
         ] },
         { id: "c", type: "side", big: 1, name: "Fields of Honor: Avery (Shield)", lv: 60, env: "sea", music: "gaAvery", trainer: TR("Pokémon Trainer Avery", "ga_avery", "In Shield, I'm the student you meet here. The Amazing Avery! And you are in my way.", "Hmph! Psychic powers don't work on the Champion, apparently."),
           waves: [WGA("abra:58", "slowpokegalar:60!")] },
-        { id: "d", type: "boss", name: "Master Dojo: Dojo Master Mustard", lv: 61, env: "gym", music: "gaMustard", reward: { key: "ga_expcharm" }, trainer: TR("Dojo Master Mustard", "ga_mustard", "Ooh, a new student! The Champion, even? Ha! I trained Leon, you know. Let's see what you've got, before anything else!", "Oh-ho! Splendid, splendid! Welcome to the Master Dojo!"),
+        { id: "d", type: "boss", name: "Master Dojo: Dojo Master Mustard", lv: 61, env: "gym", music: "gaMustard", trainer: TR("Dojo Master Mustard", "ga_mustard", "Ooh, a new student! The Champion, even? Ha! I trained Leon, you know. Let's see what you've got, before anything else!", "Oh-ho! Splendid, splendid! Welcome to the Master Dojo!"),
           waves: [WGA("mienfoo:61", "shinx:61!")], pre: [
           L("narr", "The Master Dojo sits on a hill in the middle of the island. Honey, the Dojo Matron, welcomes you, her son Hyde gives you an Exp. Charm, and an old man in a tracksuit bounces up to you."),
           L("gamustard", "I was Galar's Champion for eighteen years, you know! Now I teach. And to my best student, I'll give the Dojo's secret armor. If you pass three trials, that is!"),
@@ -912,7 +914,7 @@ const GALAR_JOURNEY = {
         { id: "s", type: "chest", name: "Workout Sea: The Galarica Cuff", reward: { galaricacuff: 1, lmd: 5000 }, music: "gaIsle", pre: [
           L("narr", "On a tiny island in the Workout Sea, a woman weaves Galarica Twigs into a cuff. Put it on a Galarian Slowpoke's arm, and the Shellder that bites it becomes Galarian Slowbro."),
         ] },
-        { id: "t", type: "boss", name: "Honeycalm Island: Dynamax Vespiquen", lv: 80, env: "forest", wild: 1, music: "gaMaxRaid", reward: { key: "ga_maxhoney" }, waves: [DYN("vespiquen:80!")], pre: [
+        { id: "t", type: "boss", name: "Honeycalm Island: Dynamax Vespiquen", lv: 80, env: "forest", wild: 1, music: "gaMaxRaid", waves: [DYN("vespiquen:80!")], pre: [
           L("narr", "Mustard says Urshifu can't drink Max Soup without a secret ingredient. Hop thinks it's honey. On Honeycalm Island, you shake the giant tree, and a Dynamax Vespiquen comes down to defend it."),
         ], post: [L("narr", "The Vespiquen shrinks back to size and flies off, leaving the Max Honey behind. Mustard knew all along, of course.")] },
         { id: "u", type: "boss", name: "Master Dojo Battle Court: Mustard's Last Battle", lv: 75, env: "gym", music: "gaMustardFinal", trainer: TR("Dojo Master Mustard", "ga_mustard", "No more holding back. This is the team I had as Champion. My Urshifu and I are going to give it everything!", "Wahaha! That's my student! The Master Dojo is proud of you."),
@@ -942,7 +944,7 @@ const GALAR_JOURNEY = {
         ], post: [
           L("gacalyrex", "(Speaking through Peony) I am Calyrex. Long ago, this land bloomed under my rule. My steed has left me. Help me find it."),
         ] },
-        { id: "d", type: "boss", name: "Snowslide Slope: Glastrier", lv: 75, env: "ice", wild: 1, music: "gaSteeds", reward: { key: "ga_reinsofunity" }, waves: [WGA("glastrier:75!")], pre: [
+        { id: "d", type: "boss", name: "Snowslide Slope: Glastrier", lv: 75, env: "ice", wild: 1, music: "gaSteeds", waves: [WGA("glastrier:75!")], pre: [
           L("narr", "Calyrex's steed loved carrots. You plant the seeds on the Snowslide Slope, and an Iceroot Carrot grows overnight. A huge white horse gallops into Freezington after it."),
         ], post: [L("narr", "Calyrex drives Glastrier away. It leaves a White Mane Hair behind, and Peony weaves it into the Reins of Unity.")] },
         { id: "e", type: "side", name: "Old Cemetery: Spectrier", lv: 75, env: "ice", wild: 1, music: "gaSteeds", waves: [WGA("spectrier:75!")], pre: [
@@ -980,7 +982,7 @@ const GALAR_JOURNEY = {
         { id: "q", type: "boss", name: "The Isle of Armor: Galarian Moltres", lv: 70, env: "sea", wild: 1, catch: "moltresgalar", music: "gaBirds", waves: [WGA("moltresgalar:70!")], pre: [
           L("narr", "Galarian Moltres circles the Isle of Armor, wreathed in dark flames. You whistle, and it comes down to fight."),
         ], post: [L("narr", "Gotcha! Galarian Moltres was caught! Its flames burn with malice, not heat.")] },
-        { id: "r", type: "story", name: "Freezington: The End of the Adven-tour", music: "gaCredits2", reward: { key: ["ga_lcpeony", "ga_goldexpuniform"] }, pre: [
+        { id: "r", type: "story", name: "Freezington: The End of the Adven-tour", music: "gaCredits2", pre: [
           L("gapeony", "All three clues, chief! Every one! Here: my rare League Card. Best adventure of my life."),
           L("gapeonia", "Dad. Will you come on an adventure with me? In the Max Lair? ...Thanks. You can keep the Gold Expedition Uniform, Champion. You earned it."),
         ] },

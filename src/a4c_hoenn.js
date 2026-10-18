@@ -67,7 +67,7 @@ const HOENN_JOURNEY = {
           L("birch", "Whew! Thank you! I'm Professor Birch. I study Pokémon out in the wild, which is how I end up up a tree now and then."),
           LR("birch", () => `You handled that Pokémon like you were made for each other. Keep it! And go and find my kid, ${hoennRivalName()}, on Route 103: you two should get along.`),
         ] },
-        { id: "c", type: "battle", name: "Route 103: the Professor's Kid", reward: { key: ["ho_pokedex", "ho_pokeballs", "ho_runningshoes"] }, get music() { return hoennRivalMay() ? "hoMeetMay" : "hoMeetBrendan"; }, lv: 5, env: "route", get trainer() { return hoennRivalTR("Oh, you're our new neighbor! You got a Pokémon from my dad? Let's see what it can do!", "Wow, you're good! You really did get that one from my dad, huh?"); },
+        { id: "c", type: "battle", name: "Route 103: the Professor's Kid", reward: { permit: 5 }, get music() { return hoennRivalMay() ? "hoMeetMay" : "hoMeetBrendan"; }, lv: 5, env: "route", get trainer() { return hoennRivalTR("Oh, you're our new neighbor! You got a Pokémon from my dad? Let's see what it can do!", "Wow, you're good! You really did get that one from my dad, huh?"); },
           // (Lv 3, not the games' 5: here a starter knows its type's move from the start, the newest games' learnsets, so Mudkip's only
           // attack is a Water Gun the rival's Treecko resists: it won none of 300 battles at Lv 5 and 15% at Lv 4; at Lv 3 every starter
           // wins about every time. Kanto's Blue and Johto's Silver are a level under their games too: README, House rules)
@@ -96,7 +96,7 @@ const HOENN_JOURNEY = {
         { id: "g", type: "battle", name: "Route 104", lv: 5, env: "route", wild: 1, catch: "taillow", waves: [WH("poochyena:4", "wingull:4"), WH("taillow:5", "marill:5")], pre: [
           L("narr", "Route 104 runs along the coast north of Petalburg. A little cottage sits on the beach, and Taillow wheel overhead, small but fearless."),
         ], post: [L("narr", "Gotcha! Taillow was caught! It takes on foes much bigger than itself.")] },
-        { id: "h", type: "battle", name: "Petalburg Woods: Team Aqua", reward: { key: "ho_greatball" }, music: "hoMeetAqua", lv: 9, env: "forest", trainer: TR("Team Aqua Grunt", "ho_aqua", "Hand over those documents, Devon boy! ...Who are you? Fine, I'll take care of you first!", "Grr! You little pest!"),
+        { id: "h", type: "battle", name: "Petalburg Woods: Team Aqua", reward: { permit: 1 }, music: "hoMeetAqua", lv: 9, env: "forest", trainer: TR("Team Aqua Grunt", "ho_aqua", "Hand over those documents, Devon boy! ...Who are you? Fine, I'll take care of you first!", "Grr! You little pest!"),
           waves: [WH("poochyena:9")], pre: [
           L("devon", "Have you seen any Shroomish around here? I love that little Pokémon... Oh! Who are you?"),
           L("aqua", "Hey, you! Devon Corporation's researcher! Give me those papers you're carrying!"),
@@ -121,7 +121,7 @@ const HOENN_JOURNEY = {
       ] },
     { id: "c2", title: "Dewford Town and Slateport City", env: "sea", map: "sea", reward: { lmd: 4000, orundum: 300 },
       nodes: [
-        { id: "a", type: "battle", name: "Rusturf Tunnel: the Devon Goods", reward: { key: ["ho_devongoods", "ho_letter", "ho_pokenav"] }, music: "hoMeetAqua", lv: 13, env: "cave", trainer: TR("Team Aqua Grunt", "ho_aqua", "Don't come any closer! I'll... I'll do something to this Wingull!", "...Okay, okay! I give up! Take the stupid parts!"),
+        { id: "a", type: "battle", name: "Rusturf Tunnel: the Devon Goods", music: "hoMeetAqua", lv: 13, env: "cave", trainer: TR("Team Aqua Grunt", "ho_aqua", "Don't come any closer! I'll... I'll do something to this Wingull!", "...Okay, okay! I give up! Take the stupid parts!"),
           waves: [WH("poochyena:13")], pre: [
           L("narr", "Outside the Gym, the Grunt from Petalburg Woods bolts out of the Devon Corporation with a package under his arm. He runs east, to Route 116."),
           L("briney", "Help! That ruffian ran into the tunnel with my darling Peeko! He's taken my Wingull!"),
@@ -134,7 +134,8 @@ const HOENN_JOURNEY = {
         { id: "c", type: "side", name: "Route 116", lv: 7, env: "route", wild: 1, catch: "nincada", waves: [WH("poochyena:6", "whismur:7"), WH("nincada:7", "taillow:7")], pre: [
           L("narr", "East of Rustboro, Route 116's grass hums. Nincada spend years underground, sipping sap from tree roots, and come up to see the sun."),
         ], post: [L("narr", "Gotcha! Nincada was caught! When it evolves, its old shell sometimes moves on its own...")] },
-        { id: "d", type: "story", name: "Mr. Briney's Boat", reward: { key: "ho_oldrod" }, music: "hoSailing", pre: [
+        { id: "d", type: "story", name: "Mr. Briney's Boat", reward: { held: "miracleseed" }, music: "hoSailing", pre: [
+          L("narr", "Back south through Petalburg Woods, a girl spots your Stone Badge and gives you a Miracle Seed. It powers up Grass-type moves."),
           L("briney", "Dewford, is it? Leave it to Peeko and me! We'll have you there before you know it. Hold on tight!"),
           L("narr", "The little boat cuts across the waves to Dewford Town, a fishing village on an island. A fisherman on the pier gives you an Old Rod."),
         ] },
@@ -169,7 +170,7 @@ const HOENN_JOURNEY = {
       ] },
     { id: "c3", title: "Mauville City", env: "city", map: "city", reward: { lmd: 5000, orundum: 300, thunderstone: 1 },
       nodes: [
-        { id: "a", type: "battle", name: "Route 110: the Rival", reward: { key: "ho_itemfinder" }, get music() { return hoennRivalMay() ? "hoMeetMay" : "hoMeetBrendan"; }, lv: 20, env: "route", get trainer() { return hoennRivalTR("Hey, it's been ages! Let's see how far you've come.", "Wow... I can't believe how strong you've gotten."); },
+        { id: "a", type: "battle", name: "Route 110: the Rival", get music() { return hoennRivalMay() ? "hoMeetMay" : "hoMeetBrendan"; }, lv: 20, env: "route", get trainer() { return hoennRivalTR("Hey, it's been ages! Let's see how far you've come.", "Wow... I can't believe how strong you've gotten."); },
           rivalWaves: () => [WH(...birchTeam(0), birchMon(1) + ":20!")], pre: [
           L("hrival", "There you are! I've been filling my Pokédex all the way from Littleroot. How's your adventure going? Let's battle!"),
         ], post: [L("hrival", "You've gotten really good! Here: an Itemfinder. It beeps when there's an item hidden nearby. I'm going to keep looking for new Pokémon!")] },
@@ -228,7 +229,7 @@ const HOENN_JOURNEY = {
           L("archie", "Kid! Team Magma is going to use that Meteorite to make the volcano erupt! Stop their leader, quick!"),
           L("tabitha", "Hehehe! Team Magma's dream is about to come true. You want our leader? You'll have to get past me first!"),
         ] },
-        { id: "g", type: "boss", name: "Mt. Chimney: Magma Leader Maxie", reward: { key: "ho_meteorite" }, music: "hoMeetMagma", lv: 27, env: "volcano", weather: "sun", trainer: TR("Magma Leader Maxie", "ho_maxie", "I'm Maxie, the leader of Team Magma. We will make the land bigger, for people and Pokémon alike. You'll understand, in time.", "...I see. I underestimated you. Very well: we give up on this volcano."),
+        { id: "g", type: "boss", name: "Mt. Chimney: Magma Leader Maxie", music: "hoMeetMagma", lv: 27, env: "volcano", weather: "sun", trainer: TR("Magma Leader Maxie", "ho_maxie", "I'm Maxie, the leader of Team Magma. We will make the land bigger, for people and Pokémon alike. You'll understand, in time.", "...I see. I underestimated you. Very well: we give up on this volcano."),
           waves: [WH("mightyena:25", "golbat:25", "camerupt:27!")], pre: [
           L("maxie", "The land is where life thrives. More land means more life... A child wouldn't understand. Then let me teach you!"),
         ], post: [
@@ -245,7 +246,7 @@ const HOENN_JOURNEY = {
         ] },
         { id: "j", type: "battle", name: "Lavaridge Gym: Kindler Cole", music: "hoEyesHiker", lv: 23, env: "volcano", weather: "sun", trainer: TR("Kindler Cole", "ho_kindler", "Fire Pokémon and hot springs! Lavaridge has it all! Feel the heat!", "Whoa! I'm all steamed up!"),
           waves: [WH("numel:23")] },
-        { id: "k", type: "boss", name: "Flannery, One with a Fiery Passion That Burns", reward: { tm: hoTM("overheat"), key: "ho_gogoggles" }, lv: 29, env: "volcano", weather: "sun", badgeWin: 3,
+        { id: "k", type: "boss", name: "Flannery, One with a Fiery Passion That Burns", reward: { tm: hoTM("overheat") }, lv: 29, env: "volcano", weather: "sun", badgeWin: 3,
           trainer: TR("Leader Flannery", "ho_flannery", "I'm Flannery, the Lavaridge Gym Leader! I just became one, but I'll still burn you to a crisp!", "Oh... I guess I was trying too hard. Here: the Heat Badge."),
           waves: [WH("numel:24+", "slugma:24+"), WH("camerupt:26+", "torkoal:29!@whiteherb")], pre: [
           L("flannery", "My grandfather was the Gym Leader before me. I'll show you the hot moves he taught me!"),
@@ -286,7 +287,7 @@ const HOENN_JOURNEY = {
       ] },
     { id: "c6", title: "Fortree City", env: "forest", map: "forest", reward: { lmd: 8000, orundum: 500 },
       nodes: [
-        { id: "a", type: "battle", name: "Route 118", reward: { key: "ho_goodrod" }, lv: 25, env: "sea", wild: 1, catch: "carvanha", waves: [WH("wingull:24", "electrike:24"), WH("carvanha:25", "linoone:24")], music: "hoRoute119", pre: [
+        { id: "a", type: "battle", name: "Route 118", lv: 25, env: "sea", wild: 1, catch: "carvanha", waves: [WH("wingull:24", "electrike:24"), WH("carvanha:25", "linoone:24")], music: "hoRoute119", pre: [
           L("narr", "With Surf, you can cross the water east of Mauville to Route 118. A fisherman gives you a Good Rod. Carvanha swarm in the channel."),
           L("steven", "We meet again! Some Trainers raise one type of Pokémon. Others raise all kinds. Which will you be? I'll be looking forward to seeing."),
         ], post: [L("narr", "Gotcha! Carvanha was caught! Its fangs can tear through a boat's hull.")] },
@@ -308,7 +309,7 @@ const HOENN_JOURNEY = {
         { id: "e", type: "side", name: "Route 119: Feebas", lv: 22, env: "sea", wild: 1, catch: "feebas", waves: [WH("barboach:20", "tentacool:20"), WH("feebas:22!")], pre: [
           L("narr", "A fisherman swears there are only six spots on this whole river where Feebas bite. You find one."),
         ], post: [L("narr", "Gotcha! Feebas was caught! It's shabby to look at, but it's said to grow into the most beautiful Pokémon of all.")] },
-        { id: "f", type: "battle", name: "Route 120: Steven and the Devon Scope", reward: { key: "ho_devonscope" }, lv: 30, env: "forest", wild: 1, catch: "kecleon", waves: [WH("kecleon:30!")], music: "hoRoute120", pre: [
+        { id: "f", type: "battle", name: "Route 120: Steven and the Devon Scope", lv: 30, env: "forest", wild: 1, catch: "kecleon", waves: [WH("kecleon:30!")], music: "hoRoute120", pre: [
           L("narr", "Something invisible is blocking the path to the Fortree Gym. On a bridge on Route 120, Steven is staring at an empty patch of air."),
           L("steven", "There's something here we can't see. This is a Devon Scope: it shows things that are hiding. Let's see what it is!"),
           L("narr", "The Devon Scope shows a Kecleon, colored exactly like the bridge behind it. It lunges!"),
@@ -335,7 +336,7 @@ const HOENN_JOURNEY = {
         { id: "a", type: "battle", name: "Mt. Pyre", lv: 28, env: "tower", wild: 1, catch: "shuppet", waves: [WH("shuppet:27", "duskull:27"), WH("shuppet:28", "duskull:29")], music: "hoPyre", pre: [
           L("narr", "On Route 121, Team Aqua Grunts run south to Mt. Pyre, a mountain where people lay their Pokémon to rest. Inside, Shuppet and Duskull drift between the graves."),
         ], post: [L("narr", "Gotcha! Shuppet was caught! It's drawn to feelings of envy and grudges.")] },
-        { id: "b", type: "battle", name: "Mt. Pyre Summit: Team Aqua", reward: { key: "ho_magmaemblem" }, music: "hoMeetAqua", lv: 35, env: "tower", trainer: TR("Team Aqua Grunts", "ho_aqua", "Our boss is taking care of business. Nobody gets past!", "Argh! Boss, I tried!"),
+        { id: "b", type: "battle", name: "Mt. Pyre Summit: Team Aqua", music: "hoMeetAqua", lv: 35, env: "tower", trainer: TR("Team Aqua Grunts", "ho_aqua", "Our boss is taking care of business. Nobody gets past!", "Argh! Boss, I tried!"),
           waves: [WH("carvanha:33", "mightyena:35"), WH("mightyena:34", "golbat:34")], pre: [
           L("narr", "Mist hangs over Mt. Pyre's summit. An old couple guards two orbs on a shrine there, and Team Aqua is standing between you and them."),
         ], post: [
@@ -513,7 +514,7 @@ const HOENN_JOURNEY = {
       ] },
     { id: "c11", title: "The Super-Ancient Pokémon", env: "sea", map: "sea", reward: { orundum: 2000, permit: 10, rec4: 5 },
       nodes: [
-        { id: "a", type: "story", name: "A Bulletin on TV", reward: { key: "ho_ssticket" }, music: "hoLittleroot", pre: [
+        { id: "a", type: "story", name: "A Bulletin on TV", music: "hoLittleroot", pre: [
           L("hmom", "Welcome home, Champion! Oh, look at the TV: they're talking about a strange Pokémon flying over Hoenn. Was it red or blue? Red, they said."),
           L("norman", "A letter came for you from Mr. Briney: a ticket for the S.S. Tidal. And the Weather Institute keeps reporting strange weather out at sea. The world is wide, my child."),
         ] },

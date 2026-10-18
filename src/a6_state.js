@@ -148,21 +148,17 @@ function tickTimers() {
 // ---------- inventory ----------
 const WALLET = ["lmd", "orundum", "permit", "cert", "tokens", "prime"];
 function have(k) { return WALLET.includes(k) ? S[k] : k === "sanity" ? S.sanity : HELD[k] ? (S.held[k] || 0) : (S.inv[k] || 0); }
-// the story key items (the owner's rule, 2026-10-16: what a scene hands you goes in the Bag, a keepsake with no use): tools/key_items,
-// embedded by build.sh. A reward's key: "id" (or a list) gives one; tm: a TM id (TMS, tmId) gives that TM or HM
-const KEY_ITEMS = (typeof RES_DATA !== "undefined" && RES_DATA.keyItems) || {};
-const keyName = id => (KEY_ITEMS[id] || {}).n || id;
-const keyIcon = id => KEY_ITEMS[id] && KEY_ITEMS[id].ic ? pxIcon(KEY_ITEMS[id].ic) : IC.letter;
+// a stage's reward, as its card shows it (the owner's rule, 2026-10-18: only items that do something; a gift of balls is Safari Balls,
+// and the story's keepsakes are gone): items, held items, TMs and HMs (tm: a TM id, tmId), Pokémon
 // a reward as the list rewardsHTML shows (a stage's card)
 const rwList = rw => Object.entries(rw || {}).flatMap(([k, v]) => k === "op" ? [{ k: "op:" + v, n: 1 }] : k === "held" ? [].concat(v).map(h => ({ k: "held:" + h, n: 1 }))
-  : k === "tm" ? [].concat(v).map(n => ({ k: "tm:" + n, n: 1 })) : k === "key" ? [].concat(v).map(id => ({ k: "key:" + id, n: 1 })) : [{ k, n: v }]);
+  : k === "tm" ? [].concat(v).map(n => ({ k: "tm:" + n, n: 1 })) : [{ k, n: v }]);
 function give(rw) {
   const out = [];
   for (const k in rw) {
     const v = rw[k];
     if (k === "op") { const r = grantOp(v); out.push({ k: "op:" + v, n: 1, isNew: r.isNew }); continue; }
     if (k === "tm") { for (const n of [].concat(v)) if (TM_MOVE[n]) { S.tms[n] = (S.tms[n] || 0) + 1; out.push({ k: "tm:" + n, n: 1 }); } continue; }
-    if (k === "key") { for (const id of [].concat(v)) { (S.keys = S.keys || {})[id] = 1; out.push({ k: "key:" + id, n: 1 }); } continue; }
     if (k === "held") { for (const h of [].concat(v)) { S.held[h] = (S.held[h] || 0) + 1; out.push({ k: "held:" + h, n: 1 }); } continue; }
     if (k === "sanityMax") { S.sanity = Math.max(S.sanity, maxSanity(S.lvl)); S.sTime = Date.now(); out.push({ k: "sanity", n: maxSanity(S.lvl) }); continue; }
     if (HELD[k]) { S.held[k] = (S.held[k] || 0) + v; out.push({ k: "held:" + k, n: v }); continue; }

@@ -108,19 +108,19 @@ const ALOLA_JOURNEY = {
           rivalWaves: () => [[{ op: hauMon(0), LV: 4, moves: { popplio: ["pound", "growl", "watergun"], rowlet: ["tackle", "growl", "leafage"], litten: ["scratch", "growl", "ember"] }[hauMon(0)] }]], post: [
           L("alkukui", "Now that's a battle, yeah! Here, let me heal them up. Iki Town's just up these stairs."),
         ] },
-        { id: "d", type: "battle", name: "Mahalo Trail: Nebby on the Bridge", lv: 4, env: "route", wild: 1, music: "alBridge", reward: { key: "al_sparklingstone" }, waves: [WA("spearow:4")], pre: [
+        { id: "d", type: "battle", name: "Mahalo Trail: Nebby on the Bridge", lv: 4, env: "route", wild: 1, music: "alBridge", waves: [WA("spearow:4")], pre: [
           L("narr", "Hala is away, so Kukui sends you up Mahalo Trail to find him. On the old rope bridge, a girl in a white hat is begging a strange little Pokémon to come back."),
           L("allillie", "Please, help it! Nebby got out of my bag, and the Spearow are attacking it!"),
         ], post: [
           L("narr", "Nebby flashes with light. The bridge snaps. As you fall, a Pokémon with a shell like a mask swoops down, catches you both, and is gone again: Tapu Koko, Melemele's guardian deity."),
           L("allillie", "I'm Lillie. I'm Professor Kukui's assistant. Please... don't tell anyone about Nebby. And take this: Nebby found it on the bridge. It's a Sparkling Stone."),
         ] },
-        { id: "e", type: "story", name: "Iki Town: Kahuna Hala", music: "alIki", reward: { key: "al_passport" }, pre: [
+        { id: "e", type: "story", name: "Iki Town: Kahuna Hala", music: "alIki", pre: [
           L("alhala", "So you're the new arrival! And Tapu Koko saved you on the bridge? Ho ho! Then the guardian has its eye on you."),
           L("alhala", "Tomorrow we hold a festival for Tapu Koko. Come, and bring that stone. I think it has a purpose."),
           L("alkukui", "And here: a Pokédex and your Trainer Passport. Fill it with Alola's Pokémon, yeah? Every island's got its own."),
         ] },
-        { id: "f", type: "battle", name: "Route 1: Pikipek", lv: 3, env: "route", wild: 1, catch: "pikipek", music: "alRoute1", reward: { key: "al_pokeballs" }, waves: [WA("yungoos:3", "grubbin:3"), WA("pikipek:3")], pre: [
+        { id: "f", type: "battle", name: "Route 1: Pikipek", lv: 3, env: "route", wild: 1, catch: "pikipek", music: "alRoute1", reward: { permit: 10 }, waves: [WA("yungoos:3", "grubbin:3"), WA("pikipek:3")], pre: [
           L("alkukui", "Watch my Rockruff: weaken it first, then throw the Poké Ball. Here, ten Poké Balls. Have a go!"),
           L("narr", "At the top of Route 1, two strangers in strange suits are watching the sky. One of them mutters about \"the Blinding One\"."),
         ], post: [L("narr", "Gotcha! Pikipek was caught! It pecks at trees at sixteen times a second.")] },
@@ -146,7 +146,7 @@ const ALOLA_JOURNEY = {
           L("alrotom", "Bzzt! Pleased to meet you! Let's fill in every page, okay? Bzzt!"),
           L("narr", "For a moment the sky goes dark, as if something swallowed the sun. Kukui laughs it off as an eclipse nobody predicted."),
         ] },
-        { id: "l", type: "battle", name: "Trainers' School: Teacher Emily", lv: 10, env: "city", music: "alSchool", reward: { key: "al_expshare" }, trainer: TR("Teacher Emily", "al_teacher", "You've beaten my four students? Then the lesson today is type matchups. Pay attention!", "Top marks! You've learned that lesson well."),
+        { id: "l", type: "battle", name: "Trainers' School: Teacher Emily", lv: 10, env: "city", music: "alSchool", trainer: TR("Teacher Emily", "al_teacher", "You've beaten my four students? Then the lesson today is type matchups. Pay attention!", "Top marks! You've learned that lesson well."),
           get waves() { return [WA(emilyMon() + ":10!")]; }, pre: [
           L("alkukui", "The Trainers' School is where Alola's kids learn to battle. Beat four of the students and their teacher, and I'll give you an Exp. Share."),
         ], post: [
@@ -224,11 +224,12 @@ const ALOLA_JOURNEY = {
         { id: "f", type: "side", name: "Melemele Sea: Mareanie", lv: 17, env: "sea", wild: 1, catch: "mareanie", music: "alRoute2", waves: [WA("corsola:17", "wishiwashi:17"), WA("mareanie:17")], pre: [
           L("narr", "A Corsola in the shallows calls for help, and a Mareanie answers: it's been eating Corsola's branches."),
         ], post: [L("narr", "Gotcha! Mareanie was caught! It feeds on the branches of Corsola, and sometimes takes one home.")] },
-        { id: "g", type: "boss", name: "Iki Town: Kahuna Hala's Grand Trial", lv: 16, env: "city", badgeWin: 1, music: "alKahunaTheme", trainer: TR("Island Kahuna Hala", "al_hala", "As kahuna of Melemele, I will test everything your trial taught you. Show me your strength, and the strength of your bond!", "Ho ho! A fine grand trial. You have Melemele's blessing."),
+        { id: "g", type: "boss", name: "Iki Town: Kahuna Hala's Grand Trial", lv: 16, env: "city", badgeWin: 1, reward: { tm: tmId("falseswipe", 7) }, music: "alKahunaTheme", trainer: TR("Island Kahuna Hala", "al_hala", "As kahuna of Melemele, I will test everything your trial taught you. Show me your strength, and the strength of your bond!", "Ho ho! A fine grand trial. You have Melemele's blessing."),
           waves: [WA("machop:15", "makuhita:15"), WA("crabrawler:16!")], pre: [
           L("alhala", "A grand trial is a kahuna's battle. Clear it, and you have completed this island's challenge."),
         ], post: [
           L("alhala", "Take the Melemele Stamp. Now Akala awaits. Ride a Mantine across the waves from Big Wave Beach, and greet Akala's captains for me!"),
+          L("alkukui", "Woo! That's my cousin! Here, a little something from me for beating the grand trial: TM54, False Swipe."),
         ] },
       ] },
     { id: "c4", title: "Akala Island: Heahea City to Brooklet Hill", env: "route", map: "route", reward: { lmd: 5000, orundum: 400, waterstone: 1 },
@@ -265,7 +266,7 @@ const ALOLA_JOURNEY = {
         { id: "j", type: "side", name: "Brooklet Hill: Morelull", lv: 16, env: "forest", wild: 1, catch: "morelull", music: "alTrialSite", waves: [WA("wishiwashi:15"), WA("morelull:16")], pre: [
           L("narr", "When night falls on Brooklet Hill, little lights blink on in the grass: Morelull, glowing as they doze."),
         ], post: [L("narr", "Gotcha! Morelull was caught! Its flashing spores put anything that sees them to sleep.")] },
-        { id: "k", type: "boss", name: "Brooklet Hill: Totem Wishiwashi", lv: 20, env: "sea", wild: 1, weather: "rain", badgeWin: 2, reward: { key: "al_fishingrod" }, trainer: totemTR("Wishiwashi", "al_lana"),
+        { id: "k", type: "boss", name: "Brooklet Hill: Totem Wishiwashi", lv: 20, env: "sea", wild: 1, weather: "rain", badgeWin: 2, trainer: totemTR("Wishiwashi", "al_lana"),
           waves: [[...TOT("wishiwashi:20!@sitrusberry", { def: 1 }), ...WA("wishiwashi:18", "alomomola:18")]], pre: [
           L("allana", "This is my trial. Something's been splashing in the water. Chase it to the lake at the top of the hill, and... well, see what happens."),
           L("narr", "Rain starts to fall. The splashing fish gather in the last lake, and gather, and gather, until a school as big as a whale rises out of the water: Totem Wishiwashi."),
@@ -339,12 +340,13 @@ const ALOLA_JOURNEY = {
         { id: "m", type: "side", name: "Lush Jungle: Bounsweet (Sun and Moon)", lv: 17, env: "forest", wild: 1, catch: "bounsweet", music: "alMallowTrial", waves: [WA("fomantis:17"), WA("bounsweet:17")], pre: [
           L("narr", "In Sun and Moon, little Bounsweet live in the jungle too, giving off a smell so sweet that bird Pokémon carry them off."),
         ], post: [L("narr", "Gotcha! Bounsweet was caught! Its sweet scent is a favorite of Trainers... and of Toucannon.")] },
-        { id: "n", type: "boss", name: "Lush Jungle: Totem Lurantis", lv: 24, env: "forest", wild: 1, badgeWin: 4, trainer: totemTR("Lurantis", "al_mallow"),
+        { id: "n", type: "boss", name: "Lush Jungle: Totem Lurantis", lv: 24, env: "forest", wild: 1, badgeWin: 4, reward: { tm: tmId("smartstrike", 7) }, trainer: totemTR("Lurantis", "al_mallow"),
           waves: [[...TOT("lurantis:24!", { spe: 2 }), ...WA("kecleon:22", "comfey:22")]], pre: [
           L("almallow", "My trial is cooking! Find me a Mago Berry, Honey and a Big Root, and I'll make the Mallow Special. Its smell will bring out the Totem."),
           L("narr", "The pot bubbles. Out of the jungle steps Totem Lurantis, pink blades raised, its aura flickering like sunlight."),
         ], post: [
           L("almallow", "You did it! That was the best ingredient hunt ever. Here's your stamp. Akala's grand trial is next!"),
+          L("alkukui", "Three trials down on Akala, yeah? Take this along: TM67, Smart Strike."),
         ] },
         { id: "o", type: "side", name: "Lush Jungle: Sun and Moon's Totem Lurantis", lv: 24, env: "forest", wild: 1, music: "alMallowTrial",
           waves: [[...TOT("lurantis:24!", { spe: 2 }), ...WA("trumbeak:22", "castform:22")]], pre: [
@@ -575,7 +577,7 @@ const ALOLA_JOURNEY = {
           waves: [WA("clefable:47", "lilligant:47", "lopunny:47"), WA("milotic:47", "bewear:47!")], pre: [
           L("allusamine", "Lillie, my darling, is right here. And her Cosmog is the key to Ultra Space. I'll use it to find Necrozma myself."),
         ] },
-        { id: "j", type: "chest", name: "Lusamine Opens the Ultra Wormhole", reward: { gold5: 1, lmd: 3000, key: "al_moonflute" }, music: "alLusamineWormhole", pre: [
+        { id: "j", type: "chest", name: "Lusamine Opens the Ultra Wormhole", reward: { gold5: 1, lmd: 3000 }, music: "alLusamineWormhole", pre: [
           L("narr", "Lusamine forces Nebby to open an Ultra Wormhole. She and Guzma step through it and are gone. Nebby, drained, curls into a hard golden shell: Cosmoem."),
           L("allillie", "I'm going after my mother. Nebby can take us there, once it's... grown. Will you come with me?"),
           L("algladion", "Take my Master Ball. You'll need it more than I do. Lillie... be careful."),
@@ -598,7 +600,7 @@ const ALOLA_JOURNEY = {
           L("alhapu", "Poni's had no kahuna for years. Tapu Fini hasn't picked one. ...Hm? Tapu Fini? It's giving me a Sparkling Stone?"),
           L("narr", "Tapu Fini rises from the mist of its ruins and names Hapu kahuna of Poni. The Sun Flute, she says, lies on Exeggutor Island."),
         ] },
-        { id: "e", type: "battle", name: "Exeggutor Island: Alolan Exeggutor", lv: 43, env: "route", wild: 1, catch: "exeggutoralola", music: "alPoni", reward: { key: "al_sunflute" }, waves: [WA("pinsir:42", "pinsir:43"), WA("exeggutoralola:43")], pre: [
+        { id: "e", type: "battle", name: "Exeggutor Island: Alolan Exeggutor", lv: 43, env: "route", wild: 1, catch: "exeggutoralola", music: "alPoni", waves: [WA("pinsir:42", "pinsir:43"), WA("exeggutoralola:43")], pre: [
           L("narr", "Exeggutor Island is crowded with Alolan Exeggutor, tall as palm trees, and a few Pinsir pestering them. One Exeggutor lifts you up to the summit, where the Sun Flute waits."),
         ], post: [L("narr", "Gotcha! Alolan Exeggutor was caught! Alola's sun made it grow tall, and its tail is a head too.")] },
         { id: "f", type: "battle", name: "Ancient Poni Path: Team Skull's Last Stand", lv: 45, env: "route", music: "alPoni", trainer: skullTR("Where's the boss? Where's Guzma?! You did somethin' to him!", "...He's gone. The boss is really gone.", "Team Skull Grunts"),
@@ -651,19 +653,19 @@ const ALOLA_JOURNEY = {
       ] },
     { id: "c13", title: "Poni Island: Mina's Trial and Hapu's Grand Trial", env: "sea", map: "sea", reward: { lmd: 12000, orundum: 700, shinystone: 1 },
       nodes: [
-        { id: "a", type: "boss", name: "Seafolk Village: Captain Mina", lv: 51, env: "sea", music: "alSeafolk", reward: { key: "al_pinkpetal" }, trainer: TR("Captain Mina", "al_mina", "My trial's different. First, battle me. Then go see every captain, and bring me back a petal from each!", "Nice! Here's my Pink Petal. Off you go!"),
+        { id: "a", type: "boss", name: "Seafolk Village: Captain Mina", lv: 51, env: "sea", music: "alSeafolk", trainer: TR("Captain Mina", "al_mina", "My trial's different. First, battle me. Then go see every captain, and bring me back a petal from each!", "Nice! Here's my Pink Petal. Off you go!"),
           waves: [WA("mawile:51", "granbull:51"), WA("ribombee:51!")] },
-        { id: "b", type: "boss", name: "Hau'oli Cemetery: Captain Ilima", lv: 51, env: "route", music: "alRoute2", reward: { key: "al_orangepetal" }, trainer: TR("Captain Ilima", "al_ilima", "Mina's trial? How exciting. My Orange Petal is yours, if you can take it!", "Splendid, as always. The Orange Petal is yours."),
+        { id: "b", type: "boss", name: "Hau'oli Cemetery: Captain Ilima", lv: 51, env: "route", music: "alRoute2", trainer: TR("Captain Ilima", "al_ilima", "Mina's trial? How exciting. My Orange Petal is yours, if you can take it!", "Splendid, as always. The Orange Petal is yours."),
           waves: [WA("gumshoos:51", "smeargle:51"), WA("komala:51!")] },
-        { id: "c", type: "boss", name: "Lush Jungle: Captain Mallow", lv: 51, env: "forest", music: "alMallowTrial", reward: { key: ["al_bluepetal", "al_greenpetal"] }, trainer: TR("Captain Mallow", "al_mallow", "A petal? Lana and I both have one for you! But you have to beat me first. Lana says that's fair.", "You win! Here are the Blue and Green Petals."),
+        { id: "c", type: "boss", name: "Lush Jungle: Captain Mallow", lv: 51, env: "forest", music: "alMallowTrial", trainer: TR("Captain Mallow", "al_mallow", "A petal? Lana and I both have one for you! But you have to beat me first. Lana says that's fair.", "You win! Here are the Blue and Green Petals."),
           waves: [WA("trevenant:51", "shiinotic:51"), WA("tsareena:51!")] },
-        { id: "d", type: "boss", name: "Wela Volcano Park: Captain Kiawe", lv: 51, env: "volcano", music: "alKiaweTrial", reward: { key: "al_redpetal" }, trainer: TR("Captain Kiawe", "al_kiawe", "The Red Petal burns like my Fire types. Show me your flame!", "Your flame burns brighter. Take the Red Petal."),
+        { id: "d", type: "boss", name: "Wela Volcano Park: Captain Kiawe", lv: 51, env: "volcano", music: "alKiaweTrial", trainer: TR("Captain Kiawe", "al_kiawe", "The Red Petal burns like my Fire types. Show me your flame!", "Your flame burns brighter. Take the Red Petal."),
           waves: [WA("arcanine:51", "talonflame:51"), WA("marowakalola:51!")] },
         { id: "e", type: "battle", name: "Wela Volcano Park: Hiker David", lv: 48, env: "volcano", music: "alKiaweTrial", trainer: TR("Hiker David", "al_hiker", "I'm still dancing! Kiawe's moves are hard to forget!", "Still got it. Mostly."),
           waves: [WA("magmar:48")] },
-        { id: "f", type: "boss", name: "Hokulani Observatory: Captain Sophocles", lv: 51, env: "plant", music: "alBurnet", reward: { key: "al_yellowpetal" }, trainer: TR("Captain Sophocles", "al_sophocles", "I fixed the Pinger! Let's test it. With a battle!", "Okay, okay, take the Yellow Petal! Nanu's got the Purple one for Acerola."),
+        { id: "f", type: "boss", name: "Hokulani Observatory: Captain Sophocles", lv: 51, env: "plant", music: "alBurnet", trainer: TR("Captain Sophocles", "al_sophocles", "I fixed the Pinger! Let's test it. With a battle!", "Okay, okay, take the Yellow Petal! Nanu's got the Purple one for Acerola."),
           waves: [WA("togedemaru:51", "magnezone:51"), WA("golemalola:51!")] },
-        { id: "g", type: "boss", name: "Seafolk Village: Totem Ribombee", lv: 55, env: "sea", wild: 1, badgeWin: 10, reward: { key: "al_purplepetal" }, trainer: totemTR("Ribombee", "al_mina"),
+        { id: "g", type: "boss", name: "Seafolk Village: Totem Ribombee", lv: 55, env: "sea", wild: 1, badgeWin: 10, trainer: totemTR("Ribombee", "al_mina"),
           waves: [[...TOT("ribombee:55!@occaberry", ALL2), ...WA("pelipper:52", "blissey:53")]], pre: [
           L("alnanu", "Acerola's petal? She's busy at the Aether House. Here, the purple one. Don't make me battle for it, kid."),
           L("almina", "Seven petals: now I weave them into the Rainbow Flower. Its scent will bring my Totem right to the houseboat. Get ready!"),

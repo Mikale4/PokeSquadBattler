@@ -34,12 +34,6 @@ node -e '
 const fs = require("fs"), b64 = f => fs.readFileSync(f).toString("base64"), out = { item: {}, type: {}, cat: {}, cry: {}, trainer: {}, scene: {}, cutin: {}, area: {}, card: {}, badge: {}, tyic: {}, bb: {}, ball: {}, back: {}, backMeta: null, home: { map: {}, mon: {}, pl: {}, meta: null } };
 const map = JSON.parse(fs.readFileSync("tools/item_icons.json", "utf8"));
 for (const k in map) if (k !== "_") { const f = "resources/sprites/items/" + map[k]; if (!fs.existsSync(f)) throw new Error("item_icons.json: no " + f); out.item[k] = b64(f); }
-// the story key items (the owner: into the Bag, as keepsakes): tools/key_items/<region>.json, each region its own file, { id: { n, d, icon } }
-out.keyItems = {};
-if (fs.existsSync("tools/key_items")) for (const kf of fs.readdirSync("tools/key_items").filter(x => x.endsWith(".json"))) {
-  const km = JSON.parse(fs.readFileSync("tools/key_items/" + kf, "utf8"));
-  for (const k in km) if (k !== "_") { if (out.keyItems[k]) throw new Error("key_items/" + kf + ": " + k + " is already in key_items/" + out.keyItems[k].r + ".json (ids are shared: start them with the region code)"); const e = km[k], p = e.icon ? "resources/sprites/items/" + e.icon : null; if (p && !fs.existsSync(p)) throw new Error("key_items/" + kf + ": no " + p); out.keyItems[k] = { n: e.n, d: e.d || "", ic: p ? b64(p) : null, r: kf.slice(0, -5) }; }
-}
 const tmap = JSON.parse(fs.readFileSync("tools/trainer_sprites.json", "utf8"));
 for (const k in tmap) if (k !== "_") { const f = "resources/sprites/trainer sprites/" + tmap[k]; if (!fs.existsSync(f)) throw new Error("trainer_sprites.json: no " + f); out.trainer[k] = b64(f); }
 // the pictures of the player looks, cut from the player sheets (tools/pack_backs.py): these come first

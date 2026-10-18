@@ -143,7 +143,7 @@ async function launchNode(id) {
       const cat = nd.catch && first ? nd.catch : null;
       if (cat) { const lvAt = Math.min(levelCap(cat), (waves.flat().find(s => s.op === cat) || {}).LV || nd.lv); const r = grantOp(cat, lvAt); list.unshift({ k: "op:" + cat, n: 1, isNew: r.isNew }); }
       if (nd.gift && first) { const r = grantOp(nd.gift, Math.min(levelCap(nd.gift), nd.giftLv || nd.lv)); list.unshift({ k: "op:" + nd.gift, n: 1, isNew: r.isNew }); }
-      if (nd.reward && first && nd.type !== "chest" && !nd.chest) list.push(...give(nd.reward));   // (what its scenes hand you: items, TMs, key items)
+      if (nd.reward && first && nd.type !== "chest" && !nd.chest) list.push(...give(nd.reward));   // (what its scenes hand you: items, held items, TMs, Pokémon)
       // (each region's Badges and Champion title are its own: badgesIn, regionChamp; a Journey in parts has each part's Badges)
       const rid = nd.ep.id, part = ndPart(nd);
       if (nd.badgeWin != null && partBadges(rid, part) <= nd.badgeWin) { setPartBadges(rid, part, nd.badgeWin + 1); badgeGot = nd.badgeWin; live("badge"); }
@@ -589,7 +589,7 @@ const ACT = {
   hold: d => { if (equipHeld(d.k, d.it)) { sfx("tap"); toast(`${OPS[d.k].n} is now holding the ${HELD[d.it].n}.`); } rerender(); },
   unhold: d => { equipHeld(d.k, null); sfx("tap"); rerender(); },
   assistant: d => { S.assistant = d.k; toast(`${OPS[d.k].n} is now your partner!`); rerender(); },
-  depotTab: d => { UI.depotTab = d.t; rerender(); },
+  depotTab: d => { UI.depotTab = d.t === "keys" ? "items" : d.t; rerender(); },
   dexF: d => { UI.dexF = d.v; rerender(); },
   dexR: d => { UI.dexR = +d.v; rerender(); },
   regionSoon: d => regionSoonModal(d.v),
@@ -703,6 +703,7 @@ function migrate(s) {
     if (n) { s.towerW.kanto = n - towerFloors("kanto", true).slice(0, n).filter(o => o.moved).length; s.tower = Object.values(s.towerW).reduce((a, v) => a + v, 0); }
   }
   s.sevii = 1;
+  delete s.keys;   // (the story's keepsakes, 2026-10-16 to 10-18: gone, the owner's rule)
   const fresh = newSave(), featsBefore = s.featSeen == null;
   for (const k in fresh) if (s[k] == null) s[k] = fresh[k];
   // features open with the Journey (featOn in a6_state.js): a save from before that already has what it has reached, without

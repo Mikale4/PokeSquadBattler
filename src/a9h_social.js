@@ -10,7 +10,8 @@ const rwChips = rw => Object.entries(rw || {}).map(([k, n]) => `<span class="cos
 // every Trainer has a look (a6b_ladder.js docSpr); the player's is their own
 const avatarKey = i => i === -1 ? avatar() : docSpr(S.ladder.seed + ":" + i), avatarOf = i => trainerURL(avatarKey(i));
 const emblem = g => `<span class="gem" style="--gc:${g.col}"><img class="px" src="${sprFront(g.em)}" alt=""></span>`;
-const SET_DEF = { ticker: true, whisperToasts: true, filter: false };
+// (and the battle's display settings, ported from Arknights Tactics: S3 cut-ins, screen shake, damage numbers; the owner's ask, 2026-10-18)
+const SET_DEF = { ticker: true, whisperToasts: true, filter: false, cutins: true, shake: true, dmgNums: true };
 // chat emotes: HeartGold/SoulSilver's (resources/emotes, tools/pack_emotes.py), written :name: in a message and drawn animated
 const EMOTES = ["dots", "note", "happy", "grumpy", "exclaim", "heart", "laugh", "angry", "question", "sick", "sad", "alert"];
 const emoteHTML = (n, size = 20) => `<i class="emote" style="--es:${size}px;--ei:${EMOTES.indexOf(n)}" title="${n}"></i>`;

@@ -76,12 +76,12 @@ const KALOS_JOURNEY = {
         ], post: [
           L("shauna", "There! I healed both our Pokémon. Tierno gave you the Professor's letter for your mom, right? Go show her!"),
         ] },
-        { id: "d", type: "story", name: "Vaniville Town: The Professor's Letter", reward: { key: "ka_townmap" }, music: "kaHurry1", pre: [
+        { id: "d", type: "story", name: "Vaniville Town: The Professor's Letter", music: "kaHurry1", pre: [
           L("kmom", "A letter from Professor Sycamore? What lovely handwriting. ...He wants you to go on a journey with your Pokémon. Well, of course you'll go!"),
           L("kmom", "Here: a Town Map, and a fresh set of clothes. A Trainer has to look sharp in Kalos!"),
           L("narr", "On your way out, Mom's Rhyhorn ambles over and nudges you. It has known you since you were a baby, and it's going to miss you."),
         ] },
-        { id: "e", type: "battle", name: "Route 2", reward: { key: "ka_pokeballs" }, lv: 3, env: "route", wild: 1, catch: "fletchling", music: "kaHurry2", waves: [WK("bunnelby:3", "scatterbug:2"), WK("fletchling:3")], pre: [
+        { id: "e", type: "battle", name: "Route 2", reward: { permit: 10 }, lv: 3, env: "route", wild: 1, catch: "fletchling", music: "kaHurry2", waves: [WK("bunnelby:3", "scatterbug:2"), WK("fletchling:3")], pre: [
           LR("krival", () => `Watch. First you weaken it... then you throw the Poké Ball. See? Easy. Here, ten Poké Balls each. Now you try!`),
           L("narr", "Fletchling hop through the grass on Route 2, singing. They're braver than they look."),
         ], post: [L("narr", "Gotcha! Fletchling was caught! It sings beautifully, and fights fiercely for its territory.")] },
@@ -95,13 +95,13 @@ const KALOS_JOURNEY = {
         { id: "h", type: "side", name: "Route 22: Litleo", lv: 6, env: "route", wild: 1, catch: "litleo", music: "kaRoute4", waves: [WK("psyduck:6", "bunnelby:6"), WK("litleo:6")], pre: [
           L("narr", "Route 22 runs along the river west of Santalune City. A young Litleo is prowling the long grass, trying to look fierce."),
         ], post: [L("narr", "Gotcha! Litleo was caught! It leaves its pride to live on its own, and gets stronger for it.")] },
-        { id: "i", type: "battle", name: "Santalune City: Roller Skater Rinka", reward: { key: "ka_rollerskates" }, lv: 7, env: "city", music: "kaEyesRoller", trainer: TR("Roller Skater Rinka", "ka_rollerf", "You don't have Roller Skates? In Kalos? Beat me and I'll give you a pair!", "Whoa, you're fast even without skates! Here, take these."),
+        { id: "i", type: "battle", name: "Santalune City: Roller Skater Rinka", lv: 7, env: "city", music: "kaEyesRoller", trainer: TR("Roller Skater Rinka", "ka_rollerf", "You don't have Roller Skates? In Kalos? Beat me and I'll give you a pair!", "Whoa, you're fast even without skates! Here, take these."),
           waves: [WK("zigzagoon:7")], pre: [
           L("narr", "Santalune City has a fountain, a Trainers' School and a Gym. A Roller Skater spins to a stop in front of you, blocking the way."),
         ] },
         { id: "j", type: "battle", name: "Santalune Gym: Lass Charlotte", lv: 9, env: "gym", music: "kaEyesLass", trainer: TR("Lass Charlotte", "ka_lass", "Don't get stuck in the web! Viola's photos look much better with a challenger caught in them!", "I'm the one who got caught..."),
           waves: [WK("kakuna:7", "combee:9")] },
-        { id: "k", type: "boss", name: "Santalune Gym: Leader Viola", get reward() { return { tm: tmId("infestation", 6), key: "ka_expshare" }; }, lv: 12, env: "forest", badgeWin: 0,
+        { id: "k", type: "boss", name: "Santalune Gym: Leader Viola", get reward() { return { tm: tmId("infestation", 6) }; }, lv: 12, env: "forest", badgeWin: 0,
           trainer: TR("Leader Viola", "ka_viola", "I'm Viola, the Santalune Gym Leader, and a photographer! I'll catch the look on your face when you lose, right in my lens!", "You and your Pokémon make a great picture! Here: the Bug Badge."),
           waves: [WK("surskit:10+", "vivillon:12!")], pre: [
           L("viola", "Bug Pokémon are so photogenic! Every shot is a masterpiece. Ready? Say cheese!"),
@@ -291,7 +291,7 @@ const KALOS_JOURNEY = {
           waves: [WK("remoraid:27", "skrelp:27", "wailmer:27")], pre: [
           L("narr", "With Surf, Azure Bay opens up: blue water, small sandy islands, and a strange empty cave in the middle, the Sea Spirit's Den."),
         ] },
-        { id: "c", type: "battle", name: "Coumarine City: the Good Rod", reward: { key: "ka_goodrod" }, lv: 25, env: "sea", wild: 1, catch: "clauncher", music: "kaCoumarine", waves: [WK("staryu:25"), WK("clauncher:25")], pre: [
+        { id: "c", type: "battle", name: "Coumarine City: the Good Rod", lv: 25, env: "sea", wild: 1, catch: "clauncher", music: "kaCoumarine", waves: [WK("staryu:25"), WK("clauncher:25")], pre: [
           L("narr", "A Fisherman on Coumarine's pier gives you the Good Rod. Something with one big claw bites before the lure hits the water."),
         ], post: [L("narr", "Gotcha! Clauncher was caught! It knocks down its prey with blasts of water from its claw.")] },
         { id: "d", type: "side", name: "Coumarine City: Skrelp", lv: 25, env: "sea", wild: 1, catch: "skrelp", music: "kaCoumarine", waves: [WK("shellder:25"), WK("skrelp:25")], pre: [
@@ -453,7 +453,7 @@ const KALOS_JOURNEY = {
         // (two battles in X and Y, Celosia then Bryony: a normal stage, so they come one after the other)
         { id: "e", type: "battle", name: "Lysandre Labs: Celosia & Bryony", lv: 48, env: "plant", music: "kaFlare", trainer: TR("Team Flare Celosia & Bryony", "ka_bryony", "One at a time, this time. Celosia first.", "The stones on Route 10 are graves, you know. Of the Pokémon the weapon killed. It'll happen again."),
           waves: [WK("manectric:46", "drapion:48!"), WK("liepard:46", "bisharp:48!")] },
-        { id: "f", type: "boss", name: "Lysandre Labs: Mable", reward: { key: "ka_elevatorkey" }, lv: 48, env: "plant", music: "kaFlare", trainer: TR("Team Flare Mable", "ka_gruntf", "Looking for this? The Elevator Key. Beat me, and it's yours.", "Fine. Take it. It won't change anything."),
+        { id: "f", type: "boss", name: "Lysandre Labs: Mable", lv: 48, env: "plant", music: "kaFlare", trainer: TR("Team Flare Mable", "ka_gruntf", "Looking for this? The Elevator Key. Beat me, and it's yours.", "Fine. Take it. It won't change anything."),
           waves: [WK("houndoom:46", "weavile:48!")] },
         { id: "g", type: "story", name: "Lysandre Labs: AZ", music: "kaPrison", pre: [
           L("narr", "The elevator goes down. Behind bars, sits the very tall man from Route 13. Lysandre stands outside the cell."),
@@ -593,7 +593,7 @@ const KALOS_JOURNEY = {
         ], post: [
           L("narr", "Diantha takes you up to the Hall of Fame, where your Kalos Pokémon are recorded for all time. Their level cap keeps rising with the rest of your Journey, and lifts to Lv 100 once it's done."),
         ] },
-        { id: "i", type: "battle", name: "Lumiose City: AZ", reward: { key: "ka_honorofkalos" }, lv: 60, env: "city", music: "kaLumiose", trainer: TR("Pokémon Trainer AZ", "ka_az", "Champion. I would like to know what it is to be a Trainer. Please. Battle me.", "...So that is a Trainer. I feel free. Free of the man who built the weapon."),
+        { id: "i", type: "battle", name: "Lumiose City: AZ", lv: 60, env: "city", music: "kaLumiose", trainer: TR("Pokémon Trainer AZ", "ka_az", "Champion. I would like to know what it is to be a Trainer. Please. Battle me.", "...So that is a Trainer. I feel free. Free of the man who built the weapon."),
           waves: [WK("torkoal:60", "golurk:60", "sigilyph:60!")], pre: [
           L("narr", "A few days later, Lumiose City throws a parade for the five friends who saved Kalos. Professor Sycamore gives you the Honor of Kalos."),
           L("narr", "Then the crowd parts. The tall man, AZ, steps onto the stage."),
@@ -605,7 +605,7 @@ const KALOS_JOURNEY = {
       ] },
     { id: "c12", title: "Kiloude City and the Looker Bureau", env: "city", map: "city", reward: { orundum: 1500, permit: 5, rec4: 3 },
       nodes: [
-        { id: "a", type: "story", name: "Lumiose Station: the TMV Pass", reward: { key: "ka_tmvpass" }, music: "kaTMV", pre: [
+        { id: "a", type: "story", name: "Lumiose Station: the TMV Pass", music: "kaTMV", pre: [
           L("kmom", "The Champion of Kalos, in my kitchen! Professor Sycamore called. He's waiting for you at Lumiose Station."),
           L("sycamore", "There's the Champion! Sina and Dexio have upgraded your Pokédex to the National Pokédex. And here: a TMV Pass. The train goes all the way to Kiloude City."),
           L("narr", "Kiloude City, at the end of the line, has the Battle Maison and the Friend Safari. The Battle Maison's challenges are in the Battle Tower's Kalos wing."),

@@ -81,6 +81,11 @@ const PALDEA_LINE = { sprigatito: ["sprigatito", "floragato", "meowscarada"], fu
 const PALDEA_WEAK = { sprigatito: "quaxly", fuecoco: "sprigatito", quaxly: "fuecoco" }, PALDEA_STRONG = { sprigatito: "fuecoco", fuecoco: "quaxly", quaxly: "sprigatito" };
 const paldeaStarter = () => { const k = regionStarter("paldea"); return PALDEA_LINE[k] ? k : "sprigatito"; };
 const nemonaMon = st => PALDEA_LINE[PALDEA_WEAK[paldeaStarter()]][st];
+// Mr. Jacq's Egg in Kitakami (The Teal Mask): a Sinnoh partner, chosen at random in the games; here by your world (S.world.start), so it
+// never changes. journeyGifts reads a stage's plain gift only, so these three count as Paldea's here, as every Journey gift does
+const PA_EGG = ["turtwig", "chimchar", "piplup"];
+const paEgg = () => PA_EGG[Math.floor(((S && S.world && S.world.start) || 0) / 1000) % 3];
+for (const k of PA_EGG) if (!gensOf(k).includes(9)) (MORE_GENS[k] = MORE_GENS[k] || []).push(9);
 const nemonaTR = (intro, lose, n = "Pokémon Trainer Nemona") => TR(n, "pa_nemona", intro, lose);
 const arvenTR = (intro, lose) => TR("Pokémon Trainer Arven", "pa_arven", intro, lose);
 const starTR = (intro, lose, f = false, n = "Team Star Grunt") => TR(n, f ? "pa_gruntf" : "pa_grunt", intro, lose);
@@ -167,9 +172,12 @@ const PALDEA_DLC_CHAPTERS = [
         L("pabriar", "The hidden treasure of Area Zero! I'm still waiting for the League's permission to go down there. In the meantime... Kitakami! You'll love it."),
         L("narr", "The road climbs through rice paddies and apple orchards to Mossui Town, at the foot of a mountain with two horns."),
       ] },
-      { id: "b", type: "battle", name: "Mossui Town: Carmine", lv: 60, env: "city", music: "paMossui", trainer: carmineTR("So you're the outsider from Paldea. Everybody's making such a fuss. Let's see if you're worth it!", "Hmph. Fine, you're not bad. For an outsider."),
+      { id: "b", type: "battle", name: "Mossui Town: Carmine", lv: 60, get gift() { return paEgg(); }, giftLv: 1, env: "city", music: "paMossui", trainer: carmineTR("So you're the outsider from Paldea. Everybody's making such a fuss. Let's see if you're worth it!", "Hmph. Fine, you're not bad. For an outsider."),
         waves: [WP("poochyena:60", "vulpix:60"), WP("poltchageist:60!")], pre: [
         L("pacarmine", "I'm Carmine. I live here. And this is my little brother, Kieran. Don't get any ideas: Kitakami isn't a theme park for tourists."),
+      ], post: [
+        L("pajacq", "There you are! The Academy sent this Egg along for you. It's a partner Pokémon from Sinnoh. Look after it!"),
+        L("narr", "East of Mossui Town, the Egg hatches, and your new partner battles for you here."),
       ] },
       { id: "c", type: "story", name: "Mossui Town: the Community Center", music: "paMossui", pre: [
         L("pacaretaker", "Welcome, welcome! Your task while you're here: find Kitakami's three signboards and read the tale of the Loyal Three, who drove the ogre off long ago."),
@@ -197,8 +205,9 @@ const PALDEA_DLC_CHAPTERS = [
         waves: [WP("morpeko:62@focussash", "swadloon:63", "mightyena:63"), WP("sinistcha:64!@occaberry")], pre: [
         L("narr", "Kieran's grandparents, Yukito and Hideko, run the house in Mossui Town. Hideko lends you a festival outfit, and Carmine squints at the mask table."),
       ] },
-      { id: "j", type: "story", name: "Kitakami Hall: the Festival of Masks", music: "paFestivalMasks", pre: [
+      { id: "j", type: "story", name: "Kitakami Hall: the Festival of Masks", reward: { op: "munchlax" }, music: "paFestivalMasks", pre: [
         L("narr", "At night, Kitakami Hall glows with lanterns. You play Ogre Oustin' with Koraidon, gathering Berries before the ogre-masked children do."),
+        L("narr", "You clear it on Hard too, and the receptionist hands you her prize: a Munchlax."),
         L("narr", "On the festival's edge, a small figure in a teal mask is watching the lights. When Carmine calls out, it runs, and drops the mask."),
         L("pacarminef", "The ogre?! ...It dropped this. Don't tell Kieran. He'd lose his mind."),
       ] },
@@ -387,7 +396,7 @@ const PALDEA_DLC_CHAPTERS = [
     ] },
   { title: "The Indigo Disk: Area Zero Underdepths", env: "cave", map: "cave", bb: 1, wbgm: "paZeroWild", bgm: "paUnderdepths", reward: { orundum: 2000, permit: 5, rec4: 5 },
     nodes: [
-      { id: "a", type: "story", name: "The Zero Lab: the Indigo Disk", reward: { key: "pa_indigodisk" }, music: "paUnderdepths", pre: [
+      { id: "a", type: "story", name: "The Zero Lab: the Indigo Disk", music: "paUnderdepths", pre: [
         L("narr", "Geeta hands you an artifact a researcher left in Area Zero long ago: the Indigo Disk. In the Zero Lab it sends the elevator below the time machine, a kilometer underground."),
         L("pabriar", "The Area Zero Underdepths! Heath never got this far. And these crystals... I'm calling it the Stellar type. The nineteenth Tera Type!"),
         L("narr", "Crystal clusters block the way. Each one clears when the Stellar Tera Pokémon near it is beaten. They glitter with every color at once, and none of them can be caught."),
@@ -419,7 +428,7 @@ const PALDEA_DLC_CHAPTERS = [
         L("narr", "Gotcha! Terapagos was caught!"),
         L("pakieran", "I'm sorry. For everything. I'm quitting the League. Could we... start over? As friends?"),
       ] },
-      { id: "k", type: "story", name: "Kitakami's Crystal Pool: a Visitor from the Past", reward: { key: "pa_sadasbook" }, music: "paFromZero", pre: [
+      { id: "k", type: "story", name: "Kitakami's Crystal Pool: a Visitor from the Past", music: "paFromZero", pre: [
         L("narr", "Back at the academy, Briar gives you her book about the expedition. Then Terapagos leads you to Kitakami's Crystal Pool, and the crystals hum."),
         L("narr", "Someone steps out of the light: Professor Sada, the real one, from the past. She looks at you, at Koraidon, and smiles."),
         L("pasada", "So this is where the journey goes. Take this: the Scarlet Book. I'll take Briar's book back with me. Look after Koraidon for me, won't you?"),
@@ -435,7 +444,7 @@ const PALDEA_DLC_CHAPTERS = [
       { id: "b", type: "battle", name: "Area Zero: Gouging Fire", lv: 75, env: "cave", wild: 1, catch: "gougingfire", music: "paAreaZero", waves: [WP("gougingfire:75!")], pre: [
         L("paperrin", "I'm the Terarium's photographer now. Look: two Pokémon spotted in Area Zero, like nothing anyone's seen. Catch them and show me?"),
       ], post: [L("narr", "Gotcha! Gouging Fire was caught! It looks like Entei from an ancient time.")] },
-      { id: "c", type: "battle", name: "Area Zero: Raging Bolt", lv: 75, reward: { key: "pa_sportball" }, env: "cave", wild: 1, catch: "ragingbolt", music: "paAreaZero", waves: [WP("ragingbolt:75!")], post: [
+      { id: "c", type: "battle", name: "Area Zero: Raging Bolt", lv: 75, reward: { permit: 1 }, env: "cave", wild: 1, catch: "ragingbolt", music: "paAreaZero", waves: [WP("ragingbolt:75!")], post: [
         L("narr", "Gotcha! Raging Bolt was caught! It looks like Raikou from an ancient time."),
         L("paperrin", "Amazing! Here: a Sport Ball, for your collection."),
       ] },
@@ -455,7 +464,7 @@ const PALDEA_DLC_CHAPTERS = [
   // ===== Mochi Mayhem (the epilogue) =====
   { title: "Mochi Mayhem", env: "city", map: "city", wbgm: "paWildKitakami", bgm: "paMossui", reward: { orundum: 3000, permit: 10, rec4: 5 },
     nodes: [
-      { id: "a", type: "story", name: "Cabo Poco: Kieran's Letter", reward: { key: "pa_kieransletter" }, music: "paEpilogue", pre: [
+      { id: "a", type: "story", name: "Cabo Poco: Kieran's Letter", music: "paEpilogue", pre: [
         L("narr", "At Peachy's in Mossui Town you noticed a peach-shaped decoration... and then it was gone. Back home, Arven, Nemona and Penny are waiting, and Mom hands you a letter."),
         L("pakieran", "\"I'm taking a break from Blueberry, at home in Kitakami. Come visit? There are tickets for everyone.\""),
         L("panemona", "A trip! With battles! Kitakami, here we come!"),
@@ -504,7 +513,7 @@ const PALDEA_BASE_CHAPTERS = [
         L("pamom", "Your enrollment papers still haven't come! Don't run off yet. ...Oh, the doorbell. Who could that be?"),
         L("paclavell", "Good morning! I'm Clavell, the academy's director. I'm sorry the papers are late, so I brought them myself. And I've brought something else. Shall we step outside?"),
       ] },
-      { id: "b", type: "story", name: "Cabo Poco: Director Clavell's Three", reward: { key: "pa_rotomphone" }, starter: 1, music: "paCaboPoco", pre: [
+      { id: "b", type: "story", name: "Cabo Poco: Director Clavell's Three", starter: 1, music: "paCaboPoco", pre: [
         L("paclavell", "Every new student at the academy receives a Pokémon partner. Here are three. Take your time getting to know them, and come and find me down the hill, at the next house."),
         L("pamom", "And here's a present from me: a Rotom Phone! Rotom lives inside it and runs the apps. Now go and meet your new partners."),
         L("narr", "At the house down the hill, a girl in the academy's uniform is waiting with Director Clavell. She's grinning at you as if you're already friends."),
@@ -519,7 +528,7 @@ const PALDEA_BASE_CHAPTERS = [
         L("panemona", "Let me add the Pokédex app to your phone. There! Now let's head to the academy together. It's in Mesagoza, past Poco Path and Los Platos."),
         L("pamom", "Wait! Take this: a sandwich for the road, and some pocket money. Have a wonderful first day!"),
       ] },
-      { id: "d", type: "battle", name: "Poco Path: Lechonk", lv: 3, reward: { key: "pa_pokeballs" }, env: "route", wild: 1, catch: "lechonk", music: "paPocoPath", waves: [WP("lechonk:3")], pre: [
+      { id: "d", type: "battle", name: "Poco Path: Lechonk", lv: 3, reward: { permit: 15 }, env: "route", wild: 1, catch: "lechonk", music: "paPocoPath", waves: [WP("lechonk:3")], pre: [
         L("panemona", "Here, five Poké Balls. First you weaken it, then you throw! See that Lechonk? It's all yours."),
       ], post: [L("narr", "Gotcha! Lechonk was caught! It follows its nose all day, looking for food. Nemona hands you ten more Poké Balls.")] },
       { id: "e", type: "story", name: "Inlet Grotto: the Mysterious Pokémon", reward: { tm: tmId("swift", 9) }, music: "paCove", pre: [
@@ -527,7 +536,7 @@ const PALDEA_BASE_CHAPTERS = [
         L("narr", "The Rotom Phone slows your fall. The Pokémon is too weak to stand, so you give it Mom's sandwich. It perks up, and leads you into the Inlet Grotto, smashing boulders out of the way."),
         L("narr", "Deep in the grotto a Houndoom is waiting, far too strong for your partner. The Pokémon scoops you up and carries you up the cliff to Nemona, then shrinks in a flash of light."),
       ], post: [L("panemona", "Where did you go?! ...And what is that? I've never seen a Pokémon like it. Here, take TM032 Swift, and my number. Call me if anything else strange happens!")] },
-      { id: "f", type: "battle", name: "Poco Path Lighthouse: Arven", lv: 5, reward: { key: "pa_koraidonball" }, env: "route", music: "paStrength", trainer: arvenTR("That Pokémon's called Koraidon. Let's see if you can handle it. Battle me.", "Fine. You'll do."),
+      { id: "f", type: "battle", name: "Poco Path Lighthouse: Arven", lv: 5, env: "route", music: "paStrength", trainer: arvenTR("That Pokémon's called Koraidon. Let's see if you can handle it. Battle me.", "Fine. You'll do."),
         waves: [WP("skwovet:5!")], pre: [
         L("narr", "At the lighthouse, a boy is peering through the window, as if he's looking for someone who used to live there."),
         L("paarven", "...That Pokémon. It's Koraidon. It was in the lab here once. I'm Arven."),
@@ -557,7 +566,7 @@ const PALDEA_BASE_CHAPTERS = [
         rivalWaves: () => [WP(nemonaMon(0) + ":8"), TERA("pawmi:9!", "Electric")], pre: [
         L("panemona", "Watch closely. When Pokémon Terastallize, they shine like gems, and their type gets stronger. Here, a Tera aura shows it."),
       ] },
-      { id: "q", type: "battle", name: "Mesagoza: Team Star at the Academy Steps", lv: 9, reward: { key: "pa_teraorb" }, env: "city", music: "paTeamStar", trainer: starTR("Hey! This is Team Star business. Get lost, or we'll make you!", "Ugh! Let's get out of here!", false, "Team Star Grunts"),
+      { id: "q", type: "battle", name: "Mesagoza: Team Star at the Academy Steps", lv: 9, env: "city", music: "paTeamStar", trainer: starTR("Hey! This is Team Star business. Get lost, or we'll make you!", "Ugh! Let's get out of here!", false, "Team Star Grunts"),
         waves: [WP("shroodle:8"), WP("yungoos:9!")], pre: [
         L("narr", "At the foot of the academy's long stairs, two students in star-studded outfits are crowding a girl with an Eevee backpack. They want her to join Team Star."),
         L("panemona", "Team Star! Leave her alone! ...Here, take this Tera Orb. Show them what your partner can do!"),
@@ -1029,8 +1038,9 @@ const PALDEA_BASE_CHAPTERS = [
 // ===== The base game's post-game: the Academy Ace Tournament, the Treasures of Ruin, Area Zero's Paradox Pokémon =====
 const PALDEA_POST_CHAPTER = { title: "The Academy Ace Tournament", env: "city", map: "city", wbgm: "paZeroWild", bgm: "paAcademy", reward: { orundum: 2000, permit: 5, rec4: 5 },
   nodes: [
-    { id: "a", type: "story", name: "The Academy: the Ace Tournament", music: "paAcademy", pre: [
+    { id: "a", type: "story", name: "The Academy: the Ace Tournament", reward: { gold5: 1 }, music: "paAcademy", pre: [
       L("paclavell", "Welcome home, Champion! The Treasure Hunt is over, and so the Academy Ace Tournament begins: the school's strongest Trainers, one after another."),
+      L("paclavell", "And thank you, all four of you, for stopping the time machine. Area Zero was against the rules, but I'll overlook it. Please, take this Master Ball."),
     ] },
     { id: "b", type: "boss", name: "Academy Ace Tournament: Arven", lv: 68, env: "city", trainer: arvenTR("Round one, and it's me. Don't hold back!", "Ha. I knew you'd win."),
       waves: [WP("greedent:67", "cloyster:67", "scovillain:67"), WP("toedscruel:67", "garganacl:67"), TERA("mabosstiff:68!", "Dark")] },
@@ -1087,7 +1097,7 @@ const PALDEA_WAYHOME_CHAPTER = { title: "The Way Home: Area Zero", env: "cave", 
       { id: "b", type: "battle", name: "Research Station No. 1: Glimmora", lv: 62, env: "cave", wild: 1, music: "paAreaZero", waves: [WP("glimmora:62!")], pre: [
         L("narr", "On the way to the first station, a wild Glimmora attacks. Nemona jumps in beside you."),
       ], post: [L("narr", "The station was built eighty-seven years ago: a warp panel, a bed, and the first lock. You disable it.")] },
-      { id: "c", type: "battle", name: "Research Station No. 2: Scream Tail", lv: 62, reward: { key: "pa_scarletbook" }, env: "route", wild: 1, music: "paAreaZero", waves: [WP("screamtail:62!")], pre: [
+      { id: "c", type: "battle", name: "Research Station No. 2: Scream Tail", lv: 62, env: "route", wild: 1, music: "paAreaZero", waves: [WP("screamtail:62!")], pre: [
         L("narr", "Outside the second station, a pink, shaggy Pokémon like nothing in the Pokédex attacks. Penny fights beside you."),
       ], post: [
         L("pasada", "There is a time machine in the Zero Lab. It brings Pokémon from the ancient past here, to Area Zero. Though the cost was catastrophic."),

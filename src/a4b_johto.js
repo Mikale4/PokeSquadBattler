@@ -114,7 +114,7 @@ const JOHTO_JOURNEY = {
         { id: "d", type: "battle", name: "Union Cave", lv: 7, env: "cave", wild: 1, waves: [WJ("zubat:6", "geodude:6"), WJ("sandshrew:7", "onix:8")], pre: [
           L("jhiker", "Every Friday, they say, a huge Pokémon cries out from deep in this cave. Spooky, eh?"),
         ] },
-        { id: "e", type: "battle", name: "Slowpoke Well: Team Rocket", lv: 12, env: "cave", reward: { key: "jo_lureball" }, trainer: TR("Executive Proton", "jo_proton", "We're cutting off Slowpoke's tails to sell them! Scram!", "Team Rocket, finished? No way!"),
+        { id: "e", type: "battle", name: "Slowpoke Well: Team Rocket", lv: 12, env: "cave", reward: { permit: 1 }, trainer: TR("Executive Proton", "jo_proton", "We're cutting off Slowpoke's tails to sell them! Scram!", "Team Rocket, finished? No way!"),
           waves: [WJ("rattata:9", "zubat:9", "ekans:11"), WJ("zubat:8", "koffing:12!")], pre: [
           L("narr", "Kurt, the Azalea Town Apricorn craftsman, chased the Grunt at the entrance away, then jumped into the well after the rest... and hurt his back in the fall."),
           L("kurt", "Ow, my back! You there! Team Rocket is down here, cutting the tails off the Slowpoke! Give them a thrashing for me!"),
@@ -152,7 +152,7 @@ const JOHTO_JOURNEY = {
         ] },
         { id: "b", type: "battle", name: "Goldenrod Gym: Lass Carrie", lv: 18, env: "gym", trainer: TR("Lass Carrie", "jo_lass", "Don't let my Pokémon's cute looks fool you. They can whip you!", "Darn... I thought you were weak..."),
           waves: [WJ("snubbull:18")] },
-        { id: "c", type: "boss", name: "Whitney, the Incredibly Pretty Girl", lv: 20, env: "gym", badgeWin: 2, reward: { key: "jo_squirtbottle", tm: joTM("attract") },
+        { id: "c", type: "boss", name: "Whitney, the Incredibly Pretty Girl", lv: 20, env: "gym", badgeWin: 2, reward: { tm: joTM("attract") },
           trainer: TR("Leader Whitney", "rg_whitney", "Hi! I'm Whitney! Everyone was into Pokémon, so I got into it too! They're super-cute!", "Waaaah! You're mean! That's not fair!"),
           waves: [WJ("clefairy:18+"), WJ("miltank:20!")], pre: [
           L("whitney", "You want to battle? Just so you know, I'm really strong! My Miltank's Rollout gets stronger every turn it keeps rolling!"),
@@ -231,7 +231,7 @@ const JOHTO_JOURNEY = {
         ] },
         { id: "d", type: "battle", name: "Cianwood Gym: Blackbelt Yoshi", lv: 27, env: "gym", trainer: TR("Blackbelt Yoshi", "jo_blackbelt", "My Fighting Pokémon trained right beside me under the waterfall!", "Wha-what?! Did I lose?"),
           waves: [WJ("hitmonlee:27")] },
-        { id: "e", type: "boss", name: "Chuck, His Roaring Fists Do the Talking", lv: 31, env: "gym", badgeWin: 4, reward: { key: "jo_secretpotion", tm: [joTM("dynamicpunch"), joTM("fly")] },
+        { id: "e", type: "boss", name: "Chuck, His Roaring Fists Do the Talking", lv: 31, env: "gym", badgeWin: 4, reward: { tm: [joTM("dynamicpunch"), joTM("fly")] },
           trainer: TR("Leader Chuck", "rg_chuck", "WAHAHAH! So you've come this far! Let me tell you, I'm tough! My Pokémon will crush stones and shatter bones!", "Wha? Huh? I lost? How about that! Take the Storm Badge, you're worthy."),
           waves: [WJ("primeape:29+"), WJ("poliwrath:31!@sitrusberry")], pre: [
           L("chuck", "Watch this! I'll smash this boulder with my bare hands... Hah! Now it's your turn: fight me!"),
@@ -252,7 +252,7 @@ const JOHTO_JOURNEY = {
       ] },
     { id: "c6", title: "Mahogany Town and Olivine", env: "ice", map: "cave", reward: { lmd: 8000, orundum: 500 },
       nodes: [
-        { id: "a", type: "battle", name: "Lake of Rage: the Red Gyarados", lv: 30, env: "sea", wild: 1, reward: { key: "jo_redscale" }, waves: [WJ("magikarp:15", "magikarp:18"), WJ("gyarados:30!")], pre: [
+        { id: "a", type: "battle", name: "Lake of Rage: the Red Gyarados", lv: 30, env: "sea", wild: 1, waves: [WJ("magikarp:15", "magikarp:18"), WJ("gyarados:30!")], pre: [
           L("narr", "On Route 42, Suicune stands in an Apricorn grove. You step toward it, and it bounds away east toward Mahogany Town."),
           L("narr", "North of Mahogany Town, the Lake of Rage is swarming with Gyarados, far too many for one lake. One of them is red."),
           L("narr", "It rears up from the water, furious!"),
@@ -306,7 +306,7 @@ const JOHTO_JOURNEY = {
         ] },
         { id: "b", type: "battle", name: "Radio Tower: the Lower Floors", lv: 25, env: "plant", trainer: TR("Team Rocket Grunts", "jo_grunt", "The Radio Tower is ours now! Get lost!", "Ugh... the boss won't be happy..."),
           waves: [WJ("raticate:24", "raticate:24"), WJ("grimer:23", "grimer:23", "muk:25!")] },
-        { id: "c", type: "battle", name: "Radio Tower: the Director", lv: 32, env: "plant", reward: { key: "jo_basementkey" }, trainer: TR("Executive Petrel", "jo_petrel", "Hello, I'm the Director of the Radio Tower! ...Hah! Fooled you!", "I knew I should have stuck to disguises..."),
+        { id: "c", type: "battle", name: "Radio Tower: the Director", lv: 32, env: "plant", trainer: TR("Executive Petrel", "jo_petrel", "Hello, I'm the Director of the Radio Tower! ...Hah! Fooled you!", "I knew I should have stuck to disguises..."),
           waves: [WJ("koffing:30", "koffing:30", "koffing:30"), WJ("koffing:30", "weezing:32!", "koffing:30")], pre: [
           L("petrel", "The real Director? He's locked up in the Underground warehouse. Our boss will hear us from anywhere once we broadcast on every channel!"),
         ], post: [L("narr", "The fake Director drops the Basement Key. The way into the Goldenrod Underground is open.")] },
@@ -314,7 +314,7 @@ const JOHTO_JOURNEY = {
           rivalWaves: () => [WJ("golbat:32", "magnemite:30", "haunter:32"), WJ("sneasel:34", silverMon(1) + ":34!")], pre: [
           L("silver2", "Team Rocket again. Weaklings in a crowd. I'll crush them myself, after I'm done with you."),
         ], post: [L("silver2", "...I lost. Lance beat me too, at their hideout. He said I don't love my Pokémon... What does that even mean?")] },
-        { id: "e", type: "story", name: "The Real Director", reward: { key: "jo_cardkey" }, pre: [
+        { id: "e", type: "story", name: "The Real Director", pre: [
           L("narr", "Past three shutters and a maze of Grunts, the real Director is tied up in the warehouse under the Department Store."),
           L("director", "Thank you! They took my tower and my disguise. Here is the Card Key: it opens the door on the third floor. Please, take back the tower!"),
         ] },
@@ -324,7 +324,7 @@ const JOHTO_JOURNEY = {
         ] },
         { id: "g", type: "battle", name: "Radio Tower: Executive Ariana", lv: 32, env: "plant", trainer: TR("Executive Ariana", "jo_ariana", "You again! You ruined our experiment at the hideout. I won't let you ruin this too.", "Tch, you really are strong. What a shame."),
           waves: [WJ("arbok:32", "vileplume:32", "murkrow:32!")] },
-        { id: "h", type: "boss", name: "Radio Tower: Executive Archer", lv: 38, env: "plant", reward: { key: "jo_clearbell" }, trainer: TR("Executive Archer", "jo_archer", "We are Team Rocket, and we will return Giovanni to his rightful place! Stand aside, child!", "...Giovanni, forgive us. We have failed again. Team Rocket is finished."),
+        { id: "h", type: "boss", name: "Radio Tower: Executive Archer", lv: 38, env: "plant", trainer: TR("Executive Archer", "jo_archer", "We are Team Rocket, and we will return Giovanni to his rightful place! Stand aside, child!", "...Giovanni, forgive us. We have failed again. Team Rocket is finished."),
           waves: [WJ("houndour:35", "koffing:35"), WJ("houndoom:38!")], pre: [
           L("archer", "I am Archer, and I lead Team Rocket while our boss is away. We've waited three years for this broadcast!"),
         ], post: [
@@ -394,7 +394,7 @@ const JOHTO_JOURNEY = {
         ], post: [L("silver2", "What you have that I don't... I'm going to figure it out. I'll keep training. ...Go on. Get to the League.")] },
         { id: "s1", type: "side", name: "Entei", lv: 40, env: "volcano", weather: "sun", wild: 1, catch: "entei", waves: [WJ("entei:40!")], pre: [
           L("narr", "The air on Route 27 shimmers with heat. Entei, born of the Burned Tower's fire, has stopped running. It turns to face you."),
-        ], post: [L("narr", "Gotcha! Entei was caught! A volcano erupts, they say, each time a new one is born.")] },
+        ], post: [L("narr", "Gotcha! Entei was caught! Volcanoes erupt when it barks, they say.")] },
         { id: "c", type: "battle", name: "Victory Road", lv: 34, env: "cave", music: "joVictoryRoad", wild: 1, catch: "ursaring", waves: [WJ("graveler:32", "golbat:33"), WJ("ursaring:33", "onix:34")], pre: [
           L("narr", "Victory Road climbs through the mountain to the Indigo Plateau. Only Trainers with eight Badges may pass."),
         ], post: [L("narr", "Gotcha! Ursaring was caught!")] },
@@ -433,7 +433,7 @@ const JOHTO_JOURNEY = {
     // Gyms go by their levels, Blue last (he battles only once the other seven are beaten); Kanto's Leaders award no Badges here
     { id: "c10", title: "Kanto", env: "city", map: "city", kanto: 1, reward: { lmd: 25000, orundum: 1500, permit: 10 },
       nodes: [
-        { id: "a", type: "story", name: "The S.S. Ticket", reward: { key: "jo_ssticket" }, pre: [
+        { id: "a", type: "story", name: "The S.S. Ticket", pre: [
           L("elm", "Our new Champion! Here: an S.S. Ticket. The S.S. Aqua sails from Olivine to Vermilion City, in Kanto. Professor Oak would love to see you there."),
           L("narr", "The S.S. Aqua is a fast ship: Olivine to Vermilion in a single night."),
         ] },
@@ -460,8 +460,7 @@ const JOHTO_JOURNEY = {
           waves: [WJ("golbat:39!")], pre: [
           L("narr", "The Power Plant's generator is dead: someone stole a vital part, so the Magnet Train can't run. In Cerulean City, a man in black runs out of the Gym and north to Nugget Bridge."),
         ], post: [L("narr", "The Machine Part is at the bottom of the Cerulean Gym's pool. But the Gym is empty: Misty is out on a date at Cerulean Cape.")] },
-        { id: "g", type: "boss", name: "Cerulean Gym: Misty", lv: 54, env: "gym", music: "joCerulean", reward: { key: "jo_expncard" },
-          trainer: TR("Leader Misty", "jo_misty", "You interrupted my date! You'd better make it up to me with a real battle!", "...Fine, you win. You really are good."),
+        { id: "g", type: "boss", name: "Cerulean Gym: Misty", lv: 54, env: "gym", music: "joCerulean",           trainer: TR("Leader Misty", "jo_misty", "You interrupted my date! You'd better make it up to me with a real battle!", "...Fine, you win. You really are good."),
           waves: [WJ("golduck:49+", "quagsire:49+"), WJ("lapras:52+", "starmie:54!@sitrusberry")], pre: [
           L("jmisty", "My Water Pokémon are tougher than ever. Grass and Electric moves? Quagsire doesn't even feel the Electric ones."),
         ], post: [L("narr", "The Machine Part goes back to the Power Plant, and the generator hums to life. At Lavender's radio station they give you the EXPN Card: it adds a channel to your radio, the Poké Flute, a tune that wakes any Pokémon.")] },
@@ -509,15 +508,15 @@ const JOHTO_JOURNEY = {
           L("narr", "Mt. Silver stands on the border of Johto and Kanto. Only Trainers the League recognizes may climb it, and Professor Oak has given you his. The Pokémon inside are fierce."),
           L("narr", "A Trainer is said to wait at the very top, silent, as if he's been there for years."),
         ] },
-        { id: "b", type: "side", name: "Tin Tower: Ho-Oh", lv: 60, reward: { key: "jo_rainbowwing" }, env: "tower", weather: "sun", wild: 1, catch: "hooh", waves: [WJ("hooh:60!")], pre: [
+        { id: "b", type: "side", name: "Tin Tower: Ho-Oh", lv: 60, env: "tower", weather: "sun", wild: 1, catch: "hooh", waves: [WJ("hooh:60!")], pre: [
           L("narr", "With Raikou, Entei and Suicune together, the Tin Tower's Sage hands you a feather that shines every color: the Rainbow Wing."),
           L("narr", "At the top of the Tin Tower, the Rainbow Wing grows warm. Ho-Oh, the Pokémon from the legend, lands on the roof."),
         ], post: [L("narr", "Gotcha! Ho-Oh was caught! The legend was true.")] },
-        { id: "b2", type: "side", name: "Whirl Islands: Lugia", lv: 60, reward: { key: "jo_silverwing" }, env: "sea", weather: "rain", wild: 1, catch: "lugia", waves: [WJ("lugia:60!")], pre: [
+        { id: "b2", type: "side", name: "Whirl Islands: Lugia", lv: 60, env: "sea", weather: "rain", wild: 1, catch: "lugia", waves: [WJ("lugia:60!")], pre: [
           L("narr", "In Pewter City, an old man who once saw a silver bird over the sea gives you a feather that glitters silver: the Silver Wing."),
           L("narr", "Deep under the Whirl Islands, the Silver Wing begins to shine. A vast Pokémon rises from the water: Lugia, the guardian of the seas."),
         ], post: [L("narr", "Gotcha! Lugia was caught!")] },
-        { id: "c", type: "side", name: "The Ilex Forest Shrine", lv: 30, reward: { key: "jo_gsball" }, env: "forest", wild: 1, catch: "celebi", waves: [WJ("celebi:30!")], pre: [
+        { id: "c", type: "side", name: "The Ilex Forest Shrine", lv: 30, env: "forest", wild: 1, catch: "celebi", waves: [WJ("celebi:30!")], pre: [
           L("kurt", "This GS Ball... I've studied it for ages, and I can't open it. But it reacts when I bring it near the shrine in Ilex Forest. Try it."),
           L("narr", "You set the GS Ball on the shrine. A Pokémon steps out of the light: Celebi, the voice of the forest, which travels through time."),
         ], post: [L("narr", "Gotcha! Celebi was caught!")] },
