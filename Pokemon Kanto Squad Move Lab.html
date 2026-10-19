@@ -74479,8 +74479,8 @@ function rescueModal(m) {
     <div class="eyebrow">${esc(r.prof[0])} · ${esc(r.n)}</div><h2>${opts.length === 1 ? "One more partner" : "Choose a new partner"}</h2>
     <p class="small dim">${opts.length === 1 ? `The last of ${esc(r.n)}'s first partners.` : `The first partners you didn't pick.`} It joins you at Lv ${m.rewards.lv || 5}, holding Berry Juice.</p>
     <div class="starters">${opts.map(k => `<button class="starter" data-act="pickRescue" data-id="${m.id}" data-k="${k}" style="--tc:${TC[OPS[k].types[0]]}"><img class="px" src="${sprFull(k)}" alt=""><b>${OPS[k].n}</b><span class="row" style="gap:3px;justify-content:center">${typeChips(OPS[k].types)}</span></button>`).join("")}</div>
-    <button class="btn ghost wide" data-act="closeModal">Not yet</button>
-  </div>`);
+    ${featOn("mail") ? `<button class="btn ghost wide" data-act="closeModal">Not yet</button>` : ""}
+  </div>`);   // (before Mail has opened the letter can't wait there: choose now)
 }
 
 // ---------- Medals ----------
@@ -76053,7 +76053,18 @@ async function claimMissions() {
   return true;
 }
 async function claimInbox() {
-  if (!featOn("mail") || !unclaimedMail().length) return false;
+  // (a Professor's letter that came before Mail opened: answered on the spot, rescueModal, like a player after the loss)
+  if (!featOn("mail")) {
+    const L = (S.inbox || []).filter(m => m.tag === "rescue" && !m.claimed && m.rewards.pick); if (!L.length) return false;
+    for (const m of L) {
+      const k = await demoRescue(m);
+      dsay("A new partner · " + m.from, `${OPS[k].n}, at Lv ${m.rewards.lv || 5}`);
+      await goHome(); rescueModal(m); await w(900);
+      await tapAct("pickRescue", { id: m.id, k }, OPS[k].n); await closeAllModals();
+    }
+    return true;
+  }
+  if (!unclaimedMail().length) return false;
   dsay("Checking Mail", `${unclaimedMail().length} gifts waiting`);
   await goHome(); await tapAct("inbox", {}, "Mail");
   // (a Professor's letter, journeyLoss: the partner that does best at the battle that held it up, demoRescue)
@@ -78066,7 +78077,7 @@ async function launchNode(id) {
   route("chapter", nd.ch.id);
   if (first && nd.pre && nd.pre.length) { if (nd.badgeWin != null) music(nd.ep.id === "unova" ? unovaGymHall(nd) : nd.ep.id === "alola" ? alolaHall(nd) : nd.ep.id === "galar" ? galarHall(nd) : nd.ep.id === "paldea" ? paldeaHall(nd) : { johto: "joGymHall", hoenn: "hoGymHall", sinnoh: "siGymHall", kalos: "kaGymHall" }[nd.ep.id] || "gymHall"); else if (nd.music) music(nd.music); await playScene(nd.pre, `${nd.id} ${nd.name}`, nd.env, nd); }
   spendSanity(cost); S.stats.battles++; save();
-  let chList = null, badgeGot = null;
+  let chList = null, badgeGot = null, lostMail = null;
   const waves = nodeWaves(nd).map(w => convWave(w, nd.lv, journeyG(nd)));
   startBattle({
     allies: ids.filter(owned).map(k => ({ op: k, prog: journeyProg(k, nd) })), waves, env: nd.env, weather: nd.weather, wild: !!nd.wild,   // (at most the region's level cap)
@@ -78096,10 +78107,12 @@ async function launchNode(id) {
       chList = chapterPayout(nd.ch);
       return { rewards: list, missions, levels };
     },
-    onLose() { S.sanity += Math.max(0, cost - 1); journeyLoss(nd); return { rewards: [] }; },   // (the region's first: the Professor's help)
+    onLose() { S.sanity += Math.max(0, cost - 1); lostMail = journeyLoss(nd); return { rewards: [] }; },   // (the region's first: the Professor's help)
     onQuit() { S.sanity += Math.max(0, cost - 1); save(); },
     async onClose(res) {
-      if (!res.win) return;
+      // (the Professor's letter opens at once, with the partners to choose from: before Mail has opened it's the only way to it.
+      // The Demo picks it up the same way in its next Mail check: claimInbox)
+      if (!res.win) { if (lostMail && !lostMail.claimed && !DEMO_ON()) rescueModal(lostMail); return; }
       if (first && nd.post && nd.post.length) await playScene(nd.post, `${nd.id} ${nd.name}`, nd.env, nd);
       rerender();
       const fin = () => { if (chList) chapterModal(nd.ch, chList); };

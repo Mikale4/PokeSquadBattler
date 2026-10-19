@@ -525,7 +525,18 @@ async function claimMissions() {
   return true;
 }
 async function claimInbox() {
-  if (!featOn("mail") || !unclaimedMail().length) return false;
+  // (a Professor's letter that came before Mail opened: answered on the spot, rescueModal, like a player after the loss)
+  if (!featOn("mail")) {
+    const L = (S.inbox || []).filter(m => m.tag === "rescue" && !m.claimed && m.rewards.pick); if (!L.length) return false;
+    for (const m of L) {
+      const k = await demoRescue(m);
+      dsay("A new partner · " + m.from, `${OPS[k].n}, at Lv ${m.rewards.lv || 5}`);
+      await goHome(); rescueModal(m); await w(900);
+      await tapAct("pickRescue", { id: m.id, k }, OPS[k].n); await closeAllModals();
+    }
+    return true;
+  }
+  if (!unclaimedMail().length) return false;
   dsay("Checking Mail", `${unclaimedMail().length} gifts waiting`);
   await goHome(); await tapAct("inbox", {}, "Mail");
   // (a Professor's letter, journeyLoss: the partner that does best at the battle that held it up, demoRescue)

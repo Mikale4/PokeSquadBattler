@@ -107,8 +107,8 @@ function rescueModal(m) {
     <div class="eyebrow">${esc(r.prof[0])} · ${esc(r.n)}</div><h2>${opts.length === 1 ? "One more partner" : "Choose a new partner"}</h2>
     <p class="small dim">${opts.length === 1 ? `The last of ${esc(r.n)}'s first partners.` : `The first partners you didn't pick.`} It joins you at Lv ${m.rewards.lv || 5}, holding Berry Juice.</p>
     <div class="starters">${opts.map(k => `<button class="starter" data-act="pickRescue" data-id="${m.id}" data-k="${k}" style="--tc:${TC[OPS[k].types[0]]}"><img class="px" src="${sprFull(k)}" alt=""><b>${OPS[k].n}</b><span class="row" style="gap:3px;justify-content:center">${typeChips(OPS[k].types)}</span></button>`).join("")}</div>
-    <button class="btn ghost wide" data-act="closeModal">Not yet</button>
-  </div>`);
+    ${featOn("mail") ? `<button class="btn ghost wide" data-act="closeModal">Not yet</button>` : ""}
+  </div>`);   // (before Mail has opened the letter can't wait there: choose now)
 }
 
 // ---------- Medals ----------

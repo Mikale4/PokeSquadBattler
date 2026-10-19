@@ -123,7 +123,7 @@ async function launchNode(id) {
   route("chapter", nd.ch.id);
   if (first && nd.pre && nd.pre.length) { if (nd.badgeWin != null) music(nd.ep.id === "unova" ? unovaGymHall(nd) : nd.ep.id === "alola" ? alolaHall(nd) : nd.ep.id === "galar" ? galarHall(nd) : nd.ep.id === "paldea" ? paldeaHall(nd) : { johto: "joGymHall", hoenn: "hoGymHall", sinnoh: "siGymHall", kalos: "kaGymHall" }[nd.ep.id] || "gymHall"); else if (nd.music) music(nd.music); await playScene(nd.pre, `${nd.id} ${nd.name}`, nd.env, nd); }
   spendSanity(cost); S.stats.battles++; save();
-  let chList = null, badgeGot = null;
+  let chList = null, badgeGot = null, lostMail = null;
   const waves = nodeWaves(nd).map(w => convWave(w, nd.lv, journeyG(nd)));
   startBattle({
     allies: ids.filter(owned).map(k => ({ op: k, prog: journeyProg(k, nd) })), waves, env: nd.env, weather: nd.weather, wild: !!nd.wild,   // (at most the region's level cap)
@@ -153,10 +153,12 @@ async function launchNode(id) {
       chList = chapterPayout(nd.ch);
       return { rewards: list, missions, levels };
     },
-    onLose() { S.sanity += Math.max(0, cost - 1); journeyLoss(nd); return { rewards: [] }; },   // (the region's first: the Professor's help)
+    onLose() { S.sanity += Math.max(0, cost - 1); lostMail = journeyLoss(nd); return { rewards: [] }; },   // (the region's first: the Professor's help)
     onQuit() { S.sanity += Math.max(0, cost - 1); save(); },
     async onClose(res) {
-      if (!res.win) return;
+      // (the Professor's letter opens at once, with the partners to choose from: before Mail has opened it's the only way to it.
+      // The Demo picks it up the same way in its next Mail check: claimInbox)
+      if (!res.win) { if (lostMail && !lostMail.claimed && !DEMO_ON()) rescueModal(lostMail); return; }
       if (first && nd.post && nd.post.length) await playScene(nd.post, `${nd.id} ${nd.name}`, nd.env, nd);
       rerender();
       const fin = () => { if (chList) chapterModal(nd.ch, chList); };
