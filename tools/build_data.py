@@ -534,6 +534,13 @@ SLOT_FIX = {"splash": 1, "transform": 3, "sonicboom": 1, "dragonrage": 2, "night
 
 
 def slot_class(key, e):
+    s = slot_class0(key, e)
+    # (the owner's rule, 2026-10-19: a flinch makes the target lose its next turn, so no S1 move flinches: Astonish, Bite, Heart
+    # Stamp, Needle Arm, Rolling Kick, Snore and Twister are S2)
+    return 2 if s == 1 and e.get("fl") else s
+
+
+def slot_class0(key, e):
     if key in SLOT_FIX:
         return SLOT_FIX[key]
     if e["c"] == "X":

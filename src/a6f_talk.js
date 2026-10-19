@@ -341,8 +341,8 @@ function memberJob(doc, k, A) {
   if (cm && roleKind(role) === "setter") t += roleKind(cv) === "hazard" ? `, and it sets ${MOVES[cm].n} too` : `, and it's the team's support too, with ${MOVES[cm].n}`;
   // a lead whose job is a first-turn move: its priority moves and Quick Claw give it turn meter by their priority the moment it's sent out
   if (R && (R.pri || J && J.need === "pri") && J && J.need && !/ hits with /.test(t)) {
-    const pri = mv.filter(m => isPri(m)), qc = pr.held === "quickclaw", n = pri.length + (qc ? 1 : 0);
-    if (n) t += `; with ${listAnd([...(qc ? ["its Quick Claw"] : []), ...pri.map(m => MOVES[m].n)])} it starts at +${30 * n}% turn meter, so it goes first`;
+    const pri = mv.filter(m => isPri(m)), qc = pr.held === "quickclaw", n = pri.reduce((a, m) => a + priBracket(MOVES[m]), 0) + (qc ? 1 : 0);   // (10% a point of priority)
+    if (n) t += `; with ${listAnd([...(qc ? ["its Quick Claw"] : []), ...pri.map(m => MOVES[m].n)])} it starts at +${10 * n}% turn meter, so it goes first`;
   }
   return t.replace("{n}", OPS[k].n);
 }

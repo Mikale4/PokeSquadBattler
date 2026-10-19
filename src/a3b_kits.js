@@ -80,8 +80,8 @@ const SHIELD_TXT = {
 };
 // the field moves that go up by themselves as their user comes onto the field (the owner's rule, like Trick Room: autoField in a7_engine.js)
 const ENTRY_MOVES = new Set(["sunnyday", "raindance", "sandstorm", "hail", "snowscape", "terrain", "stealthrock", "spikes", "toxicspikes", "stickyweb",
-  "reflect", "lightscreen", "auroraveil", "safeguard", "mist", "luckychant", "gravity", "wonderroom", "magicroom"]);
-const entryTxt = sp => `It goes up by itself the moment its user comes onto the field${["stealthrock", "spikes", "toxicspikes", "stickyweb"].includes(sp) ? " (with a Pokémon left on the other side's bench to hit)" : sp === "auroraveil" ? " in hail or snow" : ""}, if it's ready (that isn't the user's turn: the move just goes on cooldown). `
+  "reflect", "lightscreen", "auroraveil", "safeguard", "mist", "luckychant", "gravity", "wonderroom", "magicroom", "iondeluge", "powder"]);   // (Ion Deluge and Powder: the owner's rules, 2026-10-19)
+const entryTxt = sp => `It goes up by itself the moment its user comes onto the field${["stealthrock", "spikes", "toxicspikes", "stickyweb"].includes(sp) ? " (with a Pokémon left on the other side's bench to hit)" : sp === "auroraveil" ? " in hail or snow" : sp === "powder" ? " (on the opposing Pokémon there that aren't covered yet)" : ""}, if it's ready (that isn't the user's turn: the move just goes on cooldown). `
   + `While ${["stealthrock", "spikes", "toxicspikes", "stickyweb"].includes(sp) ? "every layer is" : "it's"} already up the move stays ready${["sunnyday", "raindance", "sandstorm", "hail", "snowscape", "terrain"].includes(sp) ? ", and it replaces any other " + (sp === "terrain" ? "terrain" : "weather") + ", whoever set it" : ""}; it can still be used by hand`;
 function moveDesc(sk) {
   const M = sk.M, out = [], who = sk.target === "aoe_enemies" ? "each target" : "the target";
@@ -101,7 +101,7 @@ function moveDesc(sk) {
     const obj = sk.target === "aoe_enemies" ? "every opposing Pokémon" : "the target";
     out.push((M.ail === "SLP" ? `Puts ${obj} to sleep` : { PAR: "Paralyzes", BRN: "Burns", FRZ: "Freezes", PSN: "Poisons", TOX: "Badly poisons", CNF: "Confuses", INFAT: "Infatuates", DISABLE: "Disables (no S2 or S3 for 2 turns)", SEED: "Plants a Leech Seed on", TRAP: "Binds" }[M.ail] + " " + obj) + (M.ac < 100 && M.ac ? ` (${M.ac}%)` : ""));
   }
-  if (M.fl) out.push(`${M.fl}% chance to make ${who} flinch (lose 40% turn meter)`);
+  if (M.fl) out.push(`${M.fl}% chance to make ${who} flinch (it loses its next turn)`);
   if (M.st) {
     const t = M.sw === "self" ? (sk.target === "team" ? "your team's" : "the user's") : M.sw === "foes" ? "every opposing Pokémon's" : "the target's";
     out.push(`${M.sc < 100 ? M.sc + "% chance: " : ""}${t} ${statList(M.st)}${M.pre ? " before it strikes" : ""}`);
@@ -183,16 +183,16 @@ function moveDesc(sk) {
     grudge: "If the user faints from an attack before its next turn, the attacker can't use that move again this battle",
     guardsplit: "Averages the user's and the target's Defense and Sp. Def", powersplit: "Averages the user's and the target's Attack and Sp. Atk",
     heartswap: "Swaps every stat change with the target", imprison: "The other side can't use any move the user knows",
-    instruct: "A partner uses its last move again at once", iondeluge: "For a round Normal-type moves become Electric type",
-    magiccoat: "Until the user's next turn, status moves aimed at it bounce back", magicroom: "For 5 rounds held items have no effect (using it again ends it)",
+    instruct: "A partner uses its last move again at once", iondeluge: "For 5 rounds Normal-type moves become Electric type, on both sides",
+    magiccoat: "It can't be chosen: when an opposing Pokémon uses a status move on the user (a status condition or a stat drop), it bounces the move back by itself, and any other until the user's next turn, if it's ready (that isn't the user's turn: the move just goes on cooldown)", magicroom: "For 5 rounds held items have no effect (using it again ends it)",
     wonderroom: "For 5 rounds every Pokémon's Defense and Sp. Def swap (using it again ends it)", mimic: "Copies the target's last move into Mimic's place for the rest of the battle",
     mudsport: "For 5 rounds Electric-type moves are a third as strong", watersport: "For 5 rounds Fire-type moves are a third as strong",
     nightmare: "A sleeping target loses 1/4 of its max HP every turn while it sleeps", octolock: "The target can't switch out, and its Defense and Sp. Def fall by 1 every turn",
-    perishsong: "The user and its target each faint after 3 of their own turns, unless they switch out", powder: "If the target uses a Fire-type move before its next turn, it explodes for 1/4 of its max HP instead",
+    perishsong: "The user and its target each faint after 3 of their own turns, unless they switch out", powder: "Covers every opposing Pokémon on the field in powder, until it uses a Fire-type move: that move fails, and the explosion costs it and each of its partners on the field 1/4 of their max HP",
     powertrick: "Swaps the user's Attack and Defense", psychoshift: "Passes the user's status condition to the target",
     purify: "Cures a partner's status condition, and the user gets back half its max HP if it does", quash: "The target's turn meter drops to 0",
     recycle: "The user gets back the held item it used up", revivalblessing: "Revives a fainted teammate with half its max HP",
-    simplebeam: "The target's Ability becomes Simple", snatch: "Until the user's next turn, the next boosting or healing move the other side uses is the user's instead",
+    simplebeam: "The target's Ability becomes Simple", snatch: "It can't be chosen: when an opposing Pokémon uses a move that raises its own (or its team's) stats or heals it, the user takes the boost or the healing instead, by itself, if it's ready (that isn't the user's turn: the move just goes on cooldown; the other Pokémon's move is still used, for nothing)",
     spite: "The target can't use its last move for its next 2 turns", spotlight: "The other side's single-target attacks go to the partner it lights up, for as long as that partner stays on the field (the newest redirect draws them). It goes up by itself the moment its user comes onto the field, on the partner best able to take the hits, if it's ready (that isn't the user's turn: the move just goes on cooldown)",
     stockpile: "Defense and Sp. Def +1 and one Stockpile (up to 3)", swallow: "Restores 1/4, 1/2 or all of its max HP by its Stockpiles (1, 2, 3), then uses them up",
     spitup: "100 power for each Stockpile (up to 300), then uses them up", telekinesis: "For 3 turns every move hits the target, and Ground moves don't",
@@ -202,10 +202,10 @@ function moveDesc(sk) {
     mefirst: "Uses the target's strongest ready attack against it, 50% stronger",
     belch: "Only works once the user has eaten a Berry this battle (a Poison-type user needs no Berry)", naturalgift: "Its type and power come from the user's Berry, which it uses up",
     fling: "Throws the user's held item (its power and effect depend on the item)", lastresort: "While the user is under Encore or Disable: double power (140), no cooldown, and usable despite them",
-    trumpcard: "40, 50, 60, 80, then 200 power with each use in a battle", bide: "The user takes hits for 2 turns, then hits back for twice the damage",
+    trumpcard: "40, 50, 60, 80, then 200 power with each use in a battle", bide: "It can't be chosen: the user starts storing energy by itself the moment it comes onto the field, if it's ready. The moment the second opposing attack since its last turn is over, it strikes the last attacker for twice the damage those two did (that isn't the user's turn: the move just goes on cooldown). Once each time it comes in",
     skydrop: "Lifts the target into the sky (it can't move or be reached) and drops it on the user's next turn. Fails on a target of 200 kg or more",
     future: "Strikes every Pokémon the other side has on the field 2 rounds later", terablast: "Physical when the user's Attack is higher than its Sp. Atk (no Terastallizing here)",
-    upperhand: "When it's ready, it also strikes by itself first at an opposing Pokémon using a priority move, which flinches and loses that move (like Pursuit, it isn't the user's turn). Chosen like any move, its flinch costs the target 40% turn meter",
+    upperhand: "When it's ready, it also strikes by itself first at an opposing Pokémon using a priority move, which flinches and loses that move (like Pursuit, it isn't the user's turn). Chosen like any move, its flinch costs the target its next turn",
     teleport: "The user switches out (last)", batonpass: "The user switches out, passing on its stat changes", spikes: "Spikes on the other side hurt each Pokémon sent in (up to 3 layers)",
     toxicspikes: "Poisons each Pokémon sent in on the other side (2 layers: badly)", stealthrock: "Pointed stones hurt each Pokémon sent in on the other side, more for Rock weaknesses",
     defog: "Clears hazards, the target's screens and the terrain, and lowers the target's evasiveness", roost: "Restores half of the user's max HP",
@@ -327,7 +327,7 @@ const ABILITY = {
   "anger-point": ["Anger Point", "Every hit it takes raises its Attack by 1, and a critical hit maxes out its Attack.", { id: "ANGER" }],
   defiant: ["Defiant", "When another Pokémon lowers its stats, its Attack rises by 2.", { id: "DEFIANT", stat: "atk" }],
   competitive: ["Competitive", "When another Pokémon lowers its stats, its Sp. Atk rises by 2.", { id: "DEFIANT", stat: "spa" }],
-  steadfast: ["Steadfast", "Each time it flinches, its Speed rises by 1.", { id: "STEADFAST" }],
+  steadfast: ["Steadfast", "Each time it flinches (losing its next turn), its Speed rises by 1.", { id: "STEADFAST" }],
   moxie: ["Moxie", "Knocking out a Pokémon raises its Attack by 1.", { id: "MOXIE" }],
   scrappy: ["Scrappy", "Its Normal- and Fighting-type moves can hit Ghost-type Pokémon, and Intimidate doesn't affect it.", { id: "SCRAPPY", noIntim: 1 }],
   infiltrator: ["Infiltrator", "Its moves pass through Reflect, Light Screen, Aurora Veil, Safeguard, Mist and Substitute.", { id: "INFILTRATOR" }],
@@ -564,7 +564,7 @@ const HELD = {
   scopelens: { n: "Scope Lens", t: 1, d: "Raises its critical-hit ratio." },
   widelens: { n: "Wide Lens", t: 1, d: "Accuracy +1." },
   brightpowder: { n: "Bright Powder", t: 1, d: "Evasiveness +1." },
-  kingsrock: { n: "King's Rock", t: 1, d: "Its damaging moves may make the target flinch (10%, each strike of a multi-strike move)." },
+  kingsrock: { n: "King's Rock", t: 1, d: "Its damaging moves may make the target flinch, losing its next turn (10%, each strike of a multi-strike move). One per team (Item Clause)." },
   focusband: { n: "Focus Band", t: 2, d: "10% chance to hold on with 1 HP instead of fainting." },
   shellbell: { n: "Shell Bell", t: 2, d: "Restores HP equal to 1/8 of the damage it deals." },
   expertbelt: { n: "Expert Belt", t: 2, d: "Super-effective moves deal 20% more damage." },
@@ -700,7 +700,7 @@ Object.assign(HELD, {
   ironball: {"n": "Iron Ball", "t": 1, "d": "Speed −2, and it's grounded (Ground moves hit it).", "src": "bp"},
   laggingtail: {"n": "Lagging Tail", "t": 1, "d": "It moves later: its turn meter fills slower.", "src": "bp"},
   razorclaw: {"n": "Razor Claw", "t": 2, "d": "Raises its critical-hit ratio.", "src": "bp"},
-  razorfang: {"n": "Razor Fang", "t": 2, "d": "Its damaging moves may make the target flinch (10%).", "src": "bp"},
+  razorfang: {"n": "Razor Fang", "t": 2, "d": "Its damaging moves may make the target flinch, losing its next turn (10%, each strike of a multi-strike move). One per team (Item Clause).", "src": "bp"},
   zoomlens: {"n": "Zoom Lens", "t": 1, "d": "Accuracy +1 (the same as a Wide Lens).", "src": "bp"},
   metronome: {"n": "Metronome", "t": 2, "d": "Each time it uses the same move in a row, that move is 20% stronger (up to double).", "src": "bp"},
   throatspray: {"n": "Throat Spray", "t": 1, "d": "After it uses a sound move: Sp. Atk +1 (used up).", "src": "bp"},
@@ -843,7 +843,7 @@ function moveValue0(k, m) {
     }
     if (M.tg === "foes") p *= 1.15;
     if (M.ail && M.ac) p *= 1 + overStrikes(M.ac / 100, hits) / 4;   // (Twineedle: each strike can poison)
-    if (M.fl) p *= 1 + overStrikes(M.fl / 100, hits) / 5;
+    if (M.fl) p *= 1 + overStrikes(M.fl / 100, hits) / 2.5;   // (a flinch: a lost turn, the owner's rule, 2026-10-19)
     if (priBracket(M)) p *= 1 + priBracket(M) / 15;   // (a priority move: 10% turn meter a point of priority whenever it's sent out)
     if (M.st && M.sw === "self" && M.st.some(([, n]) => n < 0)) p *= .85;   // Overheat, Superpower
     return p;
@@ -864,9 +864,9 @@ function moveValue0(k, m) {
     dragoncheer: 20, healblock: 15, strengthsap: at > sa ? 45 : 60, partingshot: 40, sketch: 50,
     afteryou: 5, allyswitch: 5, assist: 25, bestow: 5, conversion2: 30, courtchange: 15, craftyshield: 10, doodle: 5, electrify: 5, embargo: 10,
     encore: 30, entrainment: 5, fairylock: 5, foresight: 10, miracleeye: 10, addtype: 10, gravity: 15, grudge: 15, guardsplit: 15, powersplit: 15,
-    heartswap: 15, imprison: 10, instruct: 15, iondeluge: 5, magiccoat: 20, magicroom: 10, wonderroom: 10, mimic: 15, mudsport: 10, watersport: 10,
-    nightmare: 15, octolock: 25, perishsong: 15, powder: 10, powertrick: op.b[2] > op.b[1] + 30 ? 35 : 5, psychoshift: 20, purify: 15, quash: 10,
-    recycle: 15, revivalblessing: 60, simplebeam: 5, snatch: 10, spite: 15, spotlight: 5, stockpile: 35, swallow: 40, telekinesis: 5, topsyturvy: 20,
+    heartswap: 15, imprison: 10, instruct: 15, iondeluge: 8, magiccoat: 25, magicroom: 10, wonderroom: 10, mimic: 15, mudsport: 10, watersport: 10,
+    nightmare: 15, octolock: 25, perishsong: 15, powder: 15, powertrick: op.b[2] > op.b[1] + 30 ? 35 : 5, psychoshift: 20, purify: 15, quash: 10,
+    recycle: 15, revivalblessing: 60, simplebeam: 5, snatch: 15, spite: 15, spotlight: 5, stockpile: 35, swallow: 40, telekinesis: 5, topsyturvy: 20,
     torment: 20, teatime: 5, matblock: 25, quickguard: 20, wideguard: 20, mefirst: 30, stickyweb: 35 };
   if (M.sp && SPV[M.sp] != null) return SPV[M.sp];
   if (M.st) {

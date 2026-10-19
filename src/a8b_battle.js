@@ -452,7 +452,7 @@ function sizeCanvas() {
 // the turn counter and each timed field effect's turns left (the engine's fieldTimers), in a row under the turn order: the whole
 // field's one by one, each side's together (yours marked blue, the opposing side's red), so it stays a line or two; a tap on one says
 // what it is and how long it has left (the owner's rule)
-const FIELD_N = { trickRoom: "Trick Room", gravity: "Gravity", wonderRoom: "Wonder Room", magicRoom: "Magic Room", mudSport: "Mud Sport", waterSport: "Water Sport",
+const FIELD_N = { trickRoom: "Trick Room", gravity: "Gravity", wonderRoom: "Wonder Room", magicRoom: "Magic Room", mudSport: "Mud Sport", waterSport: "Water Sport", ionDeluge: "Ion Deluge",
   uproar: "Uproar", tailwind: "Tailwind", REFLECT: "Reflect", LSCREEN: "Light Screen", VEIL: "Aurora Veil", SAFEGUARD: "Safeguard", MIST: "Mist", LUCKY: "Lucky Chant" };
 const WX_SHORT = { sun: "Sun", rain: "Rain", sand: "Sandstorm", hail: "Snow", snow: "Snow" };
 function fieldRow(rd, fx) {

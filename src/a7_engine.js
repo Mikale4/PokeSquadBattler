@@ -25,10 +25,9 @@ for (const [t, id] of Object.entries({ electric: "electricterrain", grassy: "gra
 const ACTIVE = 3, ROSTER = 6;
 let UID = 0;
 const DMG_SCALE = .62;   // squad battles last longer than one-on-one ones: every hit is scaled down
-const FLINCH_TM = .4;    // a flinch costs 40% turn meter
 const STALEMATE_TURNS = 500;
 // the battle AI's weights (a7_engine.js aiPlan), tuned in head-to-head battles against earlier versions
-const AIW = { twMix: .75, killBase: .25, killTw: .6, fuOver: .35, fuSetup: .3, resist: .65, superEff: 1.2, heal: .8, cd: .012, status: 1,
+const AIW = { twMix: .75, killBase: .25, killTw: .6, fuOver: .35, fuSetup: .3, resist: .65, superEff: 1.2, heal: .8, cd: .012, status: 1, flinch: .3,
   // feeding an absorbing Ability (base + per unit of threat), and switching: stuck (best option worth less than swStuckV) needs a
   // bench matchup swStuck better; a weak best option (under swWeakV) needs one swWeak better
   absorbBase: .4, absorbTw: .8, swStuckV: .02, swStuck: .15, swWeakV: .3, swWeak: .45 };
@@ -182,7 +181,7 @@ function makeBattle(cfg) {
   const axelLike = sk => sk.M.sp === "tripleaxel" || !!sk.axel;
   const COUNTERS = { counter: "P", mirrorcoat: "S", metalburst: "*" };   // (the counters and the damage that sets each off: counterStrikes)
   // (the moves that can't be chosen, as they go off by themselves: Shell Trap, the counters, Conversion and Conversion 2)
-  const SELF_GOING = new Set(["shelltrap", "counter", "mirrorcoat", "metalburst", "conversion", "conversion2"]);
+  const SELF_GOING = new Set(["shelltrap", "counter", "mirrorcoat", "metalburst", "conversion", "conversion2", "magiccoat", "snatch", "bide"]);
   const STRIKES = [2, 2, 2, 3, 3, 3, 4, 5], avgStrikes = h => { const l = STRIKES.filter(n => n >= h[0] && n <= h[1]); return l.length ? l.reduce((a, b) => a + b, 0) / l.length : (h[0] + h[1]) / 2; };   // (Triple Axel, Triple Kick, Ash-Greninja's Water Shuriken)
   // Forecast (the owner's rule): Castform's form follows its held rock, not the weather. A Heat Rock makes it Sunny Castform with
   // Drought, a Damp Rock Rainy Castform with Drizzle, an Icy Rock Snowy Castform with Snow Warning (their weather goes off as it comes
@@ -301,7 +300,21 @@ function makeBattle(cfg) {
     for (const u of list) autoTrickRoom(u);   // (Trick Room sets itself up as its user comes in: the owner's rule)
     for (const u of list) autoField(u);   // (so do the weather, terrain, entry hazards, screens and rooms: the owner's rule)
     for (const u of list) autoRedirect(u);   // (so do Follow Me, Rage Powder and Spotlight: the owner's rule)
+    for (const u of list) autoBide(u);   // (and Bide starts storing energy: the owner's rule, 2026-10-19)
   }
+  // Bide (the owner's rule, 2026-10-19): it can't be chosen. Its user starts storing energy by itself the moment it comes onto the
+  // field, if the move is ready, and keeps storing until it goes off (bideStrikes); once a time on the field
+  function autoBide(u) {
+    if (!u.alive || B.over || !B.units.includes(u) || u.flags.bide) return;
+    const s = u.skills.find(x => x.M.sp === "bide" && skillReady(u, x)); if (!s) return;
+    u.flags.bide = { hits: 0, dmg: 0, by: null, act: null }; addEff(u, "BIDE", 999, u); msg(`${Nm(u)} is storing energy!`);
+  }
+  // a move that goes off by itself when something happens (Magic Coat, Snatch): ready, its Pokémon on the field and able to move
+  const reactReady = (x, sp) => x.alive && B.units.includes(x) && !x.flags.semi && x.status !== "SLP" && x.status !== "FRZ" && !has(x, "TAUNT") && x.skills.find(k => k.M.sp === sp && skillReady(x, k));
+  const reactEv = (x, s, t) => { ev({ k: "act", u: x.uid, slot: s.slot, key: s.key, name: s.name, type: s.type, cat: s.cat, anim: s.anim, s3: false, t: t && t.uid, tgt: s.target, quiet: 1 }); msg(`${Nm(x)} used ${s.name}!`); };
+  // Snatch takes a move that raises its user's (or its team's) stats or heals them (the owner's rule, 2026-10-19)
+  const SNATCH_SP = new Set(["bellydrum", "focusenergy", "aquaring", "ingrain", "filletaway", "acupressure", "lifedew"]);
+  const snatchable = sk => { const M = sk.M; return M.c === "X" && (sk.target === "self" || sk.target === "team") && !!(M.hf || M.hl > 0 || SNATCH_SP.has(M.sp) || (M.st && M.sw === "self" && M.st.some(([, n]) => n > 0))); };
   // the field moves (the owner's rule, like Trick Room): weather, terrain, entry hazards, Reflect, Light Screen, Aurora Veil, Safeguard,
   // Mist, Lucky Chant, Gravity, Wonder Room and Magic Room go up by themselves the moment their user comes onto the field, if the move
   // is ready. It isn't the user's turn (the move goes on cooldown). When it's already up (that weather or terrain, the screen, every
@@ -309,6 +322,7 @@ function makeBattle(cfg) {
   // in snow, hazards only with an opposing Pokémon left on the bench to hit
   const ENTRY_SIDE = { reflect: "REFLECT", lightscreen: "LSCREEN", auroraveil: "VEIL", safeguard: "SAFEGUARD", mist: "MIST", luckychant: "LUCKY" };
   const ENTRY_HZ = { stealthrock: h => h.sr, spikes: h => h.spikes >= 3, toxicspikes: h => h.tspikes >= 2, stickyweb: h => h.web };
+  const powderProof = (u, x) => x.types.includes("Grass") || item(x, "safetygoggles") || tab(u, x, "OVERCOAT");   // (powder moves don't affect it)
   function entryReady(u, s) {
     const sp = s.M.sp;
     if (WX_MOVE[sp]) return B.weather !== WX_MOVE[sp];
@@ -318,6 +332,8 @@ function makeBattle(cfg) {
     if (ENTRY_SIDE[sp]) return !has(u, ENTRY_SIDE[sp]);
     if (sp === "gravity") return !fieldOn("gravity");
     if (sp === "wonderroom" || sp === "magicroom") return !fieldOn(sp === "wonderroom" ? "wonderRoom" : "magicRoom");
+    if (sp === "iondeluge") return !fieldOn("ionDeluge");
+    if (sp === "powder") return enemies(u).some(x => x.alive && !has(x, "POWDER") && !powderProof(u, x));
     return false;
   }
   function autoField(u) {
@@ -407,7 +423,7 @@ function makeBattle(cfg) {
     if (it === "flameorb") tryStatus(u, x, "BRN", false);
     else if (it === "toxicorb") tryStatus(u, x, "TOX", false);
     else if (it === "lightball") tryStatus(u, x, "PAR", false);
-    else if ((it === "kingsrock" || it === "razorfang") && !pv(x, "INNER_FOCUS")) { msg(`${Nm(x)} flinched!`); addATB(x, -FLINCH_TM); }
+    else if ((it === "kingsrock" || it === "razorfang") && !pv(x, "INNER_FOCUS")) flinchIt(x);
     else if (it === "whiteherb") { for (const k in x.stages) if (x.stages[k] < 0) x.stages[k] = 0; fxEv(x); }
     else if (it === "mentalherb") for (const id of ["INFAT", "TAUNT", "DISABLE", "HEALBLOCK", "ENCORE", "TORMENT"]) removeEff(x, id);
   }
@@ -475,7 +491,7 @@ function makeBattle(cfg) {
     if (u.orig) untransform(u, false);
     const pass = forced === "baton" ? { stages: { ...u.stages }, shield: u.shield, eff: u.eff.filter(e => ["SUB", "FOCUS", "AQUARING", "INGRAIN", "MAGNETRISE", "CNF", "SEED", "CURSE"].includes(e.id)) } : null;
     if (pv(u, "REGEN") && u.alive) u.hp = Math.min(u.max.hp, u.hp + Math.floor(u.max.hp / 3));
-    u.flags.wasOut = true; u.flags.booster = false; u.flags.bide = null; u.flags.stock = 0;   // (Zero to Hero; Booster Energy's boost, Bide and Stockpile end)
+    u.flags.wasOut = true; u.flags.booster = false; u.flags.bide = null; u.flags.stock = 0; u.flags.stun = false;   // (Zero to Hero; Booster Energy's boost, Bide and Stockpile end)
     u.aura = null;   // (a Totem's aura ends when it leaves the field, as in the games)
     for (const x of B.units) { const sd = effOf(x, "SKYDROP"); if (sd && sd.src === u.uid) removeEff(x, "SKYDROP"); }
     if (u.passives[0] && u.passives[0].key === "natural-cure") { u.status = null; u.sTurn = 0; }
@@ -804,7 +820,10 @@ function makeBattle(cfg) {
       if (att !== tar && dealt > 0) {
         tar.hitT = B.turn; tar.hitsTaken = (tar.hitsTaken || 0) + 1;
         const c = meta.cat; if (c === "P" || c === "S") (tar.lastHit || (tar.lastHit = {}))[c] = { dmg: dealt, by: att.uid, t: B.turn };
-        if (tar.flags.bide && att.team !== tar.team) { tar.flags.bide.dmg += dealt; tar.flags.bide.by = att.uid; }   // (Bide)
+        if (tar.flags.bide && att.team !== tar.team) {   // (Bide: each opposing attack counts once, however many strikes; bideStrikes)
+          const b = tar.flags.bide; b.dmg += dealt; b.by = att.uid; if (b.act !== B.actN) { b.act = B.actN; b.hits++; }
+          if (b.hits >= 2 && !(B.bideQ || (B.bideQ = [])).includes(tar.uid)) B.bideQ.push(tar.uid);
+        }   // (Bide)
       }
     }
     if (tar.hp <= 0) kill(tar, att);
@@ -1158,6 +1177,15 @@ function makeBattle(cfg) {
     if (att.alive && pv(att, "MAGICIAN") && !att.held && tar.held && !tar.flags.itemUsed && !item(tar, "stickybarb")) { att.held = tar.held; att.flags.itemUsed = false; tar.held = null; msg(`${Nm(att)} stole ${nm(tar)}'s ${HELD[att.held].n}!`); }
     if (tar.alive && pv(att, "TOXIC_CHAIN") && R() < .3) tryStatus(att, tar, "TOX", false);
   }
+  // the chance an attack flinches its target (its own, or King's Rock, Razor Fang and Stench; Serene Grace doubles it)
+  const flinchOf = (u, s) => { const M = s.M, f = M.fl || (M.c !== "X" && (item(u, "kingsrock") || item(u, "razorfang") || pv(u, "STENCH")) ? 10 : 0); return Math.min(1, f / 100 * (pv(u, "SERENE") ? 2 : 1)); };
+  // a flinch (the owner's rule, 2026-10-19): the Pokémon loses its next turn (canMove), instead of 40% turn meter. Upper Hand going
+  // off by itself costs the priority move instead (flinchT); Steadfast still raises Speed
+  function flinchIt(x) {
+    msg(`${Nm(x)} flinched!`); x.flags.flinchT = B.turn;
+    if (!B.upperHanding) x.flags.stun = true;
+    if (pv(x, "STEADFAST")) stage(x, x, "spe", 1, "Steadfast");
+  }
   // added effects of a damaging move on one target (status, flinch, stat drops)
   function secondary(att, tar, sk, fx = {}) {
     const M = sk.M;
@@ -1168,7 +1196,7 @@ function makeBattle(cfg) {
     if (fl && !fx.flinched && R() < fl / 100 * sg) {
       fx.flinched = true;
       if (pv(tar, "INNER_FOCUS")) { /* never flinches */ }
-      else { msg(`${Nm(tar)} flinched!`); tar.flags.flinchT = B.turn; if (!B.upperHanding) addATB(tar, -FLINCH_TM); if (pv(tar, "STEADFAST")) stage(tar, tar, "spe", 1, "Steadfast"); }   // (Upper Hand's trigger: the priority move is cancelled instead)
+      else flinchIt(tar);   // (Upper Hand's trigger: the priority move is cancelled instead)
     }
     if (M.st && M.sw !== "self" && R() < M.sc / 100 * sg) for (const [s, n] of M.st) stage(att, tar, s, n);
     if (M.sp === "triattack" && R() < .2 * sg) tryStatus(att, tar, pick(["BRN", "PAR", "FRZ"]), false);   // Tri Attack: one of the three
@@ -1351,7 +1379,8 @@ function makeBattle(cfg) {
       case "afteryou": return t && t !== u && t.atb < 60 && threatRaw(t) > threatRaw(u) * 1.3 ? .1 : -1;
       case "instruct": return t && t !== u && t.lastSkill && t.lastSkill.M.c !== "X" && t.lastSkill.M.p >= 80 ? .2 : -1;
       case "purify": return t && t !== u && t.status ? .15 + (1 - hpf(u)) * .2 : -1;
-      case "allyswitch": case "doodle": case "electrify": case "entrainment": case "fairylock": case "iondeluge": case "simplebeam": case "spotlight": case "teatime": case "addtype": return .01;
+      case "iondeluge": return fieldOn("ionDeluge") ? -1 : .01;
+      case "allyswitch": case "doodle": case "electrify": case "entrainment": case "fairylock": case "simplebeam": case "spotlight": case "teatime": case "addtype": return .01;
       case "assist": return [...allies(u), ...mine].some(x => x !== u && x.skills.some(s => s.M.c !== "X")) ? .2 : -1;
       case "bestow": return t && u.held && !u.flags.itemUsed && ["flameorb", "toxicorb", "laggingtail", "ironball", "stickybarb"].includes(u.held) && !t.held ? .2 : -1;
       case "conversion2": return t && t.lastSkill && t.lastSkill.M.c !== "X" && typeEff(t.lastSkill.M.t, u.types) >= 1 ? .1 : -1;
@@ -1379,7 +1408,7 @@ function makeBattle(cfg) {
       case "nightmare": return t && t.status === "SLP" && t.sTurn > 1 && !has(t, "NIGHTMARE") ? .25 : -1;
       case "octolock": return t && !has(t, "OCTOLOCK") ? .2 : -1;
       case "perishsong": return t && !has(t, "PERISH") && mine.length && sumUp(t.stages) >= 2 && sumUp(u.stages) < 2 ? .1 * sumUp(t.stages) : -1;
-      case "powder": return t && !has(t, "POWDER") && t.skills.some(s => s.M.t === "Fire" && s.M.c !== "X" && skillReady(t, s)) ? .15 : -1;
+      case "powder": { const n = enemies(u).filter(f => !has(f, "POWDER") && !powderProof(u, f) && f.skills.some(s => s.M.t === "Fire" && s.M.c !== "X" && skillReady(f, s))).length; return n ? .15 * n : -1; }   // (every foe on the field)
       case "powertrick": return u.max.def > u.max.atk * 1.3 ? .25 : -1;
       case "psychoshift": return u.status && t && !t.status ? .3 : -1;
       case "quash": return t && t.atb > 60 ? .1 : -1;
@@ -1613,6 +1642,8 @@ function makeBattle(cfg) {
       return { v, kill: kill === 1 };
     }
     const push = (s, t, v) => out.push({ slot: s.slot, t, v: v + R() * .01 });
+    // a status move Magic Bounce or Magic Coat (up, or ready to go off by itself: the owner's rule, 2026-10-19) would send back
+    const bounces = (f, M) => !!(M.ail || M.st) && (tab(u, f, "MAGIC_BOUNCE") || has(f, "MAGICCOAT") || !!reactReady(f, "magiccoat"));
     const cdCost = s => cdOf(u, s) * AIW.cd;
     for (const s1 of u.skills) {
       const s = s1.M.sp === "expandingforce" && inTerrain("psychic", u) ? { ...s1, target: "aoe_enemies" } : s1;   // (every foe in Psychic Terrain)
@@ -1655,6 +1686,8 @@ function makeBattle(cfg) {
           if (d > 0 && !r.kill) { const e = effOn(u, f, s); v *= e < 1 ? AIW.resist : e > 1 ? AIW.superEff : 1; }
           // added effects: a chance to burn, paralyze or freeze a Pokémon that has no status yet
           if (d > 0 && M.ail && M.ac && !f.status && MAJOR.includes(M.ail) && !(TYPE_IMMUNE[M.ail] && f.types.includes(TYPE_IMMUNE[M.ail]))) v += M.ac / 100 * .25 * tw(f);
+          // a chance to flinch it: a flinch costs its next turn (the owner's rule, 2026-10-19), worth more the more dangerous it is
+          if (d > 0 && !r.kill && combos(u, "flinch") && !f.flags.stun && !pv(f, "INNER_FOCUS") && !(f.shield > 0)) { const fl = flinchOf(u, s); if (fl) v += fl * AIW.flinch * tw(f); }
           if (d > 0 && !legacy(u)) v -= hitBack(u, f, s, r.kill);
           // a super-effective hit that leaves a Weakness Policy holder standing gives it +2 Attack and Sp. Atk
           if (d > 0 && !r.kill && combos(u, "wp") && item(f, "weaknesspolicy") && effOn(u, f, s) > 1) v -= .25 * tw(f);
@@ -1703,12 +1736,13 @@ function makeBattle(cfg) {
         for (const f of foes) {
           let v = statusValue(u, s, f);
           if (has(f, "PROTECT") && !ATTACK_ONLY.has(effOf(f, "PROTECT").shield)) v = -1;   // (Protect, Detect, Spiky Shield and Baneful Bunker stop status moves too)
+          if (bounces(f, M)) v = -1;   // (it would come back at the user)
           if (v > 0) { v *= tw(f) * AIW.status; if (!fast && followUp(f) >= f.hp) v *= .2; }   // no need to put to sleep what is about to faint
           push(s, f, v > 0 ? v : harmless);
         }
         continue;
       }
-      if (s.target === "aoe_enemies") { const v = foes.reduce((a, x) => a + Math.max(0, statusValue(u, s, x)) * tw(x), 0); push(s, null, v > 0 ? v : harmless); continue; }
+      if (s.target === "aoe_enemies") { const v = foes.reduce((a, x) => a + (bounces(x, M) ? 0 : Math.max(0, statusValue(u, s, x)) * tw(x)), 0); push(s, null, v > 0 ? v : harmless); continue; }
       // self and team: stat boosts, screens, Mist, Focus Energy, Substitute, Haze
       let v = statusValue(u, s, u);
       if (v > 0 && M.st && M.sw === "self") {
@@ -1941,7 +1975,7 @@ function makeBattle(cfg) {
     for (const u of [...B.units.filter(x => x.team === "A"), ...B.bench.A]) {
       if (u.orig) untransform(u, false);
       u.cool = { 1: 0, 2: 0, 3: 0 }; u.stages = newStages(); u.eff = []; u.shield = 0; u.aura = null; u.held = u.held0 !== undefined ? u.held0 : u.held;
-      Object.assign(u.flags, { itemUsed: false, ateBerry: false, booster: false, bide: null, stock: 0, noAbility: false, wasOut: false });
+      Object.assign(u.flags, { itemUsed: false, ateBerry: false, booster: false, bide: null, stock: 0, noAbility: false, wasOut: false, stun: false });
       if (u.status === "TOX") u.sTurn = 1;
       u.atb = R() * 10;
     }
@@ -2002,14 +2036,8 @@ function makeBattle(cfg) {
   }
   // can it move this turn? (sleep, freeze, paralysis, love, confusion, recharge)
   function canMove(u) {
+    const stun = u.flags.stun; u.flags.stun = false;   // (a flinch lasts until its next turn, whatever happens on it)
     if (has(u, "SKYDROP")) { msg(`${Nm(u)} is held up in the sky and can't move!`); return false; }
-    if (u.flags.bide) {   // Bide: two turns storing energy, then twice what it took back at the last attacker
-      const b = u.flags.bide; if (--b.n > 0) { msg(`${Nm(u)} is storing energy!`); return false; }
-      u.flags.bide = null; msg(`${Nm(u)} unleashed its energy!`);
-      const tg = b.by != null && B.byId(b.by);
-      if (!tg || !tg.alive || !B.units.includes(tg) || !b.dmg) { msg("But it failed!"); return false; }
-      applyDamage(u, tg, Math.max(1, b.dmg * 2), { cat: "P" }); return false;
-    }
     if (has(u, "RECHARGE")) { removeEff(u, "RECHARGE"); msg(`${Nm(u)} must recharge!`); return false; }
     if (pv(u, "TRUANT")) { if (u.flags.loaf) { u.flags.loaf = false; msg(`${Nm(u)} is loafing around!`); ev({ k: "txt", u: u.uid, s: "Loafing", c: "txt" }); return false; } u.flags.loaf = true; }
     if (u.status === "SLP") {
@@ -2028,6 +2056,7 @@ function makeBattle(cfg) {
       if (u.sTurn > 0 && R() >= .2) { msg(`${Nm(u)} is frozen solid!`); return false; }
       u.status = null; msg(`${Nm(u)} thawed out!`); fxEv(u);
     }
+    if (stun) { msg(`${Nm(u)} flinched and couldn't move!`); ev({ k: "txt", u: u.uid, s: "Flinch", c: "debuff" }); return false; }
     if (u.status === "PAR" && R() < .25) { msg(`${Nm(u)} is paralyzed! It can't move!`); ev({ k: "txt", u: u.uid, s: "PAR", c: "debuff" }); return false; }
     if (has(u, "INFAT") && R() < .5) { msg(`${Nm(u)} is immobilized by love!`); return false; }
     if (has(u, "CNF")) {
@@ -2061,20 +2090,26 @@ function makeBattle(cfg) {
       else if (sk.key === "kingsshield" && u.spr === "aegislashblade") { becomeBase(u); msg(`${Nm(u)} changed to Shield Forme!`); stage(u, u, u.max.sdf > u.max.def ? "sdf" : "def", 1, "Stance Change"); }
     }
     // Upper Hand (the owner's rule): an opposing Pokémon with it ready strikes first, by itself, at one using a priority move; the
-    // priority move flinches and doesn't happen (no turn meter lost: the move is what it loses). Chosen like any move, it's a normal hit
-    // whose flinch costs 40% turn meter
+    // priority move flinches and doesn't happen (no turn lost: the move is what it loses). Chosen like any move, it's a normal hit
+    // whose flinch costs the target its next turn
     if (!free && !landing && M.pri > 0) {
       u.flags.flinchT = null; upperHand(u);
       if (!u.alive || B.over) { ev({ k: "end", u: u.uid }); endTurn(u); return; }
       if (u.flags.flinchT === B.turn) { msg(`${Nm(u)} couldn't use ${sk.name}!`); ev({ k: "end", u: u.uid }); endTurn(u); return; }
     }
     // Powder: a Fire-type move explodes in its face
-    if (has(u, "POWDER") && M.c !== "X" && mtype(u, sk) === "Fire") { removeEff(u, "POWDER"); msg("When the flame touched the powder on the Pokémon, it exploded!"); if (sk.slot > 1) u.cool[sk.slot] = cdOf(u, sk); chip(u, hpBase(u) / 4); ev({ k: "end", u: u.uid }); endTurn(u); return; }
+    // (the owner's rule, 2026-10-19: the user and each of its partners on the field lose 1/4 of their max HP; the powder is gone)
+    if (has(u, "POWDER") && M.c !== "X" && mtype(u, sk) === "Fire") {
+      removeEff(u, "POWDER"); msg("When the flame touched the powder on the Pokémon, it exploded!"); if (sk.slot > 1) u.cool[sk.slot] = cdOf(u, sk);
+      for (const x of allies(u)) if (x.alive) chip(x, hpBase(x) / 4, x === u ? null : `${Nm(x)} was caught in the explosion!`);
+      ev({ k: "end", u: u.uid }); if (free) checkOver(); else endTurn(u); return;
+    }
     if (pv(u, "PROTEAN") && M.sp !== "struggle") { const pt = mtype(u, sk); if (pt !== "???" && !(u.types.length === 1 && u.types[0] === pt)) { u.types = [pt]; msg(`${Nm(u)}'s ${u.passives[0].name} made it the ${pt} type!`); fxEv(u); } }   // (Protean, Libero: before every move, Generation 8's effect)
     u.metroN = u.lastSkill && u.lastSkill.key === sk.key ? (u.metroN || 0) + 1 : 0;
     u.lastSkill = sk;
     let targets, rodMsg = null;
-    if (M.sp === "spotlight" && t && t !== u && t.alive && t.team === u.team && B.units.includes(t)) targets = [t];   // (Spotlight on a partner, as in the main games: autoRedirect, redirectNow)
+    if (M.sp === "spotlight" && t && t !== u && t.alive && t.team === u.team && B.units.includes(t)) targets = [t];
+    else if (M.sp === "bide" && t && t.alive && t.team !== u.team && B.units.includes(t)) targets = [t];   // (Bide going off: bideStrikes)   // (Spotlight on a partner, as in the main games: autoRedirect, redirectNow)
     else if (sk.target === "enemy") {
       if (!t || !t.alive || t.team === u.team || !B.units.includes(t)) t = defaultTarget(u, sk);
       const r = redirect(u, sk, t); if (r && r !== t && drawsIn(u, r, mtype(u, sk)) && !has(r, "FOLLOWME")) rodMsg = r; t = r;   // (Lightning Rod, Storm Drain or Earth Eater)
@@ -2101,7 +2136,7 @@ function makeBattle(cfg) {
     ev({ k: "act", u: u.uid, slot, key: sk.key, name: sk.name, type: sk.type, cat: sk.cat, anim: sk.anim, s3: sk.slot === 3 && !landing, t: targets[0] && targets[0].uid, tgt: sk.target, land: landing ? 1 : 0 });
     msg(`${Nm(u)} used ${sk.name}!`, { big: 1 });
     if (rodMsg) msg(`${Nm(rodMsg)}'s ${rodMsg.passives[0].name} took the attack!`);
-    B.ctxKill = false; B.failed = false; B.acting = true;
+    B.ctxKill = false; B.failed = false; B.acting = true; B.actN = (B.actN || 0) + 1;
     if (sk.slot > 1 && !landing && !(M.sp === "lastresort" && lrBoost(u))) u.cool[sk.slot] = cdOf(u, sk) + (enemies(u).some(f => pv(f, "PRESSURE")) ? 1 : 0);
     // Fly, Bounce, Dig, Dive, Phantom Force (the owner's rule): this turn the user goes out of reach; the move lands on its next turn
     if ((M.sp === "semi" || M.sp === "skydrop") && !landing) {
@@ -2114,15 +2149,19 @@ function makeBattle(cfg) {
       ev({ k: "semi", u: u.uid, on: 1, key: sk.key });
       B.acting = false; ev({ k: "end", u: u.uid }); endTurn(u); return;
     }
-    // Snatch: the other side's first boosting or healing move goes to the snatcher instead
-    const snatcher = M.c === "X" && (sk.target === "self" || sk.target === "team") && !free && enemies(u).find(f => has(f, "SNATCH"));
-    if (snatcher) { removeEff(snatcher, "SNATCH"); msg(`${Nm(snatcher)} snatched ${nm(u)}'s move!`); callMove(snatcher, sk.key, sk.slot); B.acting = false; ev({ k: "end", u: u.uid }); endTurn(u); return; }
+    // Snatch (the owner's rule, 2026-10-19): it can't be chosen. When an opposing Pokémon uses a move that raises its stats or heals it,
+    // a Pokémon that knows Snatch, ready, takes the boost or the healing for itself by itself (not its turn: Snatch goes on cooldown,
+    // like Counter). The move is still used (its turn and cooldown are spent); it just does nothing for its user
+    let snatcher = !free && snatchable(sk) && enemies(u).find(f => has(f, "SNATCH"));   // (a Snatch called by another move: until its next turn)
+    if (snatcher) removeEff(snatcher, "SNATCH");
+    else if (!free && snatchable(sk)) for (const f of enemies(u)) { const s = reactReady(f, "snatch"); if (s) { f.cool[s.slot] = cdOf(f, s); reactEv(f, s, u); snatcher = f; break; } }
+    if (snatcher) { msg(`${Nm(snatcher)} snatched ${nm(u)}'s move!`); callMove(snatcher, sk.key, sk.slot); B.acting = false; ev({ k: "end", u: u.uid }); endTurn(u); return; }
     useMove(u, sk, targets);
     if (B.sketched && B.sketched.u === u) { const x = B.sketched; B.sketched = null; if (u.alive && !B.over) sketchUse(u, x.sk, x.t); }   // (Sketch: the copied move, at once)
     if (M.sp === "skydrop" && landing) for (const x of B.units) { const sd = effOf(x, "SKYDROP"); if (sd && sd.src === u.uid) removeEff(x, "SKYDROP"); }
     (u.flags.used || (u.flags.used = {}))[sk.key] = 1;   // (Last Resort)
     if (M.sp === "trumpcard") u.flags.trump = (u.flags.trump || 0) + 1;
-    removeEff(u, "ELECTRIFY"); removeEff(u, "POWDER");
+    removeEff(u, "ELECTRIFY");   // (Powder stays until a Fire-type move sets it off: the owner's rule, 2026-10-19)
     // Dancer: a dance move is danced again right away by every other Dancer on the field
     if (DANCES.has(sk.key) && !B.dancing) { B.dancing = true; for (const x of B.units.slice()) if (x !== u && x.alive && pv(x, "DANCER")) { msg(`${Nm(x)}'s Dancer!`); callMove(x, sk.key, sk.slot); } B.dancing = false; }
     if (M.sp === "ramp") u.flags["ramp:" + sk.key] = rampN(u, sk.key) + 1;
@@ -2134,6 +2173,7 @@ function makeBattle(cfg) {
     ev({ k: "end", u: u.uid });
     if (B.shellQ && B.shellQ.length && !B.shellTrapping && !B.over) shellTraps();
     if (B.counterQ && B.counterQ.length && !B.shellTrapping && !B.over) counterStrikes();
+    if (B.bideQ && B.bideQ.length && !B.biding && !B.over) bideStrikes();
     if (free) checkOver(); else endTurn(u);
   }
   // Shell Trap (the owner's rule): it can't be chosen. A Pokemon an opposing attack damages strikes back with it by itself as soon as
@@ -2163,6 +2203,19 @@ function makeBattle(cfg) {
         try { act(x, s.slot, null, null, true); } finally { B.counterBy = null; B.counterCat = null; }
       }
     } finally { B.shellTrapping = false; }
+  }
+  // Bide going off (the owner's rule, 2026-10-19): the moment the second opposing attack since its user's last turn is over, it strikes
+  // the last attacker for twice the damage those attacks did, if it can move (not its turn: the move goes on cooldown). Then it's done
+  // until its user comes onto the field again (autoBide)
+  function bideStrikes() {
+    B.biding = true;
+    try {
+      for (const uid of B.bideQ.splice(0)) {
+        const x = B.byId(uid); if (!x || !x.alive || B.over || !B.units.includes(x) || !x.flags.bide || x.flags.semi || x.status === "SLP" || x.status === "FRZ") continue;
+        const s = x.skills.find(k => k.M.sp === "bide" && skillReady(x, k)); if (!s) continue;
+        act(x, s.slot, B.byId(x.flags.bide.by), null, true);
+      }
+    } finally { B.biding = false; }
   }
   // Conversion and Conversion 2 (the owner's rule, 2026-10-16): they can't be chosen. Just before an opposing attack's damage, a
   // Pokemon that knows one, ready, becomes a type that resists the attack (Conversion 2: one the attack doesn't affect at all, when
@@ -2294,7 +2347,7 @@ function makeBattle(cfg) {
     const per = B.perNow || Math.max(2, B.units.filter(x => x.alive).length), left = end => Math.max(1, Math.ceil((end - B.turn) / per)), out = [];   // (the count the ends were last kept to: rescaleField)
     if (B.weather) out.push({ id: "wx:" + B.weather, n: B.wxEnd > B.turn ? left(B.wxEnd) : null });
     if (B.terrain) out.push({ id: "ter:" + B.terrain.t, n: left(B.terrain.until) });
-    for (const k of ["trickRoom", "gravity", "wonderRoom", "magicRoom", "mudSport", "waterSport"]) if (B[k] > B.turn) out.push({ id: k, n: left(B[k]) });
+    for (const k of ["trickRoom", "gravity", "wonderRoom", "magicRoom", "mudSport", "waterSport", "ionDeluge"]) if (B[k] > B.turn) out.push({ id: k, n: left(B[k]) });
     if (B.uproar && B.uproar.until > B.turn) out.push({ id: "uproar", n: left(B.uproar.until) });
     for (const tm of ["A", "E"]) {
       if (B.tailwind && B.tailwind[tm] > B.turn) out.push({ id: "tailwind", side: tm, n: left(B.tailwind[tm]) });
@@ -2368,7 +2421,7 @@ function makeBattle(cfg) {
       case "heartswap": { if (!t) return fail(); [u.stages, t.stages] = [{ ...t.stages }, { ...u.stages }]; msg(`${Nm(u)} switched stat changes with the target!`); fxEv(u); fxEv(t); return true; }
       case "imprison": if (has(u, "IMPRISON")) return fail(); addEff(u, "IMPRISON", 99, u, true); msg(`${Nm(u)} sealed any moves its target shares with it!`); return true;
       case "instruct": { const last = t && t !== u && t.alive && t.lastSkill; if (!last || CALL_BAN.has(last.key) || last.key === "instruct" || last.M.sp === "semi" || last.M.sp === "skydrop" || !MOVES[last.key]) return fail(); msg(`${Nm(t)} followed ${nm(u)}'s instructions!`); callMove(t, last.key, last.slot); return true; }
-      case "iondeluge": B.ionDeluge = fieldRounds(1); msg("A deluge of ions showers the battlefield!"); return true;
+      case "iondeluge": B.ionDeluge = fieldRounds(5); msg("A deluge of ions showers the battlefield!"); return true;   // (both sides, 5 rounds: the owner's rule, 2026-10-19)
       case "magiccoat": addEff(u, "MAGICCOAT", 99, u, true); msg(`${Nm(u)} shrouded itself with Magic Coat!`); return true;
       case "magicroom": case "wonderroom": { const k = sp === "magicroom" ? "magicRoom" : "wonderRoom"; if (fieldOn(k)) { B[k] = 0; msg(sp === "magicroom" ? "Magic Room wore off, and held items' effects returned to normal!" : "Wonder Room wore off, and Defense and Sp. Def stats returned to normal!"); return true; } B[k] = fieldRounds(5); msg(sp === "magicroom" ? "It created a bizarre area in which Pokémon's held items lose their effects!" : "It created a bizarre area in which Defense and Sp. Def stats are swapped!"); return true; }
       case "mimic": { const last = t && t.lastSkill; if (!last || ["mimic", "sketch", "sketch1", "sketch3", "struggle", "transform", "metronome"].includes(last.key) || !MOVES[last.key] || u.skills.some(s => s.key === last.key)) return fail(); const ns = { ...makeSkill(last.key, sk.slot), cd: 0 }; u.skills = u.skills.map(x => x === sk ? ns : x); msg(`${Nm(u)} learned ${MOVES[last.key].n}!`); return true; }
@@ -2380,7 +2433,11 @@ function makeBattle(cfg) {
         if (tab(u, t, "SOUNDPROOF")) { msg(`${Nm(t)}'s Soundproof blocks the move!`); return true; }
         addEff(t, "PERISH", 3, u, true); if (!has(u, "PERISH")) addEff(u, "PERISH", 3, u, true);
         msg(`${Nm(u)} and ${nm(t)} heard the song: both will faint in three turns!`); return true;
-      case "powder": if (!t) return fail(); addEff(t, "POWDER", 99, u, true); msg(`${Nm(t)} is covered in powder!`); return true;
+      case "powder": {   // (every opposing Pokémon on the field, until it uses a Fire-type move: the owner's rule, 2026-10-19)
+        const on = enemies(u).filter(x => x.alive && !has(x, "POWDER")); if (!on.length) return fail();
+        for (const x of on) { if (powderProof(u, x)) { msg(`It doesn't affect ${nm(x)}...`); continue; } addEff(x, "POWDER", 999, u, true); msg(`${Nm(x)} is covered in powder!`); }
+        return true;
+      }
       case "powertrick": [u.max.atk, u.max.def] = [u.max.def, u.max.atk]; msg(`${Nm(u)} switched its Attack and Defense!`); return true;
       case "psychoshift": { if (!t || !u.status || t.status) return fail(); const st = u.status; if (!tryStatus(u, t, st, true)) return true; u.status = null; u.sTurn = 0; msg(`${Nm(u)} was cured!`); fxEv(u); return true; }
       case "purify": { if (!t || !t.status) return fail(); t.status = null; t.sTurn = 0; msg(`${Nm(t)} was purified!`); fxEv(t); heal(u, hpBase(u) / 2, `${Nm(u)} had its HP restored.`); return true; }
@@ -2535,7 +2592,13 @@ function makeBattle(cfg) {
       if (!best) { msg("But it failed!"); return; }
       B.meFirst = true; try { callMove(u, best.key, sk.slot); } finally { B.meFirst = false; } return;
     }
-    if (sp === "bide") { if (u.flags.bide) { msg("But it failed!"); return; } u.flags.bide = { n: 3, dmg: 0, by: null }; msg(`${Nm(u)} is storing energy!`); return; }
+    if (sp === "bide") {   // (going off: bideStrikes; called by another move, it does nothing)
+      const b = u.flags.bide; if (!B.biding || !b) { msg("But it failed!"); return; }
+      u.flags.bide = null; removeEff(u, "BIDE"); msg(`${Nm(u)} unleashed its energy!`);
+      const tg = b.by != null && B.byId(b.by);
+      if (!tg || !tg.alive || !B.units.includes(tg) || !b.dmg) { msg("But it failed!"); return; }
+      applyDamage(u, tg, Math.max(1, b.dmg * 2), { cat: "P" }); return;
+    }
     if (sp === "future") {   // Future Sight and Doom Desire (the owner's rule): the whole other side on the field takes it 2 rounds later
       if ((B.future || []).some(f => f.by === u.uid)) { msg("But it failed!"); return; }
       (B.future || (B.future = [])).push({ team: foeTeam(u), by: u.uid, key: sk.key, at: fieldRounds(2) });
@@ -2771,6 +2834,9 @@ function makeBattle(cfg) {
       if (foe && M.pw && (x.types.includes("Grass") || item(x, "safetygoggles") || tab(u, x, "OVERCOAT"))) { msg(`It doesn't affect ${nm(x)}...`); continue; }
       if (foe && M.t === "Electric" && M.ail && typeEff("Electric", x.types) === 0 && !item(u, "ringtarget")) { msg(`It doesn't affect ${nm(x)}...`); continue; }
       if (foe && x.shield > 0 && !M.so && !pv(u, "INFILTRATOR")) { msg("But it failed!"); continue; }
+      // Magic Coat (the owner's rule, 2026-10-19): it can't be chosen. A Pokémon that knows it, ready, bounces a status move aimed at
+      // it back by itself (not its turn: the move goes on cooldown, like Counter), and any other until its next turn
+      if (foe && !B.bouncing && (M.ail || M.st) && !tab(u, x, "MAGIC_BOUNCE") && !has(x, "MAGICCOAT")) { const mc = reactReady(x, "magiccoat"); if (mc) { x.cool[mc.slot] = cdOf(x, mc); reactEv(x, mc, null); addEff(x, "MAGICCOAT", 1, x, true); } }
       // Magic Bounce: the move comes back at its user (once: a bounced move doesn't bounce again)
       if (foe && !B.bouncing && (tab(u, x, "MAGIC_BOUNCE") || has(x, "MAGICCOAT")) && (M.ail || M.st)) { msg(`${Nm(x)} bounced the ${M.n} back!`); B.bouncing = true; try { if (M.ail) tryStatus(x, u, M.ail, true, { direct: true }); if (M.st) for (const [s2, n2] of M.st) stage(x, u, s2, n2); } finally { B.bouncing = false; } continue; }
       if (M.ail) { if (tryStatus(u, x, M.ail, sk.target !== "aoe_enemies", { sound: !!M.so, direct: true })) any = true; }
@@ -2844,12 +2910,13 @@ function makeBattle(cfg) {
     }
     const u = advance(); B.actor = u; B.turn++;
     rescaleField();
+    if (u.flags.bide) Object.assign(u.flags.bide, { hits: 0, dmg: 0, by: null });   // (Bide counts the attacks between its user's turns)
     // (Follow Me, Rage Powder and Spotlight aren't among them: they last as long as their Pokémon stays on the field, the owner's rule)
     for (const id of ["PROTECT", "ENDURE", "DBOND", "MAGICCOAT", "SNATCH", "GRUDGE"]) if (has(u, id)) removeEff(u, id);
     for (const a of B.units) for (const e of a.eff.slice()) if (["CRAFTY", "MATBLOCK", "QUICKGUARD", "WIDEGUARD", "ALLYSWITCH"].includes(e.id) && e.src === u.uid) removeEff(a, e.id);
     for (const [k, line] of [["gravity", "Gravity returned to normal!"], ["magicRoom", "Magic Room wore off, and held items' effects returned to normal!"],
       ["wonderRoom", "Wonder Room wore off, and Defense and Sp. Def stats returned to normal!"], ["mudSport", "The effects of Mud Sport have faded."],
-      ["waterSport", "The effects of Water Sport have faded."], ["ionDeluge", null], ["fairyLock", null]]) if (B[k] && B.turn >= B[k]) { B[k] = 0; if (line) msg(line); }
+      ["waterSport", "The effects of Water Sport have faded."], ["ionDeluge", "The deluge of ions stopped."], ["fairyLock", null]]) if (B[k] && B.turn >= B[k]) { B[k] = 0; if (line) msg(line); }
     futureHits();
     if (B.terrain && B.turn >= B.terrain.until) endTerrain();
     if (B.trickRoom && B.turn >= B.trickRoom) { B.trickRoom = 0; msg("The twisted dimensions returned to normal!"); ev({ k: "terrain", t: B.terrain && B.terrain.t, tr: 0 }); }

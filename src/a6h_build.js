@@ -99,7 +99,7 @@ function abilityValue(k, abKey, c = {}) {
     case "PINCH": return 0;   // in its moves (abMoveMul), like the other Abilities that power up attacks
     case "CONTACT": return meta.contact * A.chance * ({ PAR: .4, PSN: .25, BRN: .2 + .5 * meta.phys, SPORE: .4, INFAT: .15 }[A.what] || .2) * .6;
     case "TOUCH": return share(M => M.ct) * .3 * .25 * .6;
-    case "STENCH": return .1 * .3 * .6 + .18 * shareW(M => M.fl ? 0 : overStrikes(.1, strikesOf(M, abKey, held)) - .1);   // (each strike of a multi-strike move can flinch)
+    case "STENCH": return .036 + .36 * shareW(M => M.fl ? 0 : overStrikes(.1, strikesOf(M, abKey, held)) - .1);   // (each strike of a multi-strike move can flinch)
     case "INTIMIDATE": return meta.phys * .35;
     case "IMMUNE_TYPE": return DEF * part(A.type);
     case "ABSORB": return DEF * part(A.type) * 1.25;
@@ -114,7 +114,7 @@ function abilityValue(k, abKey, c = {}) {
     case "RESIST": return DEF * A.types.reduce((a, t) => a + part(t), 0) * .5;
     case "HEATPROOF": return DEF * part("Fire") + .03;   // (immune to Fire, can't be burned)
     case "NO_STATUS": return status(A.list) * .4;
-    case "INNER_FOCUS": return meta.intim * phys * .3 + meta.flinch * .08;
+    case "INNER_FOCUS": return meta.intim * phys * .3 + meta.flinch * .16;
     case "NO_DROP": return A.stats === "all" ? meta.intim * phys * .3 + meta.drops * .12 : A.stats === "atk" ? meta.intim * phys * .3 + meta.drops * .03 : meta.drops * .02 + (A.eva ? .01 : 0);
     case "STURDY": return held === "focussash" ? .01 : .05 + .1 * clamp(1 - (b[0] + b[2] + b[4]) / 330, 0, 1);
     case "ROCK_HEAD": return 0;
@@ -147,7 +147,7 @@ function abilityValue(k, abKey, c = {}) {
     case "WEAK_ARMOR": return meta.phys * .03;
     case "ANGER": return phys * .25;
     case "DEFIANT": return (A.stat === "atk" ? phys : 1 - phys) * (meta.intim + meta.drops) * .4;
-    case "STEADFAST": return meta.flinch * .05;
+    case "STEADFAST": return meta.flinch * .08;
     case "MOXIE": return (A.stat === "spa" ? 1 - phys : A.stat === "best" ? .8 : phys) * .15 + (A.unnerve ? .02 : 0);
     case "INFILTRATOR": return meta.screens * .2;
     case "CURSED": return .04;
@@ -302,7 +302,7 @@ const resistShare = t => (resistShare.m || (resistShare.m = {}))[t] != null ? re
   : (resistShare.m[t] = COMP_POOL().filter(x => { const e = typeEff(t, OPS[x].types); return e > 0 && e < 1; }).length / COMP_POOL().length);
 function abMoveMul(k, ab, m, held) {
   const M = MOVES[m]; if (!M || M.c === "X" || !ab) return 1;
-  const n = strikesOf(M), A = abilityOf(ab), fx = 1 + (M.ail && M.ac ? overStrikes(M.ac / 100, n) / 4 : 0) + (M.fl ? overStrikes(M.fl / 100, n) / 5 : 0);   // what moveValue gave its added effect
+  const n = strikesOf(M), A = abilityOf(ab), fx = 1 + (M.ail && M.ac ? overStrikes(M.ac / 100, n) / 4 : 0) + (M.fl ? overStrikes(M.fl / 100, n) / 2.5 : 0);   // what moveValue gave its added effect
   switch (A.id) {
     case "TECHNICIAN": return M.p > 0 && M.p <= 60 ? 1.5 : 1;
     case "SKILL_LINK": return M.hit && M.hit[0] !== M.hit[1] ? M.hit[1] / 3 : 1;   // (always the most strikes: 5, not 3 on average; Loaded Dice then only adds its accuracy, diceMul)
@@ -310,7 +310,7 @@ function abMoveMul(k, ab, m, held) {
     case "NO_DROP": return A.sure && M.a ? 100 / M.a : 1;   // (Keen Eye and Illuminate: their moves are 100% accurate)
     case "ACC": return M.a ? Math.min(100, M.a * 4 / 3) / M.a : 1;   // (Compound Eyes: accuracy +1)
     case "SHEER_FORCE": return M.ail || M.fl || (M.st && M.sw !== "self") || ["triattack", "secretpower", "throatchop", "psychicnoise"].includes(M.sp) ? 1.5 / fx : 1;
-    case "SERENE": return (1 + (M.ail && M.ac ? overStrikes(M.ac / 50, n) / 4 : 0) + (M.fl ? overStrikes(M.fl / 50, n) / 5 : 0)) / fx * (M.st && M.sw !== "self" && M.sc < 100 ? 1.05 : 1);
+    case "SERENE": return (1 + (M.ail && M.ac ? overStrikes(M.ac / 50, n) / 4 : 0) + (M.fl ? overStrikes(M.fl / 50, n) / 2.5 : 0)) / fx * (M.st && M.sw !== "self" && M.sc < 100 ? 1.05 : 1);
     case "IRON_FIST": return M.pu ? 1.5 : 1;
     case "FLAGPOW": return (A.flag === "pulse" ? ["aurasphere", "darkpulse", "dragonpulse", "waterpulse", "originpulse", "terrainpulse"].includes(m) : M[A.flag]) ? A.mul : 1;
     case "ATE": return (A.sound ? M.so : M.t === "Normal") ? (A.mul || 1) * (OPS[k].types.includes(A.type) && !OPS[k].types.includes(M.t) ? 1.5 : 1) : 1;
@@ -342,7 +342,7 @@ let MOVE_WORTH_ON = true;
 // (the moves that go up by themselves on entry keep the table's own value: the samples only see what a move is worth on a
 // Pokémon's turn, never the free use it gets coming in; a head-to-head with them left neutral won 61.3% vs 60.0%, 2026-10-14; Follow
 // Me, Rage Powder and Spotlight too: up on entry for as long as their Pokémon stays out)
-const worthF = (k, m) => { const sp = (MOVES[m] || {}).sp; if (!MOVE_WORTH_ON || typeof MOVE_WORTH === "undefined" || ENTRY_MOVES.has(sp) || sp === "followme" || sp === "spotlight" || sp === "shelltrap" || sp === "counter" || sp === "mirrorcoat" || sp === "metalburst" || sp === "conversion" || sp === "conversion2") return 1; const s = MOVE_WORTH.s[k]; return s && s[m] != null ? s[m] : MOVE_WORTH.g[m] != null ? MOVE_WORTH.g[m] : 1; };
+const worthF = (k, m) => { const sp = (MOVES[m] || {}).sp; if (!MOVE_WORTH_ON || typeof MOVE_WORTH === "undefined" || ENTRY_MOVES.has(sp) || sp === "followme" || sp === "spotlight" || sp === "shelltrap" || sp === "counter" || sp === "mirrorcoat" || sp === "metalburst" || sp === "conversion" || sp === "conversion2" || sp === "magiccoat" || sp === "snatch" || sp === "bide") return 1; const s = MOVE_WORTH.s[k]; return s && s[m] != null ? s[m] : MOVE_WORTH.g[m] != null ? MOVE_WORTH.g[m] : 1; };
 // Loaded Dice (the owner's rule, 2026-10-16): every multi-strike move strikes its most times at 100% accuracy. A 2-5-strike move is worth
 // 5/3 of its average (Skill Link gives that already, abMoveMul), and a move that can miss 100/its accuracy; Triple Axel and Triple
 // Kick roll each strike, their power rising 1:2:3, so at a they deal (a + 2a² + 3a³)/6 of their whole. Twineedle and Double Kick
@@ -671,7 +671,7 @@ function itemValue0(k, h, b, c = {}) {
     // (10% flinch with each damaging move, each strike of a multi-strike move rolling it: 27% over Bullet Seed's 3 strikes on average,
     // 41% over 5 with Skill Link; Serene Grace doubles each roll; a move that flinches by itself doesn't add it)
     case "kingsrock": case "razorfang": { const sg = A.id === "SERENE" ? 2 : 1;
-      return .015 + .15 * shareW(M => M.c === "X" || M.fl ? 0 : overStrikes(.1 * sg, strikesOf(M, A.key, h)) - .1 * sg); }
+      return .03 + .3 * shareW(M => M.c === "X" || M.fl ? 0 : overStrikes(.1 * sg, strikesOf(M, A.key, h)) - .1 * sg); }
     // +10% turn meter whenever it comes in: worth most to a Pokémon whose moves pay off on the first turn (Tailwind, sleep and
     // paralysis, setup boosts; weather, Trick Room, screens and hazards go up on entry anyway), and it stacks with priority moves
     case "quickclaw": return .13 + .07 * share(M => M.c === "X" && (FIRST_TURN.has(M.sp) || M.ail === "SLP" || M.ail === "PAR" || (M.st && M.sw !== "target" && M.st.some(([, n]) => n > 0))));
