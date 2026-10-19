@@ -13516,7 +13516,7 @@
    "name": "Priority Offense",
    "weight": 84,
    "coverMaxSpeed": null,
-   "plan": "every priority move a Pokémon knows is +30% turn meter the moment it comes in (a priority Ability and a Quick Claw too), and they stack, so the team moves first and its hardest hitters strike before the other side can act",
+   "plan": "every priority move a Pokémon knows adds 10% turn meter for each point of priority the moment it comes in (Quick Attack +10%, Fake Out +30%, Protect +40%, Helping Hand +50%; a priority Ability and a Quick Claw too), and they stack, so the team moves first and its hardest hitters strike before the other side can act",
    "overlaps": [
     "rain",
     "sun",
@@ -14092,7 +14092,7 @@
     },
     {
      "name": "Priority rush",
-     "plan": "Three leads with priority attacks: each one is +30% turn meter the moment they're sent out, and they stack, so the team moves first and keeps hitting",
+     "plan": "Three leads with priority attacks: each one adds turn meter by its priority the moment they're sent out (+10% for most, +20% for Extreme Speed), and they stack, so the team moves first and keeps hitting",
      "slots": [
       [
        "ho_priority",

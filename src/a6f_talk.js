@@ -339,7 +339,7 @@ function memberJob(doc, k, A) {
   // a lead setter that does a support's or hazard setter's job too (doc.cover, buildArch in a6g_teams.js)
   const cv = doc.cover && doc.cover[k], cm = cv && ROLE(cv).mv ? mv.find(m => ROLE(cv).mv.includes(m)) : null;
   if (cm && roleKind(role) === "setter") t += roleKind(cv) === "hazard" ? `, and it sets ${MOVES[cm].n} too` : `, and it's the team's support too, with ${MOVES[cm].n}`;
-  // a lead whose job is a first-turn move: its priority moves and Quick Claw give it +30% turn meter each the moment it's sent out
+  // a lead whose job is a first-turn move: its priority moves and Quick Claw give it turn meter by their priority the moment it's sent out
   if (R && (R.pri || J && J.need === "pri") && J && J.need && !/ hits with /.test(t)) {
     const pri = mv.filter(m => isPri(m)), qc = pr.held === "quickclaw", n = pri.length + (qc ? 1 : 0);
     if (n) t += `; with ${listAnd([...(qc ? ["its Quick Claw"] : []), ...pri.map(m => MOVES[m].n)])} it starts at +${30 * n}% turn meter, so it goes first`;

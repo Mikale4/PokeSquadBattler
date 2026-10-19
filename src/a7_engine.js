@@ -84,7 +84,7 @@ function makeBattle(cfg) {
       else if (H.pinch === "crit") addEff(u, "FOCUS", 99, u, true);
       else if (H.pinch === "random") { const st = ["atk", "def", "spa", "sdf", "spe"].filter(s => u.stages[s] < 6); if (st.length) stage(u, u, pick(st), 2); }
       else if (H.pinch === "acc") addEff(u, "LOCKON", 2, u, true);
-      else if (H.pinch === "first") addATB(u, .5);
+      else if (H.pinch === "first") { if (!(B.nextQ = B.nextQ || []).includes(u.uid)) B.nextQ.push(u.uid); msg(psT("custapberry", "activate", { POKEMON: nm(u) })); }   // (Custap: its turn at once, the owner's rule)
     }
     if (H.cure) { if (u.status && H.cure.includes(u.status)) { u.status = null; u.sTurn = 0; } if (has(u, "CNF") && H.cure.includes("CNF")) removeEff(u, "CNF"); }
     fxEv(u);
@@ -100,7 +100,7 @@ function makeBattle(cfg) {
       else if (H.pinch === "crit") addEff(u, "FOCUS", 99, u, true);
       else if (H.pinch === "random") { const st = ["atk", "def", "spa", "sdf", "spe"].filter(s => u.stages[s] < 6); if (st.length) stage(u, u, pick(st), 2); }
       else if (H.pinch === "acc") addEff(u, "LOCKON", 2, u, true);
-      else if (H.pinch === "first") addATB(u, .5);
+      else if (H.pinch === "first") { if (!(B.nextQ = B.nextQ || []).includes(u.uid)) B.nextQ.push(u.uid); msg(psT("custapberry", "activate", { POKEMON: nm(u) })); }   // (Custap: its turn at once, the owner's rule)
     }
   }
   // status Berries (Lum cures everything), and the Mental Herb
@@ -238,13 +238,14 @@ function makeBattle(cfg) {
       // the game has no Dynamax, so a Gym Leader's Dynamax ace and a Max Raid's Pokémon battle with an aura instead, a4h_galar.js)
       if (u.aura && u.alive && !u.flags.auraOn) { u.flags.auraOn = true; const up = STAGE_KEYS.filter(s => u.aura[s]).map(s => STAGE_N[s]);
         msg(`${Nm(u)}'s ${u.auraN ? u.auraN + " aura" : "aura"} flared to life!${u.dmax ? " Its HP is doubled!" : ""}${up.length ? ` Its ${up.length > 1 ? up.slice(0, -1).join(", ") + " and " + up[up.length - 1] : up[0]} rose!` : ""}`); fxEv(u); }
-      // (the owner's rule) +30% turn meter on coming onto the field for each priority move it knows (Grassy Glide too), for a
-      // priority Ability (Prankster, Triage, Gale Wings, Quick Draw) and for a Quick Claw; they add up, with no other conditions
-      const pri = u.skills.filter(s => s.M.pri > 0 || s.M.sp === "grassyglide").length
-        + (u.passives.some(p => ["prankster", "triage", "gale-wings", "quick-draw"].includes(p.key)) ? 1 : 0) + (item(u, "quickclaw") ? 1 : 0);
+      // (the owner's rules) turn meter on coming onto the field by priority bracket, 10% a point (2026-10-19): each priority move it
+      // knows adds its own (Quick Attack +10%, Extreme Speed +20%, Fake Out +30%, Protect +40%, Helping Hand +50%; Grassy Glide +10%),
+      // a priority Ability its bracket (Prankster and Gale Wings +1, Triage +3) and Quick Draw and the Quick Claw +1; they add up,
+      // with no other conditions (priBracket, PRI_AB in a3b_kits.js)
+      const pri = u.skills.reduce((a, s) => a + priBracket(s.M), 0) + u.passives.reduce((a, p) => a + (PRI_AB[p.key] || 0), 0) + (item(u, "quickclaw") ? 1 : 0);
       if (pri && u.alive) {
         if (item(u, "quickclaw")) msg(psT("quickclaw", "activate", { POKEMON: nm(u) }));
-        u.atb = clamp(u.atb + 30 * pri, 0, 100); ev({ k: "tm", u: u.uid, tm: u.atb, v: 30 * pri });
+        u.atb = clamp(u.atb + 10 * pri, 0, 100); ev({ k: "tm", u: u.uid, tm: u.atb, v: 10 * pri });
       }
       if (item(u, "berserkgene")) { useUp(u, `${Nm(u)}'s Berserk Gene kicked in!`); stage(u, u, "atk", 2); tryStatus(u, u, "CNF", false); }
       castformItem(u);   // (Castform holding a Heat, Damp or Icy Rock: that form, and its weather Ability goes off below)
@@ -1856,6 +1857,9 @@ function makeBattle(cfg) {
 
   // ---------- turn flow ----------
   function advance() {
+    // an extra turn (Quick Claw, Quick Draw) or a Custap Berry's: that Pokémon goes next, before the meters move on (the owner's rules,
+    // 2026-10-18; B.nextQ, oldest first)
+    while (B.nextQ && B.nextQ.length) { const n = B.byId(B.nextQ.shift()); if (n && n.alive && B.units.includes(n)) { n.atb = 100; return n; } }
     const al = B.units.filter(x => x.alive);
     let best = null, bt = Infinity;
     for (const u of al) { const t = (100 - u.atb) / effSpd(u); if (t < bt) { bt = t; best = u; } }
@@ -1865,6 +1869,7 @@ function makeBattle(cfg) {
   }
   function predictOrder(n) {
     const snap = B.units.filter(x => x.alive).map(u => ({ u, atb: u.atb, spd: effSpd(u) })), out = [];
+    for (const id of B.nextQ || []) if (out.length < n && snap.some(s => s.u.uid === id)) out.push(id);   // (queued extra turns first)
     for (let i = 0; i < n && snap.length; i++) {
       const nx = snap.reduce((a, b) => (100 - b.atb) / b.spd < (100 - a.atb) / a.spd ? b : a);
       const dt = Math.max(0, (100 - nx.atb) / nx.spd);
@@ -1887,6 +1892,11 @@ function makeBattle(cfg) {
     }
     if (u.flags.slowStart > 0 && !u.fresh) { u.flags.slowStart--; if (!u.flags.slowStart && pv(u, "SLOW_START")) msg(`${Nm(u)} finally got its act together! Its stats rose sharply!`); }
     if (u.alive && B.units.includes(u)) formCheck(u);   // (Zen Mode checks at the end of each turn too)
+    // Quick Draw (30%) and the Quick Claw (20%): after its turn, a chance to move again at once (the owner's rules, 2026-10-18)
+    if (u.alive && B.units.includes(u) && !(B.nextQ || []).includes(u.uid)) {
+      const why = u.passives.some(p => p.key === "quick-draw") && R() < .3 ? "Quick Draw" : item(u, "quickclaw") && R() < .2 ? "Quick Claw" : null;
+      if (why) { (B.nextQ = B.nextQ || []).push(u.uid); msg(`${Nm(u)}'s ${why} let it move again!`); fxEv(u); }
+    }
     u.fresh = false; u.actT = B.turn;
     if (u.alive) {
       let changed = false;

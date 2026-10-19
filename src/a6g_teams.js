@@ -50,7 +50,7 @@ const RECOVER = ["softboiled", "recover", "slackoff", "roost", "moonlight", "mor
 const HAZARDS = ["stealthrock", "spikes", "toxicspikes"], PHAZE = ["roar", "whirlwind", "dragontail", "circlethrow"];
 const STATUSERS = ["toxic", "willowisp", "thunderwave", "spore", "sleeppowder", "yawn"], PIVOTS = ["uturn", "voltswitch", "flipturn"];
 const setupOf = k => learnsAny(k, physK(k) ? SETUP_P : SETUP_S) || learnsAny(k, ["agility", "rockpolish"]);
-// priority attacks (Fake Out has a role of its own): each one a Pokémon knows is +30% turn meter the moment it's sent out
+// priority attacks (Fake Out has a role of its own): each one a Pokémon knows adds 10% turn meter a point of priority the moment it's sent out
 const PRI_ATK = () => PRI_ATK.v || (PRI_ATK.v = Object.keys(MOVES).filter(m => MOVES[m].pri > 0 && MOVES[m].c !== "X" && MOVES[m].p > 0 && m !== "fakeout"));
 const priAtks = k => PRI_ATK().filter(m => learns(k, m));
 const PLEDGES = ["firepledge", "waterpledge", "grasspledge"];
@@ -74,7 +74,7 @@ const COMP_POOL = () => COMP_POOL.v || (COMP_POOL.v = OP_KEYS.filter(k => (!OPS[
 // "Pokemon Kanto Squad Team Config.html"; build.sh embeds it as TEAM_CONFIG). Never write archetypes or roles here. ----------
 // A role (TEAM_CONFIG.roles[id]): the Pokémon that fit it, each with a fit score (higher is picked first), the moves, Abilities and
 // items it's there for and which of them it keeps (the rest is optimized), whether it leads, waits on the bench (a backup setter)
-// or is needed (a team that can't fill it isn't that archetype), whether it keeps a priority move beside its job (+30% turn meter
+// or is needed (a team that can't fill it isn't that archetype), whether it keeps a priority move beside its job (turn meter by its priority
 // when it comes in), how much raw strength counts against the fit when it's picked (power, fitWeight), moves it keeps only in
 // some archetypes (onlyIn: Growth in Sun teams), and its kind (setter, wall, phazer...: what Trainers say it does in chat).
 // An archetype: its sub-archetypes, each a list of [role, how many] slots (filled in order), then the strongest of the rest; the
@@ -145,7 +145,7 @@ function modeDoc(doc, mode) {
   const prog = { ...doc.prog }; for (const k in prog) if (badItem(k)) prog[k] = { ...prog[k], held: null };
   return { ...doc, team, prog, roster: [...team, ...roster.filter(k => !team.includes(k))] };
 }
-// a priority move (Grassy Glide counts: it has priority in Grassy Terrain): +30% turn meter for each one known, the moment it comes in
+// a priority move (Grassy Glide counts: it has priority in Grassy Terrain): 10% turn meter a point of priority for each one known, the moment it comes in
 const isPri = m => MOVES[m] && (MOVES[m].pri > 0 || MOVES[m].sp === "grassyglide");
 function roleLocks(acc, ac) {
   const out = {}, used = new Set(), ids = archIds(acc.arch); if (!archById(acc.arch.id)) return out;

@@ -5,7 +5,7 @@
 // how often each slot gets used (S1 has no cooldown, S2 and S3 wait 3 and 4 turns)
 const SLOT_USE = { 1: 1, 2: .6, 3: .5 };
 const WX_SET = { raindance: "rain", sunnyday: "sun", sandstorm: "sand", hail: "snow", snowscape: "snow" };
-// moves that pay off most on a Pokémon's first turn (a Quick Claw's +30% turn meter gets them up sooner)
+// moves that pay off most on a Pokémon's first turn (a Quick Claw's +10% turn meter gets them up sooner)
 // (the moves a Quick Claw's turn meter gets in sooner: Trick Room, weather, terrain, hazards, screens and rooms go up by themselves on entry)
 const FIRST_TURN = new Set(["tailwind"]);
 const WX_AB = { drought: "sun", "orichalcum-pulse": "sun", drizzle: "rain", "sand-stream": "sand", "snow-warning": "snow" };
@@ -179,7 +179,7 @@ function abilityValue(k, abKey, c = {}) {
     case "SPEED_BOOST": return .25;
     case "MOODY": return .2;
     case "BAD_DREAMS": return (meta.status.SLP || 0) * .3 + .02;
-    case "PRANKSTER": return .06 + share(M => false) + mv.filter(m => MOVES[m].c === "X").length * .02;
+    case "PRANKSTER": return .02 + share(M => false) + mv.filter(m => MOVES[m].c === "X").length * .02;   // (+1: 10% turn meter)
     case "SUPER_LUCK": return .03 + share(M => M.cr) * .05 + (held === "scopelens" || held === "razorclaw" ? .05 : 0);
     case "PLUSMINUS": return mates.some(x => abilityOf(x.ab).id === "PLUSMINUS") ? (1 - phys) * .3 : 0;
     case "KLUTZ": return held === "flameorb" || held === "toxicorb" || held === "laggingtail" || held === "ironball" || held === "stickybarb" ? 0 : -.1;
@@ -290,7 +290,7 @@ function abilityValue(k, abKey, c = {}) {
     case "UNSEEN_FIST": return .04;
     case "NO_REDIRECT": return .02;
     case "CORROSION": return mv.includes("toxic") ? .05 : .01;
-    case "PRIORITY_AB": return .1;
+    case "PRIORITY_AB": return .1 * (PRI_AB[A.key] || 1) / 3 + (A.key === "quick-draw" ? .2 : 0);   // (its bracket's turn meter, 10% a point; Quick Draw: 30% of its turns are followed by another)
     case "GUARD_DOG": return meta.intim * phys * .4 + .02;
     case "RIPEN": return held && /berry$/.test(held) ? .06 : 0;
     case "CHEEK_POUCH": return held && /berry$/.test(held) ? .05 : 0;
@@ -641,7 +641,7 @@ function itemValue0(k, h, b, c = {}) {
   if (H.types) return H.types === "all" ? .2 * share(M => M.c !== "X") : .45 * share(M => M.c !== "X" && H.types.includes(M.t));   // the orbs and the Soul Dew (×1.5), the masks (×1.2)
   if (H.gem) return .045 * share(M => M.c !== "X" && M.t === H.gem);
   if (H.resist) return typeEff(H.resist, types) > 1 ? DEF * part(H.resist) * .5 : 0;
-  if (H.pinch) return H.pinch === "atk" ? .02 + .03 * o.p : H.pinch === "spa" ? .02 + .03 * o.s : .02;
+  if (H.pinch) return H.pinch === "atk" ? .02 + .03 * o.p : H.pinch === "spa" ? .02 + .03 * o.s : H.pinch === "first" ? .05 : .02;   // (Custap: a turn at once)
   if (H.cure && h !== "lumberry") return H.cure.reduce((a, s) => a + (meta.status[s] || 0), 0) * .3 + (H.cure.includes("SLP") && has(["rest"]) ? .15 : 0);   // a Chesto Berry wakes it from Rest at once
   // Berry Juice and the Oran Berry heal a fixed 20 or 10 HP: when the build knows its level (b.lvl, the Demo's own plan) they're worth
   // what that is of the Pokémon's HP there, at the Sitrus Berry's rate (.06 for a quarter; at most about 60% counts, as it heals at
@@ -672,9 +672,9 @@ function itemValue0(k, h, b, c = {}) {
     // 41% over 5 with Skill Link; Serene Grace doubles each roll; a move that flinches by itself doesn't add it)
     case "kingsrock": case "razorfang": { const sg = A.id === "SERENE" ? 2 : 1;
       return .015 + .15 * shareW(M => M.c === "X" || M.fl ? 0 : overStrikes(.1 * sg, strikesOf(M, A.key, h)) - .1 * sg); }
-    // +30% turn meter whenever it comes in: worth most to a Pokémon whose moves pay off on the first turn (Tailwind, sleep and
+    // +10% turn meter whenever it comes in: worth most to a Pokémon whose moves pay off on the first turn (Tailwind, sleep and
     // paralysis, setup boosts; weather, Trick Room, screens and hazards go up on entry anyway), and it stacks with priority moves
-    case "quickclaw": return .05 + .2 * share(M => M.c === "X" && (FIRST_TURN.has(M.sp) || M.ail === "SLP" || M.ail === "PAR" || (M.st && M.sw !== "target" && M.st.some(([, n]) => n > 0))));
+    case "quickclaw": return .13 + .07 * share(M => M.c === "X" && (FIRST_TURN.has(M.sp) || M.ail === "SLP" || M.ail === "PAR" || (M.st && M.sw !== "target" && M.st.some(([, n]) => n > 0))));
     case "shellbell": return .03 * o.atk;
     case "throatspray": return .1 * share(M => M.so);
     case "whiteherb": return .1 * share(M => M.st && M.sw === "self" && M.st.some(([, n]) => n < 0));

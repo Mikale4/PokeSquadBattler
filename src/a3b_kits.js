@@ -91,7 +91,7 @@ function moveDesc(sk) {
   if (M.crash) out.push("If it misses, the user crashes and loses a quarter of its max HP");
   if (sk.target === "aoe_enemies" && M.p) out.push(`Hits every opposing Pokémon (${P(SPREAD)} damage each)`);
   if (M.hit && M.sp !== "tripleaxel") out.push(M.hit[0] === M.hit[1] ? `Strikes ${M.hit[0]} times` : `Strikes ${M.hit[0]} to ${M.hit[1]} times`);
-  if (M.pri > 0) out.push("Priority move: the user gets +30% turn meter when it's sent out (each priority move it knows adds 30%)");
+  if (M.pri > 0) out.push(`Priority +${M.pri}: the user gets +${M.pri * 10}% turn meter when it's sent out (each priority move it knows adds its own)`);
   if (M.n === "Thunder" || M.n === "Hurricane") out.push("Never misses in rain; 50% accuracy in harsh sunlight");
   if (M.n === "Blizzard") out.push("Never misses in hail or snow");
   if (["firepledge", "grasspledge", "waterpledge"].includes(sk.key)) out.push("After a different Pledge from a teammate in the same round: a combined 150-power move, with a sea of fire (Fire + Grass), a swamp (Grass + Water) or a rainbow (Water + Fire) for 4 rounds");
@@ -146,7 +146,7 @@ function moveDesc(sk) {
     finalgambit: "Deals damage equal to the user's HP, and the user faints", counter: "It can't be chosen: when an opposing physical move damages the user, it hits back at that attacker by itself for twice the damage once the attack is over, if it's ready (that isn't the user's turn: the move just goes on cooldown)",
     mirrorcoat: "It can't be chosen: when an opposing special move damages the user, it hits back at that attacker by itself for twice the damage once the attack is over, if it's ready (that isn't the user's turn: the move just goes on cooldown)", synchronoise: "Only hits a Pokémon that shares a type, its status condition, its Ability or its nature with the user",
     freezedry: "Super effective against Water types", steelbeam: "The user loses a quarter of its max HP, hit or miss (the owner's rule; Magic Guard keeps it)", burnup: "The user loses its Fire type (without it, the move still works: the owner's rule)",
-    expandingforce: "In Psychic Terrain, with the user on the ground: 50% stronger and hits every foe", grassyglide: "A priority move: the user gets +30% turn meter when it's sent out", burningjealousy: "Burns a target whose stats rose since the user's last turn",
+    expandingforce: "In Psychic Terrain, with the user on the ground: 50% stronger and hits every foe", grassyglide: "A +1 priority move (in Grassy Terrain): the user gets +10% turn meter when it's sent out", burningjealousy: "Burns a target whose stats rose since the user's last turn",
     poltergeist: "", clearsmog: "Resets the target's stat changes", fakeout: "Works on any turn, not just the user's first on the field",
     mistyexplosion: "The user faints; 50% stronger in Misty Terrain", tripleaxel: `Strikes three times, at ${M.p}, ${M.p * 2} and ${M.p * 3} power; each strike can miss`,
     eruption: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)", metalburst: "It can't be chosen: when an opposing attack damages the user, it hits back at that attacker by itself for 1.5 times the damage once the attack is over, if it's ready (that isn't the user's turn: the move just goes on cooldown)",
@@ -386,7 +386,7 @@ const ABILITY = {
   "speed-boost": ["Speed Boost", "Its Speed rises by 1 at the end of each of its turns.", { id: "SPEED_BOOST" }],
   moody: ["Moody", "At the end of each of its turns, one of its stats rises by 2 and another falls by 1.", { id: "MOODY" }],
   "bad-dreams": ["Bad Dreams", "At the end of each of its turns, every sleeping opposing Pokémon loses 1/8 of its max HP.", { id: "BAD_DREAMS" }],
-  prankster: ["Prankster", "+30% turn meter whenever it comes onto the field, like knowing a priority move (the owner's rule).", { id: "PRANKSTER" }],
+  prankster: ["Prankster", "A +1 priority Ability: +10% turn meter whenever it comes onto the field, like knowing a +1 priority move (the owner's rule).", { id: "PRANKSTER" }],
   "super-luck": ["Super Luck", "Its moves are more likely to be critical hits (two stages higher).", { id: "SUPER_LUCK" }],
   "shadow-tag": ["Shadow Tag", "When it enters battle, every opposing Pokémon's turn meter drops to 0. While it's in battle, opposing Pokémon can't switch out and fill their turn meter 10% slower (Run Away still escapes).", { id: "ARENA_TRAP", all: 1 }],
   plus: ["Plus", "Sp. Atk +1 while a partner with Plus or Minus is in battle.", { id: "PLUSMINUS" }],
@@ -530,9 +530,9 @@ const ABILITY = {
   "propeller-tail": ["Propeller Tail", "Its moves go where it aims them: Follow Me, Lightning Rod and Storm Drain can't draw them away.", { id: "NO_REDIRECT" }],
   stalwart: ["Stalwart", "Its moves go where it aims them: Follow Me, Lightning Rod and Storm Drain can't draw them away.", { id: "NO_REDIRECT" }],
   corrosion: ["Corrosion", "It can poison Steel- and Poison-type Pokémon.", { id: "CORROSION" }],
-  triage: ["Triage", "A priority Ability: +30% turn meter when it comes onto the field.", { id: "PRIORITY_AB" }],
-  "gale-wings": ["Gale Wings", "A priority Ability: +30% turn meter when it comes onto the field.", { id: "PRIORITY_AB" }],
-  "quick-draw": ["Quick Draw", "A priority Ability: +30% turn meter when it comes onto the field.", { id: "PRIORITY_AB" }],
+  triage: ["Triage", "A +3 priority Ability: +30% turn meter when it comes onto the field.", { id: "PRIORITY_AB" }],
+  "gale-wings": ["Gale Wings", "A +1 priority Ability: +10% turn meter when it comes onto the field.", { id: "PRIORITY_AB" }],
+  "quick-draw": ["Quick Draw", "Lets it move in the +1 priority bracket: +10% turn meter when it comes onto the field, and after each of its turns a 30% chance to move again at once.", { id: "PRIORITY_AB" }],
   "guard-dog": ["Guard Dog", "Intimidate raises its Attack instead, and nothing can force it out (Roar, Whirlwind, Dragon Tail).", { id: "GUARD_DOG", noIntim: 1 }],
   "minds-eye": ["Mind's Eye", "Its Normal- and Fighting-type moves hit Ghost types, and its moves ignore evasiveness.", { id: "SCRAPPY", noIntim: 1 }],
   libero: ["Libero", "Before every move it uses, it becomes that move's type (Generation 8's effect).", { id: "PROTEAN" }],
@@ -560,7 +560,7 @@ const abilityOf = k => { const a = ABILITY[k] || [k, "", { id: "NONE" }]; return
 // tier: 1 common (Explore drops), 2 uncommon, 3 rare (BP Exchange, bosses)
 const HELD = {
   leftovers: { n: "Leftovers", t: 2, d: "Restores 1/16 of its max HP every turn." },
-  quickclaw: { n: "Quick Claw", t: 1, d: "+30% turn meter when it's sent out. One per team (Item Clause)." },
+  quickclaw: { n: "Quick Claw", t: 1, d: "Lets it move in the +1 priority bracket: +10% turn meter when it's sent out, and after each of its turns a 20% chance to move again at once. One per team (Item Clause)." },
   scopelens: { n: "Scope Lens", t: 1, d: "Raises its critical-hit ratio." },
   widelens: { n: "Wide Lens", t: 1, d: "Accuracy +1." },
   brightpowder: { n: "Bright Powder", t: 1, d: "Evasiveness +1." },
@@ -616,7 +616,7 @@ Object.assign(HELD, {
   lansatberry: {"n": "Lansat Berry", "t": 2, "d": "At 1/4 of its max HP: its critical-hit ratio rises sharply. Once per battle.", "berry": 1, "pinch": "crit", "src": "mart"},
   starfberry: {"n": "Starf Berry", "t": 2, "d": "At 1/4 of its max HP: a random stat +2. Once per battle.", "berry": 1, "pinch": "random", "src": "mart"},
   micleberry: {"n": "Micle Berry", "t": 2, "d": "At 1/4 of its max HP: its next move can't miss. Once per battle.", "berry": 1, "pinch": "acc", "src": "mart"},
-  custapberry: {"n": "Custap Berry", "t": 2, "d": "At 1/4 of its max HP: it moves sooner. Once per battle.", "berry": 1, "pinch": "first", "src": "mart"},
+  custapberry: {"n": "Custap Berry", "t": 2, "d": "At 1/4 of its max HP: it takes its turn at once, right after the attack that brought it there. Once per battle.", "berry": 1, "pinch": "first", "src": "mart"},
   occaberry: {"n": "Occa Berry", "t": 1, "d": "Halves the damage of one super-effective Fire-type hit.", "berry": 1, "resist": "Fire", "src": "mart"},
   passhoberry: {"n": "Passho Berry", "t": 1, "d": "Halves the damage of one super-effective Water-type hit.", "berry": 1, "resist": "Water", "src": "mart"},
   wacanberry: {"n": "Wacan Berry", "t": 1, "d": "Halves the damage of one super-effective Electric-type hit.", "berry": 1, "resist": "Electric", "src": "mart"},
@@ -793,6 +793,10 @@ const nextMoveLevel = (k, lvl) => (OPS[k].learn.find(([l]) => l > lvl) || [])[0]
 // TMs, HMs and TRs from every generation (TMS from a3a_dex.js: [id, generation, "TM01 (Gen 1)", move]; id = generation * 1000 +
 // that generation's number, so TM01 (Gen 1) Mega Punch and TM01 (Gen 2) Dynamic Punch are different TMs)
 const TM_MOVE = Object.fromEntries(TMS.map(t => [t[0], t[3]]));
+// priority brackets (the owner's rule, 2026-10-19): the games' priority, +1 to +5, is 10% turn meter a point when a Pokémon comes in.
+// A move's own (Grassy Glide +1, its bracket in Grassy Terrain), and the priority Abilities' and the Quick Claw's
+const priBracket = M => !M ? 0 : M.sp === "grassyglide" ? 1 : Math.max(0, M.pri || 0);
+const PRI_AB = { prankster: 1, triage: 3, "gale-wings": 1, "quick-draw": 1 };
 const tmId = (move, gen) => (TMS.find(t => t[3] === move && (!gen || t[1] === gen)) || [])[0];   // a TM or HM by its move (and generation): a stage's reward tm
 
 const TM_LABEL = Object.fromEntries(TMS.map(t => [t[0], t[2]]));
@@ -806,7 +810,7 @@ const FIXED_V = { dragonrage: 55, sonicboom: 35, nightshade: 65, seismictoss: 65
 // variable-power moves: a typical power
 const VAR_P = { weight: 71, heavy: 71, gyroball: 71, electroball: 71, flail: 60, wringout: 71, hardpress: 71, ragefist: 100,
   eruption: 71, present: 45, spitup: 100, naturalgift: 80, fling: 40, trumpcard: 60, bide: 50 };
-function moveValue(k, m) { const M = MOVES[m], v = moveValue0(k, m); return M && M.c === "X" && M.pri > 0 ? v * 1.2 : v; }
+function moveValue(k, m) { const M = MOVES[m], v = moveValue0(k, m); return M && M.c === "X" && M.pri > 0 ? v * (1 + priBracket(M) / 15) : v; }   // (its turn meter on entry: +3, 30%, is ×1.2)
 // a move's strikes (a 2-5-strike move: 3 on average, the engine's 2, 2, 2, 3, 3, 3, 4, 5), the most with Skill Link or Loaded Dice
 // (ab, held: when they're known), and the chance an added effect (c, 0 to 1) comes at least once over n strikes: each strike rolls it
 const strikesOf = (M, ab, held) => !M.hit ? 1 : M.hit[0] === M.hit[1] ? M.hit[0] : (ab && abilityOf(ab).id === "SKILL_LINK") || held === "loadeddice" ? M.hit[1] : 3;
@@ -840,7 +844,7 @@ function moveValue0(k, m) {
     if (M.tg === "foes") p *= 1.15;
     if (M.ail && M.ac) p *= 1 + overStrikes(M.ac / 100, hits) / 4;   // (Twineedle: each strike can poison)
     if (M.fl) p *= 1 + overStrikes(M.fl / 100, hits) / 5;
-    if (M.pri > 0 || M.sp === "grassyglide") p *= 1.2;   // (a priority move: +30% turn meter whenever it's sent out)
+    if (priBracket(M)) p *= 1 + priBracket(M) / 15;   // (a priority move: 10% turn meter a point of priority whenever it's sent out)
     if (M.st && M.sw === "self" && M.st.some(([, n]) => n < 0)) p *= .85;   // Overheat, Superpower
     return p;
   }
