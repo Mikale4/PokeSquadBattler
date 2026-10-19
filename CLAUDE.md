@@ -164,7 +164,9 @@ The folder name has spaces: keep every path in shell scripts quoted, or relative
   `music(key)` crossfades and ignores repeats, `jingle(key)` pauses and resumes it, `route()` calls `music(screenMusic())`; battles pass
   `cfg.bgm`/`cfg.winBgm` (`nodeMusic(nd)` for Journey stages). The headless Demo (`DEMO.fast`) keeps quiet.
 - The battle AI (`aiPlan` in `a7_engine.js`, weights in `AIW`) plans the whole team's turn: focus fire, KOs first, no attacking into immunities
-  or resists when a better target exists, no wasted turns. The Demo's team picks (`squadFor` in `a9g_demo.js`) weigh the real damage math and the
+  or resists when a better target exists, no wasted turns. A switch (and the Expert's pick after a faint) is played out first on copies
+  of the battle with the same dice (`aiSwitch`, `lookPick`, `lookRoll`, weights in `AISW`): a switched-in Pokémon is unprotected, a
+  replacement after a faint is protected, so a worn-down Pokémon usually stays (the owner's ask, 2026-10-19). The Demo's team picks (`squadFor` in `a9g_demo.js`) weigh the real damage math and the
   plain type matchup. Tune either with head-to-head battles on fixed seeds, not single games. Its combo know-how is `combos(u, key)`
   (`cfg.noCombo`/`cfg.comboKeys` switch pieces off for one side in head-to-heads); the optimizer's is `comboBonus` in a6h_build.js.
 - **Trainer teams come from `config/team_config.json`** (the owner's rule): roles (the Pokémon that fit, with fit scores; the moves,

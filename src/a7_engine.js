@@ -31,6 +31,12 @@ const AIW = { twMix: .75, killBase: .25, killTw: .6, fuOver: .35, fuSetup: .3, r
   // feeding an absorbing Ability (base + per unit of threat), and switching: stuck (best option worth less than swStuckV) needs a
   // bench matchup swStuck better; a weak best option (under swWeakV) needs one swWeak better
   absorbBase: .4, absorbTw: .8, swStuckV: .02, swStuck: .15, swWeakV: .3, swWeak: .45 };
+// switching on look-ahead (aiSwitch): what a Pokémon still standing is worth beyond its HP (a turn later), the margin a switch must
+// win by, the copies of the battle per batch and the most batches, the bench Pokémon played out, a status condition, a stat stage on the field, and how much better a
+// bench Pokémon must match up before a switch is played out at all; and for the Expert AI's pick after a faint (aiReplacement), the
+// bench Pokémon played out and the margin one must win by over the best matchup; how many rounds each copy plays out (the Expert
+// AI two: 55.6% against one round's 49% in head-to-heads, 2026-10-19)
+const AISW = { alive: .15, margin: .1, k: 8, rounds: 3, cands: 2, status: .1, stage: .03, better: .4, repCands: 3, repMargin: .05, rounds0: 1, roundsX: 2 };
 function makeBattle(cfg) {
   const B = { units: [], ev: [], wave: 0, waves: cfg.waves, over: false, result: null, turn: 0, allyTurns: 0, actor: null, waiting: null,
     tally: { crits: 0, kills: 0, payday: 0, superEff: 0 }, auto: !!cfg.auto, aiStyle: cfg.aiStyle || "balanced", enemyStyle: cfg.enemyStyle || "balanced", weather: (cfg.weather === "snow" ? "hail" : cfg.weather) || null,
@@ -1783,13 +1789,18 @@ function makeBattle(cfg) {
   }
   const fieldFoes = team => B.units.filter(f => f.team !== team && f.alive);
   // a trainer's pick for an empty place: whoever on the bench matches up best against what's on the field
-  function aiReplacement(team) {
+  function aiReplacement(team, slot) {
     const foes = fieldFoes(team); let b = benchOf(team);
     if (!b.length) return null;
     // a Trainer's backup setter (the owner's rule) waits while its team's field is up; it comes in once it's gone (faded, replaced,
     // Trick Room over), or when nobody else is left
     const go = b.filter(x => !(x.backup && fieldUp(x))); if (go.length) b = go;
-    return b.map(x => [x, matchup(x, foes) + (legacy(x) ? 0 : planPick(x, team)) + R() * .01]).sort((a, c) => c[1] - a[1])[0][0];
+    const ranked = b.map(x => [x, matchup(x, foes) + (legacy(x) ? 0 : planPick(x, team)) + R() * .01]).sort((a, c) => c[1] - a[1]), top = ranked[0][0];
+    // (the Expert AI plays its best few out on copies of the battle first, like a switch: aiSwitch; the backup setter's rule stays)
+    if (slot == null || cfg.from || cfg.probe || ranked.length < 2 || legacy(top) || !combos(top, "replace") || (team === "A" ? B.aiStyle : B.enemyStyle) !== "expert" || top.backup) return top;
+    const opts = ranked.slice(0, AISW.repCands).map(([x]) => x).filter(x => !x.backup);
+    const k = lookPick(team, opts.map(x => C => C.sendInNow(team, slot, x.uid)), AISW.repMargin);
+    return opts[k] || top;
   }
   // what a setter brings onto the field (its weather or terrain Ability, a weather or terrain move, Trick Room), and whether it's up
   function fieldOf(x) {
@@ -1827,7 +1838,8 @@ function makeBattle(cfg) {
   // A Trainer's Follow Me, Rage Powder or Spotlight user never switches out by choice: it's there to stay and draw the attacks; and
   // their backup setter only comes in for a Pokémon that fainted, once the team's field is down (the owner's rules, 2026-10-15)
   const REDIRECTS = new Set(["followme", "spotlight"]);
-  function aiSwitch(u, bestV) {
+  // (the old way, still the legacy AI's: switchPlan below weighs a switch on copies of the battle)
+  function aiSwitchOld(u, bestV) {
     const stuck = !legacy(u) && bestV <= AIW.swStuckV;
     if ((u.fresh && !stuck) || u.boss || (B.wild && u.team === "E") || !canSwitch(u)) return null;
     if (u.npc && u.skills.some(s => REDIRECTS.has(s.M.sp))) return null;
@@ -1846,12 +1858,88 @@ function makeBattle(cfg) {
     for (const y of benchOf(u.team)) { if (y.backup || !hurts(y)) continue; const m = matchup(y, foes); if (m > bar) { bar = m; x = y; } }
     return x;
   }
+  // switching out (the owner's ask, 2026-10-19: weigh everything before committing to a switch). A Pokémon that comes in on a switch
+  // has no protection and an empty turn meter, so every opposing Pokémon can hit it before it moves, and the switch costs the turn;
+  // one that comes in after a faint is protected until its first turn. So letting a worn-down Pokémon take its last turn and faint
+  // is often better than pulling it out. The decision is played out on copies of the battle with the same dice, about a round
+  // each: staying (its best move) against switching to each of the two bench Pokémon that match up best. The engine does the rest:
+  // damage, speed and Trick Room, Abilities, held items, the weather, terrain and screens, entry hazards and entry effects
+  // (Intimidate, a setter's move), Pursuit, the protected replacement after a faint. Then it compares what's left: every
+  // Pokémon's HP and whether it's still standing (a Pokémon still standing is worth a turn later), status conditions and the stat
+  // stages of those on the field. A switch has to come out ahead by a margin. It's only played out when one could pay: this one is
+  // stuck, its best move is weak or its matchup is bad, or someone on the bench matches up much better. Never right after coming in
+  // (unless stuck), never a boss or a wild Pokémon, never a Trainer's Follow Me user or backup setter (the owner's rules)
+  function swValue(C, team) {
+    let v = 0;
+    for (const x of [...C.units, ...C.bench.A, ...C.bench.E]) {
+      if (!x.alive) continue;
+      let w = AISW.alive + x.hp / x.max.hp - (x.status ? AISW.status : 0);
+      if (C.units.includes(x)) for (const k of ["atk", "def", "spa", "sdf", "spe"]) w += AISW.stage * (x.stages[k] || 0);
+      v += x.team === team ? w : -w;
+    }
+    if (C.over && C.result) v += C.result.win === (team === "A") ? 20 : -20;
+    return v;
+  }
+  // one decision played out on copies of the battle, the same dice for each option: then about a round (every Pokémon on the field
+  // moving once, and two more turns), two for the Expert AI
+  function lookRoll(team, decide, seeds, each) {
+    let sum = 0; const real = R;
+    try {
+      for (const sd of seeds) {
+        R = seeded(sd);
+        const C = makeBattle({ from: B, waves: B.waves, allies: [], turnLimit: cfg.turnLimit, legacyAI: cfg.legacyAI });
+        decide(C); C.ev.length = 0;
+        const H = ((team === "A" ? B.aiStyle : B.enemyStyle) === "expert" ? AISW.roundsX : AISW.rounds0) * C.units.filter(x => x.alive).length + 2;
+        for (let turns = 0, n = 0; turns < H && n < 3 * H && !C.over; n++) {
+          const r = C.step(); if (r === "input") C.autoAct();
+          if (C.ev.some(e => e.k === "turn")) turns++; C.ev.length = 0;
+        }
+        const v = swValue(C, team); sum += v; if (each) each.push(v);
+      }
+    } finally { R = real; }
+    return sum / seeds.length;
+  }
+  // the option to take among several played out (the first: the one taken unless another is clearly better): in batches of AISW.k
+  // copies, the same dice for every option, another is taken only when it's ahead of the first by the margin even allowing for the
+  // dice (its average gain less one standard error); one that can't get there is dropped; at most AISW.rounds batches
+  function lookPick(team, opts, margin, look) {
+    const s0 = Math.floor(Math.random() * 1e9);
+    const est = c => { const k = c.d.length, m = c.d.reduce((a, x) => a + x, 0) / k, sd = Math.sqrt(c.d.reduce((a, x) => a + (x - m) ** 2, 0) / Math.max(1, k - 1)); return { m, se: sd / Math.sqrt(k) }; };
+    let left = opts.slice(1).map((f, i) => ({ i: i + 1, f, d: [] })), best = 0;
+    for (let r = 0; r < AISW.rounds && left.length && !best; r++) {
+      const seeds = [...Array(AISW.k)].map((_, i) => s0 + (r * AISW.k + i) * 7919), st = [];
+      lookRoll(team, opts[0], seeds, st); if (look) (look[0] = look[0] || []).push(...st);
+      for (const c of left) { const e = []; lookRoll(team, c.f, seeds, e); e.forEach((v, j) => c.d.push(v - st[j])); if (look) (look[c.i] = look[c.i] || []).push(...e); }
+      for (const c of left) Object.assign(c, est(c));
+      left = left.filter(c => c.m + c.se > margin).sort((a, b) => (b.m - b.se) - (a.m - a.se));
+      if (left.length && left[0].m - left[0].se > margin) best = left[0].i;
+    }
+    return best;
+  }
+  function aiSwitch(u, bestV, ch) {
+    if (legacy(u) || !combos(u, "switch") || !ch) return aiSwitchOld(u, bestV);
+    const stuck = bestV <= AIW.swStuckV;
+    if ((u.fresh && !stuck) || u.boss || (B.wild && u.team === "E") || !canSwitch(u)) return null;
+    if (u.npc && u.skills.some(s => REDIRECTS.has(s.M.sp))) return null;
+    const foes = fieldFoes(u.team); if (!foes.length) return null;
+    const hurts = y => y.skills.some(s => isDmgSkill(s) && foes.some(f => expectedDamage(y, f, s) > 0));
+    const cur = matchup(u, foes);
+    const cands = benchOf(u.team).filter(y => !y.backup && hurts(y)).map(y => [y, matchup(y, foes)]).filter(c => c[1] > cur).sort((a, b) => b[1] - a[1]).slice(0, AISW.cands);
+    if (!cands.length) return null;
+    if (!stuck && bestV >= AIW.swWeakV && cur > -.2 && cands[0][1] - cur < AISW.better) return null;   // (nothing to gain: no need to play it out)
+    const mine = C => { const cu = C.byId(u.uid); C.waiting = cu; C.actor = cu; return cu; };
+    const look = cfg.onSwitchLook ? [] : null;   // (tests: each copy's value, per option)
+    const k = lookPick(u.team, [C => { mine(C); C.playerAct(ch.slot, ch.t ? C.byId(ch.t.uid) : null); }, ...cands.map(([y]) => C => { mine(C); C.playerSwitch(y.uid); })], AISW.margin, look);
+    const best = k ? cands[k - 1][0] : null;
+    if (look) { const avg = a => a ? a.reduce((x, y) => x + y, 0) / a.length : 0; cfg.onSwitchLook(u, { stay: avg(look[0]), tried: cands.map(([y], i) => [y.n, avg(look[i + 1])]), best: best && best.n, bestV, stuck, cur }); }
+    return best;
+  }
   function aiChoose(u, style = "balanced") {
     const rd = redirectNow(u); if (rd) return rd;
     let ch;
     if (style === "expert") ch = expertChoose(u);
     else { const best = aiPlan(u, style === "rollout" ? "balanced" : style, style === "rollout")[0]; ch = { slot: best.slot, t: best.t, v: best.v }; }
-    if (style !== "rollout") { const x = aiSwitch(u, ch.v); if (x) return { sw: x }; }
+    if (style !== "rollout") { const x = aiSwitch(u, ch.v, ch); if (x) return { sw: x }; }
     return ch;
   }
 
@@ -2855,6 +2943,7 @@ function makeBattle(cfg) {
   B.shownStages = shownStages; B.fixedStage = fixedStage;
   B.useMove = (u, slot, t) => act(u, slot, t);   // (tests: a Pokémon uses the move in that slot now, as on its turn)
   B.switchNow = (u, x) => switchOut(u, x, false);   // (tests: a Pokémon switches out for one on its bench)
+  B.sendInNow = (team, slot, uid) => { const x = benchOf(team).find(y => y.uid === uid); if (x) sendIn(team, slot, x); };   // (the look-ahead's copies: aiReplacement)
   if (cfg.futureWait != null) FUTURE_WAIT = cfg.futureWait;   // (tools: tuning the wait)
   B.plan = (u, style) => aiPlan(u, style || "balanced");   // (for tests: the scored options)
   // what one move would be worth to this Pokémon right now, were it its ready move (tools/move_worth.js samples it in top-tier
@@ -2906,7 +2995,7 @@ function makeBattle(cfg) {
     for (const team of ["E", "A"]) for (const slot of emptySlots(team)) {
       if (!benchOf(team).length) break;
       if (team === "A" && cfg.pick) { B.needPick = slot; return "replace"; }
-      sendIn(team, slot, aiReplacement(team)); return "sendin";
+      sendIn(team, slot, aiReplacement(team, slot)); return "sendin";
     }
     const u = advance(); B.actor = u; B.turn++;
     rescaleField();
@@ -2995,6 +3084,7 @@ function makeBattle(cfg) {
       weather: F.weather, wxEnd: F.wxEnd, baseWx: F.baseWx, avgL: F.avgL, terrain: F.terrain && { ...F.terrain }, trickRoom: F.trickRoom, tailwind: F.tailwind && { ...F.tailwind }, uproar: F.uproar && { ...F.uproar }, pledgeFx: F.pledgeFx && { A: { ...F.pledgeFx.A }, E: { ...F.pledgeFx.E } }, lastPledge: F.lastPledge,
       hazards: F.hazards && { A: { ...F.hazards.A }, E: { ...F.hazards.E } }, gravity: F.gravity, magicRoom: F.magicRoom, wonderRoom: F.wonderRoom,
       side: F.side && { A: { ...F.side.A }, E: { ...F.side.E } }, mudSport: F.mudSport, waterSport: F.waterSport, ionDeluge: F.ionDeluge, fairyLock: F.fairyLock, future: (F.future || []).map(x => ({ ...x })), healWish: F.healWish && { ...F.healWish }, faintT: F.faintT && { ...F.faintT }, lastMove: F.lastMove, tally: { ...F.tally }, dmgDone: { ...F.dmgDone }, trainer: F.trainer, wild: F.wild, sim: true,
+      nextQ: (F.nextQ || []).slice(), perNow: F.perNow, rf: F.rf,
       auto: true, aiStyle: "rollout", enemyStyle: "rollout", actor: F.actor && map.get(F.actor.uid), waiting: F.waiting && map.get(F.waiting.uid), ev: [] });
     return B;
   }
