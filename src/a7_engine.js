@@ -322,6 +322,7 @@ function makeBattle(cfg) {
     for (const u of list) autoField(u);   // (so do the weather, terrain, entry hazards, screens and rooms: the owner's rule)
     for (const u of list) autoRedirect(u);   // (so do Follow Me, Rage Powder and Spotlight: the owner's rule)
     for (const u of list) autoBide(u);   // (and Bide starts storing energy: the owner's rule, 2026-10-19)
+    for (const u of list) mistyCure(u);   // (coming into Misty Terrain cures it: the owner's house rule)
   }
   // Bide (the owner's rule, 2026-10-19): it can't be chosen. Its user starts storing energy by itself the moment it comes onto the
   // field, if the move is ready, and keeps storing until it goes off (bideStrikes); once a time on the field
@@ -417,6 +418,7 @@ function makeBattle(cfg) {
   function setTerrain(u, tt) {
     B.terrain = { t: tt, until: fieldRounds(item(u, "terrainextender") ? 8 : 5) }; msg(TERRAIN[tt].start); ev({ k: "terrain", t: tt, tr: B.trickRoom > B.turn ? 1 : 0 }); terrainSeeds();
     for (const x of B.units) if (x.alive) formCheck(x);   // (Mimicry)
+    if (tt === "misty") for (const x of B.units) mistyCure(x);   // (the owner's house rule)
   }
   // a terrain ends (its rounds are up, Ice Spinner, Steel Roller, Defog): Mimicry and Quark Drive follow
   function endTerrain() {
@@ -730,6 +732,15 @@ function makeBattle(cfg) {
   // infatuation ends when the Pokémon it's for faints or leaves the field
   function loveEnds(u) {
     for (const x of B.units) { const l = x.alive && x !== u && effOf(x, "INFAT"); if (l && l.src === u.uid) { removeEff(x, "INFAT"); msg(psT("attract", "end", { POKEMON: nm(x) })); } }
+  }
+  // Misty Terrain cures (the owner's house rule, 2026-10-20): a grounded Pokémon in it has no status condition, confusion or
+  // drowsiness. It's cured as the terrain goes up, as it comes onto the field while the terrain is up, and at the start of its turn
+  // (one Smack Down or Gravity brought down); new ones are blocked as in the games (tryStatus)
+  function mistyCure(u) {
+    if (!u.alive || !B.units.includes(u) || !inTerrain("misty", u)) return;
+    if (u.status) { const s = u.status; u.status = null; u.sTurn = 0; msg(psT(PS_ST[s], "end", { POKEMON: nm(u) }) || `${Nm(u)} was cured!`); fxEv(u); }
+    if (has(u, "CNF")) { removeEff(u, "CNF"); msg(psT("confusion", "end", { POKEMON: nm(u) })); }
+    if (has(u, "YAWN")) removeEff(u, "YAWN");
   }
   function cureAll(u) { u.status = null; u.sTurn = 0; u.eff = u.eff.filter(e => !["CNF", "INFAT"].includes(e.id)); fxEv(u); }
   // stat stages; returns true if anything changed
@@ -3075,6 +3086,7 @@ function makeBattle(cfg) {
     ev({ k: "turn", u: u.uid, tms: B.units.filter(x => x.alive).map(x => [x.uid, x.atb]), rd, fx: fieldTimers() });
     for (const s in u.cool) if (u.cool[s] > 0) u.cool[s]--;
     if (u.orig && u.orig.cool) for (const s in u.orig.cool) if (u.orig.cool[s] > 0) u.orig.cool[s]--;
+    mistyCure(u);   // (Misty Terrain, the owner's house rule: say Smack Down grounded it since)
     const up = upkeep(u);
     // Flame Orb and Toxic Orb: the holder starts its turn burned or badly poisoned (the first damage comes next turn)
     if (up && u.alive && !u.status && item(u, "toxicorb")) { msg(`${Nm(u)}'s Toxic Orb activated!`); tryStatus(u, u, "TOX", false); }
