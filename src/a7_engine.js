@@ -35,8 +35,9 @@ const AIW = { twMix: .75, killBase: .25, killTw: .6, fuOver: .35, fuSetup: .3, r
 // win by, the copies of the battle per batch and the most batches, the bench Pokémon played out, a status condition, a stat stage on the field, and how much better a
 // bench Pokémon must match up before a switch is played out at all; and for the Expert AI's pick after a faint (aiReplacement), the
 // bench Pokémon played out and the margin one must win by over the best matchup; how many rounds each copy plays out (the Expert
-// AI two: 55.6% against one round's 49% in head-to-heads, 2026-10-19)
-const AISW = { alive: .15, margin: .1, k: 8, rounds: 3, cands: 2, status: .1, stage: .03, better: .4, repCands: 3, repMargin: .05, rounds0: 1, roundsX: 2 };
+// AI two: 55.6% against one round's 49% in head-to-heads, 2026-10-19); and what a replacement's guaranteed first turn counts for when
+// a copy ends before it (owedHit)
+const AISW = { alive: .15, margin: .1, k: 8, rounds: 3, cands: 2, status: .1, stage: .03, better: .4, repCands: 3, repMargin: .05, rounds0: 1, roundsX: 2, owed: 1 };
 function makeBattle(cfg) {
   const B = { units: [], ev: [], wave: 0, waves: cfg.waves, over: false, result: null, turn: 0, allyTurns: 0, actor: null, waiting: null,
     tally: { crits: 0, kills: 0, payday: 0, superEff: 0 }, auto: !!cfg.auto, aiStyle: cfg.aiStyle || "balanced", enemyStyle: cfg.enemyStyle || "balanced", weather: (cfg.weather === "snow" ? "hail" : cfg.weather) || null,
@@ -1870,15 +1871,27 @@ function makeBattle(cfg) {
   // stuck, its best move is weak or its matchup is bad, or someone on the bench matches up much better. Never right after coming in
   // (unless stuck), never a boss or a wild Pokémon, never a Trainer's Follow Me user or backup setter (the owner's rules)
   function swValue(C, team) {
-    let v = 0;
+    let v = 0; const owed = combos({ team }, "owed");
     for (const x of [...C.units, ...C.bench.A, ...C.bench.E]) {
       if (!x.alive) continue;
       let w = AISW.alive + x.hp / x.max.hp - (x.status ? AISW.status : 0);
       if (C.units.includes(x)) for (const k of ["atk", "def", "spa", "sdf", "spe"]) w += AISW.stage * (x.stages[k] || 0);
+      // (a replacement still protected when the copy ends: its first turn is guaranteed, so it counts, worth the share of an
+      // opposing Pokémon's HP its best ready attack would take; the owner's ask, 2026-10-19)
+      if (owed && C.units.includes(x) && x.eff.some(e => e.id === "PROTECT" && e.shield === "replace")) w += AISW.owed * owedHit(C, x);
       v += x.team === team ? w : -w;
     }
     if (C.over && C.result) v += C.result.win === (team === "A") ? 20 : -20;
     return v;
+  }
+  // the share of an opposing Pokémon's HP (the most it can take from one on the field) a Pokémon's best ready attack would take
+  function owedHit(C, x) {
+    let best = 0;
+    for (const f of C.units) {
+      if (!f.alive || f.team === x.team) continue;
+      for (const s of x.skills) if (s.M.c !== "X" && !(x.cool[s.slot] > 0)) best = Math.max(best, Math.min(1, Math.max(0, C.estimate(x, f, s)) / Math.max(1, f.hp)));
+    }
+    return best;
   }
   // one decision played out on copies of the battle, the same dice for each option: then about a round (every Pokémon on the field
   // moving once, and two more turns), two for the Expert AI
