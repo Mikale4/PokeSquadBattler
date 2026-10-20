@@ -67,6 +67,21 @@ globalThis.PokeSquad = (() => {
     return { team: out, problems };
   }
   const validateTeam = sets => { const r = readTeam(sets); return r.problems.length ? r.problems : null; };
+  // the format's rules as Showdown lists a format's clauses at the start of a battle (|rule|Name: what it does): the ones readTeam
+  // checks and the battle keeps, in Showdown's words where it has the same rule (the owner's ask, 2026-10-20)
+  const LIMIT_N = { legendary: ["Legendary Clause", "Legendary Pokémon"], mythical: ["Mythical Clause", "Mythical Pokémon"], ultraBeast: ["Ultra Beast Clause", "Ultra Beast"], paradox: ["Paradox Clause", "Paradox Pokémon"] };
+  const RULE_LINES = () => {
+    const R = RULES(), n = x => ["no", "one", "two", "three", "four", "five", "six"][x] || x, bans = Object.values(R.ban).reduce((a, b) => a + b.size, 0);
+    return ["PokeSquad Battler: three on the field, the turn meter, S1/S2/S3 cooldowns, the house rules",
+      "Species Clause: Limit one of each Pokémon",
+      ...Object.entries(R.limits).map(([g, x]) => LIMIT_N[g] ? `${LIMIT_N[g][0]}: Limit ${n(x)} ${LIMIT_N[g][1]}${x > 1 && g === "ultraBeast" ? "s" : ""}` : `${g}: Limit ${n(x)}`),
+      `Item Clause: Limit one each of ${[...ITEM_CLAUSE].map(h => HELD[h] ? HELD[h].n : h).join(", ")}`,
+      "Move Slot Rule: One move for each slot, S1, S2 and S3, and an S1 move (one with no cooldown)",
+      ...(bans ? [`Bans: ${[...R.ban.pokemon].map(k => OPS[k] ? OPS[k].n : k).concat([...R.ban.moves].map(k => MOVES[k] ? MOVES[k].n : k), [...R.ban.abilities], [...R.ban.items].map(h => HELD[h] ? HELD[h].n : h)).join(", ")}`] : []),
+      "Adjust Level = 100: Every Pokémon is level 100, with top IVs and no Gym Badge bonus",
+      `Endless Battle Clause: After ${STALEMATE_TURNS} Pokémon turns, the battle is a draw`,
+      "HP Percentage Mod: HP is shown in percentages"];
+  };
   const spec = m => ({ op: m.k, prog: { ...progForLV(m.k, LEVEL), pot: 6, sk: [MAX_SK, MAX_SK, MAX_SK], mv: m.mv.slice(), ab: m.ab, nat: m.nat, held: m.held || null }, mine: false, badges: 0 });
 
   // ---------- Showdown's names for things ----------
@@ -82,6 +97,8 @@ globalThis.PokeSquad = (() => {
   const TARGET = { enemy: "any", aoe_enemies: "allAdjacentFoes", self: "self", team: "allies", partners: "allies", field: "all", ally_single: "adjacentAlly" };
   // Showdown narrates these itself from its own lines: the game's message for them is left out (its line goes unsilenced instead)
   const OWN_TEXT = /^(.+) used (.+)!$|^(.+) fainted!$/;
+  // the lines about a hit that Showdown writes before its damage
+  const HIT_TEXT = /^(It's (super|not very) effective|A critical hit|It's a one-hit KO)/;
   // the game's battle text, told from one player's side (the engine writes each Pokémon and team as a token: TEXT_TOKENS)
   function tell(B, text, viewer, names) {
     const me = TEAM[viewer];
@@ -113,7 +130,7 @@ globalThis.PokeSquad = (() => {
     }
     preview() {
       this.previewed = true;
-      this.add("|gametype|triples", "|gen|9", "|tier|[Gen 9] PokeSquad", "|rule|PokeSquad Battler: three on the field, the turn meter, S1/S2/S3 cooldowns, the house rules",
+      this.add("|gametype|triples", "|gen|9", "|tier|[Gen 9] PokeSquad", ...RULE_LINES().map(r => `|rule|${r}`),
         `|teamsize|p1|${this.players.p1.team.length}`, `|teamsize|p2|${this.players.p2.team.length}`, "|clearpoke");
       for (const s of ["p1", "p2"]) for (const m of this.players[s].team) this.add(`|poke|${s}|${SD.name(m.k)}|${m.held ? "item" : ""}`);
       this.add("|teampreview|6");
@@ -186,7 +203,7 @@ globalThis.PokeSquad = (() => {
       this.run(() => { UID = 0; this.B = makeBattle({ allies: t("p1"), waves: [t("p2")], auto: false, pick: true, humans: ["E"], sim: true, aiStyle: "balanced", enemyStyle: "balanced", trainer: this.players.p2.name }); });
       this.add("|start");
       // (the leads come onto the field, as in Showdown: player 1's, then player 2's)
-      for (const t of ["A", "E"]) for (const u of this.B.units.filter(x => x.team === t).sort((a, b) => a.slot - b.slot)) { this.add(`|switch|${this.ident(u)}|${this.details(u)}|${this.cond(u)}`); this.shown[u.uid] = 1; }
+      for (const t of ["A", "E"]) for (const u of this.B.units.filter(x => x.team === t).sort((a, b) => a.slot - b.slot)) { this.hp(u, c => `|switch|${this.ident(u)}|${this.details(u)}|${c}`); this.shown[u.uid] = 1; }
       this.go();
     }
     // play on until someone has to choose (or it's over), turning the events into Showdown's lines
@@ -220,6 +237,11 @@ globalThis.PokeSquad = (() => {
     ident(u) { return `${SIDE[u.team]}${u.slot >= 0 && this.B.units.includes(u) ? POS[u.slot] : ""}: ${u.n}`; }
     details(u) { return SD.name(u.spr || u.key) + (u.lvl !== 100 ? `, L${u.lvl}` : ""); }
     cond(u) { return u.alive ? `${Math.max(0, u.hp)}/${u.max.hp}${u.status && STATUS[u.status] ? " " + STATUS[u.status] : ""}` : "0 fnt"; }
+    // (as a percentage, the way Showdown shows the other side's Pokémon: rounded up, 99 until it's full)
+    condPub(u) { if (!u.alive || u.hp <= 0) return "0 fnt"; let p = Math.ceil(100 * u.hp / u.max.hp); if (p >= 100 && u.hp < u.max.hp) p = 99; return `${Math.max(1, p)}/100${u.status && STATUS[u.status] ? " " + STATUS[u.status] : ""}`; }
+    // a line with a Pokémon's HP: exact for its own player (and the full log), a percentage for the other player and spectators
+    // (Showdown's |split|, its HP Percentage Mod)
+    hp(u, line) { this.add(`|split|${SIDE[u.team]}`, line(this.cond(u)), line(this.condPub(u))); }
     order(team) { const B = this.B; return [...[0, 1, 2].map(i => B.units.find(x => x.team === team && x.slot === i)).filter(Boolean), ...B.bench[team]]; }
     sideInfo(slot) {
       const p = this.players[slot];
@@ -242,12 +264,17 @@ globalThis.PokeSquad = (() => {
     flushEvents() {
       const B = this.B; if (!B || !B.ev.length) return;
       const evs = B.ev.splice(0), U = id => B.byId(id);
+      // (an attack's damage lines wait for its "It's super effective!" and "A critical hit!" lines, as on Showdown, where the
+      // damage comes after them: its "(... lost 45% of its health!)")
+      let pend = []; const flush = () => { if (pend.length) { this.add(...pend); pend = []; } };
       for (const e of evs) {
         const u = e.u != null ? U(e.u) : null;
+        if (pend.length && e.k !== "msg" && !(e.k === "dmg" && !e.dot && !e.sub) && e.k !== "fx" && e.k !== "status") flush();
         switch (e.k) {
           case "msg": {   // (player 2 gets its own copy, told from its side: Showdown's |split|; spectators read player 1's)
             if (!e.t) break;
             const names = { A: this.players.p1.name, E: this.players.p2.name }, a = tell(B, e.t, "p1", names), b = tell(B, e.t, "p2", names);
+            if (!HIT_TEXT.test(a)) flush();
             if (OWN_TEXT.test(a)) break;
             if (a === b) this.add(`|-message|${a}`); else this.add("|split|p2", `|-message|${b}`, `|-message|${a}`);
             break;
@@ -255,18 +282,23 @@ globalThis.PokeSquad = (() => {
           case "turn": { if (e.rd && e.rd !== this.round) { this.round = e.rd; this.add(`|turn|${e.rd}`); }
             if (u && e.tms) this.add(this.meterLine(u, e.tms.map(([id, v]) => [U(id), v]))); break; }
           case "act": { if (!u) break; const t = e.t != null ? U(e.t) : null; this.add(`|move|${this.ident(u)}|${MOVES[e.key] ? MOVES[e.key].n : e.name}|${t && t !== u ? this.ident(t) : ""}`); break; }
-          case "dmg": if (u) { this.add(`|-damage|${this.ident(u)}|${this.cond(u)}|[silent]`); if (e.crit) this.add(`|-crit|${this.ident(u)}|[silent]`); } break;
-          case "heal": case "revive": if (u) this.add(`|-heal|${this.ident(u)}|${this.cond(u)}|[silent]`); break;
+          case "dmg": if (u) {
+            // an attack's damage says how much it took (Showdown's text); poison, recoil, hazards... keep only the game's own line
+            if (!e.dot && !e.sub && e.n > 0) { const id = this.ident(u); if (e.crit) pend.push(`|-crit|${id}|[silent]`); pend.push(`|split|${SIDE[u.team]}`, `|-damage|${id}|${this.cond(u)}`, `|-damage|${id}|${this.condPub(u)}`); }
+            else this.hp(u, c => `|-damage|${this.ident(u)}|${c}|[silent]`);
+          } break;
+          case "heal": case "revive": if (u) this.hp(u, c => `|-heal|${this.ident(u)}|${c}|[silent]`); break;
           case "death": if (u) { this.add(`|faint|${this.ident(u)}`); delete this.shown[u.uid]; } break;
           case "recall": if (u) delete this.shown[u.uid]; break;
-          case "sendin": if (u) { this.add(`|switch|${this.ident(u)}|${this.details(u)}|${this.cond(u)}`); this.lastSt[u.uid] = { st: u.status || null, stages: {} }; this.shown[u.uid] = 1; } break;   // (Showdown clears a Pokémon's boosts as it comes in)   // (Showdown says "Go!" from each side)
+          case "sendin": if (u) { this.hp(u, c => `|switch|${this.ident(u)}|${this.details(u)}|${c}`); this.lastSt[u.uid] = { st: u.status || null, stages: {} }; this.shown[u.uid] = 1; } break;   // (Showdown clears a Pokémon's boosts as it comes in)   // (Showdown says "Go!" from each side)
           case "status": case "fx": if (u) this.syncStatus(u); break;
-          case "transform": if (u) this.add(`|-formechange|${this.ident(u)}|${SD.name(e.to || u.spr)}|${this.cond(u)}|[silent]`); break;
+          case "transform": if (u) this.hp(u, c => `|-formechange|${this.ident(u)}|${SD.name(e.to || u.spr)}|${c}|[silent]`); break;
           case "weather": this.add(`|-weather|${WEATHER_ID[e.w] || "none"}|[silent]`); break;
           case "terrain": this.syncField(e); break;
           case "side": this.syncHazards(e); break;
         }
       }
+      flush();
       for (const u of B.units) if (u.alive) this.syncStatus(u);   // (a fixed stage changes with the weather, the terrain, an item...)
       this.syncSides(); this.syncItems();
       if (!B.over) this.add(this.meterLine(B.waiting || null, B.units.filter(x => x.alive).map(x => [x, x.atb]), B.predictOrder(6).map(U)));
