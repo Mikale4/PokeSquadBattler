@@ -26040,7 +26040,10 @@ function psT(id, key, v = {}) {
 // whose side the battle text is told from (online battles, the owner's ask, 2026-10-19: the second player is team E and reads the
 // same battle from their side); "A" everywhere else
 let VIEW_ME = "A";
-const psTeam = team => team === VIEW_ME ? "your team" : "the opposing team";
+// (the Showdown server, tools/showdown_adapter.js: each Pokémon and side in the battle text as a token, filled in from each player's
+// side by its translator: \u0001uid\u0002 a Pokémon, \u0001uid\u0003 the same starting a sentence, \u0004team\u0005 a team)
+let TEXT_TOKENS = false;
+const psTeam = team => TEXT_TOKENS ? `\u0004${team}\u0005` : team === VIEW_ME ? "your team" : "the opposing team";
 // the weather and terrain lines in their tables (a2_core.js) are Showdown's: started, still going (each turn), ended
 for (const [w, id] of Object.entries({ sun: "sunnyday", rain: "raindance", sand: "sandstorm", hail: "hail" })) if (WEATHER[w] && psT(id, "start"))
   Object.assign(WEATHER[w], { turn: psT(id, "start"), start: psT(id, "upkeep"), end: psT(id, "end") });
@@ -26146,8 +26149,8 @@ function makeBattle(cfg) {
     fxEv(u);
   }
   // "the opposing Onix" mid-sentence, "The opposing Onix" at the start of one
-  const nm = u => (u.team !== VIEW_ME ? (B.wild ? "the wild " : "the opposing ") : "") + u.n;
-  const Nm = u => { const s = nm(u); return s.charAt(0).toUpperCase() + s.slice(1); };
+  const nm = u => TEXT_TOKENS ? `\u0001${u.uid}\u0002` : (u.team !== VIEW_ME ? (B.wild ? "the wild " : "the opposing ") : "") + u.n;
+  const Nm = u => { if (TEXT_TOKENS) return `\u0001${u.uid}\u0003`; const s = nm(u); return s.charAt(0).toUpperCase() + s.slice(1); };
   const fxEv = u => {
     const list = [];
     if (u.status) list.push([u.status, 0]);
@@ -26478,7 +26481,7 @@ function makeBattle(cfg) {
   const benchOf = team => B.bench[team].filter(x => x.alive);
   const emptySlots = team => [0, 1, 2].filter(s => !B.units.some(x => x.team === team && x.alive && x.slot === s));
   const aliveCount = team => B.units.filter(x => x.team === team && x.alive).length + benchOf(team).length;
-  const sideName = team => team === VIEW_ME ? "You" : B.trainer || "The opponent";
+  const sideName = team => TEXT_TOKENS ? `\u0006${team}\u0007` : team === VIEW_ME ? "You" : B.trainer || "The opponent";
   // a Pokémon from the bench takes a place on the field (events: the line, then "sendin" for the Poké Ball)
   function enter(team, slot, x, line, atb) {
     B.bench[team].splice(B.bench[team].indexOf(x), 1);
@@ -26486,7 +26489,7 @@ function makeBattle(cfg) {
     B.units.push(x);
     for (const id in (B.side && B.side[team]) || {}) if (B.side[team][id] > B.turn) addEff(x, id, 99, null, true);   // (Reflect, Light Screen...: the side's)
     if (!B.sim && team === "E") dexSee(x.key);
-    msg(line || (team === "A" ? `Go! ${x.n}!` : B.wild ? `A wild ${x.n} appeared!` : `${sideName(team)} sent out ${x.n}!`));
+    if (!TEXT_TOKENS || line) msg(line || (team === VIEW_ME ? `Go! ${x.n}!` : B.wild ? `A wild ${x.n} appeared!` : `${sideName(team)} sent out ${x.n}!`));   // (Showdown says its own)
     ev({ k: "sendin", u: x.uid, team, slot });
     arrive(x); terrainSeeds();
     startEffects([x]);
@@ -26527,7 +26530,7 @@ function makeBattle(cfg) {
     for (const x of B.units) { const sd = effOf(x, "SKYDROP"); if (sd && sd.src === u.uid) removeEff(x, "SKYDROP"); }
     if (u.passives[0] && u.passives[0].key === "natural-cure") { u.status = null; u.sTurn = 0; }
     u.stages = newStages(); u.eff = []; u.shield = 0; u.atb = 0; if (u.status === "TOX") u.sTurn = 1; u.flags.noAbility = false; loveEnds(u);
-    if (forced !== true) msg(u.team === "A" ? `${u.n}, come back!` : `${sideName(u.team)} withdrew ${u.n}!`);
+    if (forced !== true && !TEXT_TOKENS) msg(u.team === VIEW_ME ? `${u.n}, come back!` : `${sideName(u.team)} withdrew ${u.n}!`);
     ev({ k: "recall", u: u.uid, forced: forced === true });
     B.units.splice(B.units.indexOf(u), 1); u.slot = -1; B.bench[u.team].push(u);
     enter(x.team, slot, x, forced === true ? `${x.n} was dragged out!` : null, 0);

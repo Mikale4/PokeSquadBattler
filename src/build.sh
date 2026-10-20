@@ -106,3 +106,5 @@ node tools/build_fxlab.js
 node tools/build_teamcfg.js
 # the online battle page: the same game with the Teambuilder and battles against other players (tools/online.js, server/server.js)
 node tools/build_online.js
+# the battle engine for the Showdown server fork (showdown/server, Mikale4/PokeSquad-Showdown): src/ up to a7_engine.js plus tools/showdown_adapter.js
+node tools/build_engine.js

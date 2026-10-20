@@ -3,3 +3,6 @@ tools/.pokeapi/
 tools/.showdown/
 tests/shots/
 node_modules/
+
+# the Showdown forks (their own repos: Mikale4/PokeSquad-Showdown and -Client)
+/showdown/
