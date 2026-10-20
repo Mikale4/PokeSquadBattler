@@ -57,7 +57,6 @@
 			}
 			T.slots[id] = m[2];
 			T.overrideMoveData[id] = { type: m[3], category: CAT[m[4]] || 'Status', basePower: m[5], accuracy: m[6] || true, priority: m[7] };
-			text('Moves', id, m[1] || null, m[8], m[9]);
 		});
 		var gen = 0;
 		D.species.forEach(function (s) {
@@ -87,10 +86,6 @@
 			if (D.fix[id]) for (var f in D.fix[id]) fix[f] = D.fix[id][f];
 			T.overrideSpeciesData[id] = fix;
 		});
-		D.abText.forEach(function (a) {
-			// [id, name, text, works]
-			text('Abilities', a[0], a[1], a[3] ? a[2] : 'No effect in PokeSquad Battler. ' + a[2], null);
-		});
 		var berries = false, rest = false;
 		D.items.forEach(function (it) {
 			var id = it[0];
@@ -98,17 +93,32 @@
 			if (/berry$/.test(id)) { if (!berries) T.items.push(['header', 'Berries']); berries = true; }
 			else if (!rest) { T.items.push(['header', 'Held items']); rest = true; }
 			T.items.push(id);
-			text('Items', id, null, it[1], null);
 		});
 		BattleTeambuilderTable[MOD] = T;
+		applyTexts();
 		// (anything Showdown already looked up for the mod, it looks up again)
 		if (window.Dex && Dex.moddedDexes) delete Dex.moddedDexes[MOD];
 	}
+	/** The game's texts for its moves, Abilities and held items (Showdown's English text file can load more than once: each time
+	 * it replaces them, and they're laid on again) */
+	function applyTexts() {
+		D.moves.forEach(function (m) { text('Moves', m[0], m[1] || null, m[8], m[9]); });
+		D.abText.forEach(function (a) {
+			// [id, name, text, works]
+			text('Abilities', a[0], a[1], a[3] ? a[2] : 'No effect in PokeSquad Battler. ' + a[2], null);
+		});
+		D.items.forEach(function (it) { text('Items', it[0], null, it[1], null); });
+	}
+	function textsOn() {
+		var first = D.moves[0] && BattleText.en.Moves[D.moves[0][0]];
+		return !!(first && first[MOD]);
+	}
 	(function wait() {
 		if (!loaded()) return setTimeout(wait, 50);
+		// (a data file that loads again replaces Showdown's tables or texts: lay the game's back over them)
 		if (!BattleTeambuilderTable[MOD]) apply();
+		else if (!textsOn()) applyTexts();
 		if (unindexed.length && indexReady()) { unindexed.forEach(function (id) { addToIndex(id, 'move'); }); unindexed = []; }
-		// (a data file that loads again replaces Showdown's tables: lay the game's back over them)
-		setTimeout(wait, 2000);
+		setTimeout(wait, 1000);
 	})();
 })();
