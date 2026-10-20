@@ -444,7 +444,7 @@ const ABILITY = {
   "aura-break": ["Aura Break", "While it's on the field, Fairy Aura and Dark Aura do nothing.", { id: "AURA_BREAK" }],   // (the owner's rule)
   "power-spot": ["Power Spot", "Its partners' moves are 50% stronger.", { id: "ALLYPOW", mul: 1.5 }],   // (the owner's rule: 50%)
   battery: ["Battery", "Its partners' special moves are 50% stronger.", { id: "ALLYPOW", mul: 1.5, special: 1 }],   // (the owner's rule: 50%)
-  "supreme-overlord": ["Supreme Overlord", "Its Attack rises by 1 every time it comes onto the field (like Intrepid Sword).", { id: "ENTRY_BOOST", stat: "atk" }],   // (the owner's rule)
+  "supreme-overlord": ["Supreme Overlord", "Its Attack and Sp. Atk rise by 1 every time it comes onto the field (like Intrepid Sword).", { id: "ENTRY_BOOST", stats: ["atk", "spa"] }],   // (the owner's rule, 2026-10-20: Sp. Atk too)
   stakeout: ["Stakeout", "Its moves are twice as strong against a Pokémon that hasn't acted since coming onto the field.", { id: "STAKEOUT" }],
   "gorilla-tactics": ["Gorilla Tactics", "Attack +1 (and it can still use any of its moves).", { id: "GORILLA" }],
   merciless: ["Merciless", "Its moves always land a critical hit on a poisoned target.", { id: "MERCILESS" }],

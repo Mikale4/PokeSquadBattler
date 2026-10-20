@@ -272,7 +272,7 @@ function abilityValue(k, abKey, c = {}) {
     case "SOUL_HEART": return (1 - phys) * .15;
     case "OPPORTUNIST": return meta.setup * .15;
     case "COSTAR": return .02;
-    case "ENTRY_BOOST": return A.stat === "atk" ? phys * .2 : .05;
+    case "ENTRY_BOOST": return (A.stats || [A.stat]).reduce((v, s) => v + (s === "atk" ? phys * .2 : s === "spa" ? (1 - phys) * .2 : .05), 0);
     case "SCREEN_CLEANER": case "CURIOUS": return .01;
     case "HOSPITALITY": return mates.length ? .05 : .01;
     case "HONEY": return mates.length ? .02 : -.01;

@@ -258,7 +258,7 @@ globalThis.PokeSquad = (() => {
           case "dmg": if (u) { this.add(`|-damage|${this.ident(u)}|${this.cond(u)}|[silent]`); if (e.crit) this.add(`|-crit|${this.ident(u)}|[silent]`); } break;
           case "heal": case "revive": if (u) this.add(`|-heal|${this.ident(u)}|${this.cond(u)}|[silent]`); break;
           case "death": if (u) this.add(`|faint|${this.ident(u)}`); break;
-          case "sendin": if (u) this.add(`|switch|${this.ident(u)}|${this.details(u)}|${this.cond(u)}`); break;   // (Showdown says "Go!" from each side)
+          case "sendin": if (u) { this.add(`|switch|${this.ident(u)}|${this.details(u)}|${this.cond(u)}`); this.lastSt[u.uid] = { st: u.status || null, stages: {} }; } break;   // (Showdown clears a Pokémon's boosts as it comes in)   // (Showdown says "Go!" from each side)
           case "status": case "fx": if (u) this.syncStatus(u); break;
           case "transform": if (u) this.add(`|-formechange|${this.ident(u)}|${SD.name(e.to || u.spr)}|${this.cond(u)}|[silent]`); break;
           case "weather": this.add(`|-weather|${WEATHER_ID[e.w] || "none"}|[silent]`); break;
@@ -266,6 +266,7 @@ globalThis.PokeSquad = (() => {
           case "side": this.syncHazards(e); break;
         }
       }
+      for (const u of B.units) if (u.alive) this.syncStatus(u);   // (a fixed stage changes with the weather, the terrain, an item...)
       this.syncSides(); this.syncItems();
       if (!B.over) this.add(this.meterLine(B.waiting || null, B.units.filter(x => x.alive).map(x => [x, x.atb]), B.predictOrder(6).map(U)));
     }
@@ -301,7 +302,8 @@ globalThis.PokeSquad = (() => {
         + (order ? `|${order.map(id).filter(Boolean).join(";")}` : "");
     }
     syncStatus(u) {
-      const id = this.ident(u), was = this.lastSt[u.uid] || { st: null, stages: {} }, now = { st: u.status || null, stages: { ...u.stages } };
+      // (the stat badge: the stages moves made plus the ones fixed to an item, an Ability, the weather or a status, as the game shows them)
+      const id = this.ident(u), was = this.lastSt[u.uid] || { st: null, stages: {} }, now = { st: u.status || null, stages: this.B.shownStages(u) };
       if (now.st !== was.st) this.add(now.st ? `|-status|${id}|${STATUS[now.st] || now.st.toLowerCase()}|[silent]` : `|-curestatus|${id}|${STATUS[was.st] || ""}|[silent]`);
       for (const k in STAT) { const d = (now.stages[k] || 0) - (was.stages[k] || 0); if (d) this.add(`|-${d > 0 ? "boost" : "unboost"}|${id}|${STAT[k]}|${Math.abs(d)}|[silent]`); }
       this.lastSt[u.uid] = now;
