@@ -1,12 +1,12 @@
-# The playable game on GitHub Pages (https://mikale4.github.io/PokeSquadBattler/): the built game as index.html, and the online
-# battle page as online.html (2026-10-19), without the music (the owner's pick, 2026-10-17; the soundtracks are too big for a Pages
-# site). It fetches only those two files, never the 3.9 GB of resources, and runs whenever a push to main changes either.
+# The playable game on GitHub Pages (https://mikale4.github.io/PokeSquadBattler/): the built game as index.html, without the music
+# (the owner's pick, 2026-10-17; the soundtracks are too big for a Pages site). It fetches only that file, never the 3.9 GB of
+# resources, and runs whenever a push to main changes it. (Online battles are on the PokeSquad Showdown site, its own repo.)
 name: Pages
 
 on:
   push:
     branches: [main]
-    paths: ["PokeSquad Battler.html", "PokeSquad Battler Online.html", ".github/workflows/pages.yml"]
+    paths: ["PokeSquad Battler.html", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -31,13 +31,11 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             /PokeSquad Battler.html
-            /PokeSquad Battler Online.html
           sparse-checkout-cone-mode: false
-      - name: The game as the site's index.html, online battles as online.html
+      - name: The game as the site's index.html
         run: |
           mkdir _site
           cp "PokeSquad Battler.html" _site/index.html
-          cp "PokeSquad Battler Online.html" _site/online.html
           touch _site/.nojekyll
           ls -la _site
       - uses: actions/configure-pages@v5

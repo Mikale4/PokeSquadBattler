@@ -8,11 +8,9 @@ folder there was deleted; its history (up to commit 9e60e37, branch `claude/swgo
 This folder is its own git repo (branch `main`), on GitHub: `Mikale4/PokeSquadBattler` (`Mikale4/PokemonKantoSquad` until the rename; 2026-10-16, with every resource, the soundtracks too: a push over ~2 GB goes up in parts; public since 2026-10-17, the owner's pick). The playable game is this repo's GitHub Pages site, https://mikale4.github.io/PokeSquadBattler/ (`.github/workflows/pages.yml`: the built game as `index.html`, no music; it deploys by itself whenever a push to `main` changes the built game; the old `PokemonKantoSquad-Play` link is closed). Commit and push only when the owner asks. Game details, the terminology table and the file list are in `README.md`.
 
 ## Online battles
-`PokeSquad Battler Online.html` (built by build.sh from the game plus `tools/online.js`; Pages serves it as `online.html`) is
-battling only, Showdown-style (the owner's ask, 2026-10-19): Teambuilder, Find a Battle, rooms, Lv 100, the Stadium's rules.
-Both phones run the same battle from one seed and exchange only choices through `server/server.js` (plain Node, `render.yaml`
-for Render). Anything that runs during an online battle's rules must draw randomness only from `R` (never `Math.random`), and
-nothing on one phone alone may change the battle's state: the hash check calls the battle off. README: *Online battles*.
+They're on PokeSquad Battler's own Pokémon Showdown site (the game's own `online.html` page and `server/server.js` were removed on
+2026-10-20, the owner's pick). The battle rules draw randomness only from `R` (never `Math.random`): the server runs each battle on
+its own seeded dice. README: *Online battles*.
 On Pokémon Showdown (the owner's pick, approach A, in phases; README: *On Pokémon Showdown*): the server fork `showdown/server`
 (`Mikale4/PokeSquad-Showdown`, Render) runs the game's engine, `pokesquad/engine.js` from `tools/build_engine.js` (src up to
 a7_engine plus `tools/showdown_adapter.js`, the translator: `readTeam`/`validateTeam`, `moveKey`); the client fork `showdown/client`

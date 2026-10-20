@@ -1,8 +1,0 @@
-{
-  "name": "pokesquad-battler-server",
-  "private": true,
-  "description": "PokeSquad Battler's online battle server: pairs players and passes their choices (the battles run on the phones).",
-  "main": "server.js",
-  "engines": { "node": ">=18" },
-  "scripts": { "start": "node server.js" }
-}

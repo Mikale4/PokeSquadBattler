@@ -4,7 +4,7 @@ A phone-first squad battler set in Kanto with every Pokémon from Kanto to Palde
 
 Open `PokeSquad Battler.html` directly, or serve the folder (`npm run serve`, then `http://localhost:8000/PokeSquad%20Battler.html`). It's a single file: the sprites are embedded.
 
-**Online battles** (2026-10-19): `PokeSquad Battler Online.html` (on the phone link: `https://mikale4.github.io/PokeSquadBattler/online.html`) is battling only, laid out like Pokémon Showdown: no title screen, no story, no save. See *Online battles* below.
+**Online battles** happen on PokeSquad Battler's own Pokémon Showdown site, **https://mikale4.github.io/PokeSquad-Showdown-Client/**: a Showdown server running the game's own battle engine, with Showdown's teambuilder on the game's data, the turn meter, a ladder, registered names and shared replays (see *Online battles*, below). The game's own online page (`online.html`) was removed on 2026-10-20, the owner's pick.
 
 `PokeSquad Battler Reference.html` lists every move, Ability, item and TM with what it does in this game (the game's own descriptions), who learns or has it and where to get it, with search, filters (type, category, slot, Pokémon, source...) and sorting. It's generated from the built game: after a rebuild, run `node tools/build_reference.js`.
 Every row has a **Note** button: write what you'd like changed, then **Notes → Export new notes** puts them in the `Notes` folder for Claude (see `Notes/README.md`); handled notes show **✓ Done** with Claude's reply.
@@ -199,14 +199,7 @@ Keyboard: arrows, Z or Space (A), X or Esc (B), Enter (START), Shift (SELECT). T
 
 ## Online battles
 
-Two people battle each other on PokeSquad Battler's own rules and engine (the owner's ask, 2026-10-19).
-
-- **The page:** `PokeSquad Battler Online.html`, built by `build.sh` from the game plus `tools/online.js` (`tools/build_online.js`; never edit the output), served on Pages as `online.html`. It opens on its home screen: your name and Trainer look, your team, **Find a Battle** (a random opponent), **Create a room** / **Join** (a 5-letter code for a friend) and the **Teambuilder**.
-- **The Teambuilder:** any six Pokémon (no battle-only forms, no repeats), each with a move per slot from what it can learn (S1, S2, S3), an Ability (Hidden ones too), a nature and a held item. **Optimize** fills a Pokémon in with the game's optimizer (the moves, Ability, nature and item that work best, leaving out an Item Clause item a teammate holds). Teams import and export as text, Pokémon Showdown's style. They stay on the device (`localStorage` "pks_online"); the page never writes the game's saves.
-- **The rules:** the Stadium's (`modeRules("online")`: the team config's PvP limits, one Legendary, one Mythical, one Ultra Beast and one Paradox Pokémon, the Item Clause and its bans). Every Pokémon is Lv 100 with maximum IVs and Mastery and no Badge bonus. Both phones check the other's team; a team that breaks a rule calls the battle off.
-- **A battle:** a team preview (both teams; tap two of yours to swap them, the first three lead; 60 s), then the game's battle screen. Each choice has a 45 s timer; when it runs out, the AI's choice is worked out on that player's own phone and sent like any other. No Auto. Forfeit is in the pause menu.
-- **How it stays in sync:** both phones build the same battle from the same seed (`cfg.online` in `startBattle`, `a8b_battle.js`: Pokémon numbered alike, `UID` reset, and the rules draw only from that battle's own dice while they run: the screen's effects and the AI's look-ahead keep their own random numbers). Only the choices travel, numbered in order; after each one both phones send a hash of the battle, and the server calls a battle off if they differ. The host is team A; the second player is team E and sees the battle from its side (`VIEW_ME` in `a7_engine.js`, `vteam` in `a8b_battle.js`: its team drawn near, the text told from its side, the result turned round). The engine asks either team for its moves and its picks after a faint (`cfg.humans`, `picks`, `B.needTeam`, `B.aiChoice`).
-- **The server:** `server/server.js`, plain Node with no packages: it pairs players (the queue, room codes), passes the choices on, keeps each match's choice log, and gives the win to a player whose opponent is gone for 60 s. A phone that drops out (a locked screen, a lost signal, a reload) rejoins with its token: a battle still on the page carries on, a reloaded page rebuilds the battle and replays every choice so far at speed. It runs on Render's free plan from `render.yaml` (New → Blueprint, this repo; it sleeps after 15 minutes without players and takes about a minute to wake). The page connects to `ONLINE_SERVER` in `tools/online.js`; `?server=ws://localhost:8787` points it at another (run one locally with `node server/server.js`).
+Two people battle on PokeSquad Battler's own rules and engine on its Pokémon Showdown site (the owner's ask, 2026-10-19; the game's own online page, `online.html` with `server/server.js`, came first and was removed on 2026-10-20, the owner's pick).
 
 ### On Pokémon Showdown
 
@@ -288,8 +281,6 @@ The engine's internal names stayed; only the visible text changed.
 | `a6e_people.js` | personalities, presence, chat, Clubs and Raid Battles (rules) |
 | `a6f_talk.js` | what a Trainer understands of a message and how they answer it, in their own voice (builds, ratings, matchups, where to find things, the game's rules) |
 | `a6g_teams.js` | the Stadium's top tiers: archetype teams built from `TEAM_CONFIG` (config/team_config.json), leads, each mode's rules (`modeDoc`) |
-| `tools/online.js`, `tools/build_online.js` | the online battle page (`PokeSquad Battler Online.html`): home, Teambuilder, team preview, the battle hookup |
-| `server/server.js`, `render.yaml` | the online battle server (pairs players, passes their choices, rejoins) and its Render setup |
 | `config/team_config.json` | how Trainer teams are made: roles, archetypes, rules, tiers, modes; edited on `PokeSquad Battler Team Config.html` (`tools/teamcfg.js`), embedded by build.sh |
 | `a6h_build.js` | the build optimizer: the Ability and moves that work best together, the nature and held items, for a Pokémon on its team against the meta (the Demo and the chat's build advice use it) |
 | `a7_engine.js` | battle rules |

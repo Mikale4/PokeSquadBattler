@@ -104,8 +104,6 @@ wc -c "PokeSquad Battler.html"
 node tools/build_fxlab.js
 # the Team Config page: the same game with the editor for how Trainer teams are made (tools/teamcfg.js); it exports config/team_config.json
 node tools/build_teamcfg.js
-# the online battle page: the same game with the Teambuilder and battles against other players (tools/online.js, server/server.js)
-node tools/build_online.js
 # the battle engine for the Showdown server fork (showdown/server, Mikale4/PokeSquad-Showdown): src/ up to a7_engine.js plus tools/showdown_adapter.js
 node tools/build_engine.js
 # the teambuilder's data for the Showdown client fork (showdown/client, Mikale4/PokeSquad-Showdown-Client): pokesquad/data.js
