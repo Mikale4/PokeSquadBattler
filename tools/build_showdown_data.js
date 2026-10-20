@@ -49,7 +49,7 @@ const moves = [], moveIx = {};
 for (const m of G.moves) {
   const id = mvId(m.k); if (!id) { missing.push("move " + m.k); continue; }
   // the short text: the first sentence that says what the move does (not its priority's turn meter or its Mastery)
-  const sent = m.d.split(/(?<=[.!?])\s+(?=[A-Z])/).filter(Boolean);
+  const sent = m.d.split(/(?<=[.!?])(?<!\b(?:Sp|Lv|No|vs|St|Mt)\.)\s+(?=[A-Z])/).filter(Boolean);
   const short = sent.find(s => !/^(Priority [+-]\d|Mastery:)/.test(s)) || sent[0] || "";
   const sl = SLOTTED.exec(m.k);
   moveIx[m.k] = moves.length;

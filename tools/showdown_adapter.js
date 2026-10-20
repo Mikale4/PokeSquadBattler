@@ -236,12 +236,14 @@ globalThis.PokeSquad = (() => {
     // (Showdown's names: a Pokémon on the field is p1a/p1b/p1c by its place, one on the bench just p1)
     ident(u) { return `${SIDE[u.team]}${u.slot >= 0 && this.B.units.includes(u) ? POS[u.slot] : ""}: ${u.n}`; }
     details(u) { return SD.name(u.spr || u.key) + (u.lvl !== 100 ? `, L${u.lvl}` : ""); }
-    cond(u) { return u.alive ? `${Math.max(0, u.hp)}/${u.max.hp}${u.status && STATUS[u.status] ? " " + STATUS[u.status] : ""}` : "0 fnt"; }
+    // (hp: what it had at that moment, an event's own: a line written later in the same update mustn't show what came after it, so
+    // Stealth Rock as a Pokémon comes in shows its damage)
+    cond(u, hp = u.alive ? u.hp : 0) { return hp > 0 ? `${hp}/${u.max.hp}${u.status && STATUS[u.status] ? " " + STATUS[u.status] : ""}` : "0 fnt"; }
     // (as a percentage, the way Showdown shows the other side's Pokémon: rounded up, 99 until it's full)
-    condPub(u) { if (!u.alive || u.hp <= 0) return "0 fnt"; let p = Math.ceil(100 * u.hp / u.max.hp); if (p >= 100 && u.hp < u.max.hp) p = 99; return `${Math.max(1, p)}/100${u.status && STATUS[u.status] ? " " + STATUS[u.status] : ""}`; }
+    condPub(u, hp = u.alive ? u.hp : 0) { if (hp <= 0) return "0 fnt"; let p = Math.ceil(100 * hp / u.max.hp); if (p >= 100 && hp < u.max.hp) p = 99; return `${Math.max(1, p)}/100${u.status && STATUS[u.status] ? " " + STATUS[u.status] : ""}`; }
     // a line with a Pokémon's HP: exact for its own player (and the full log), a percentage for the other player and spectators
     // (Showdown's |split|, its HP Percentage Mod)
-    hp(u, line) { this.add(`|split|${SIDE[u.team]}`, line(this.cond(u)), line(this.condPub(u))); }
+    hp(u, line, hp) { this.add(`|split|${SIDE[u.team]}`, line(this.cond(u, hp)), line(this.condPub(u, hp))); }
     order(team) { const B = this.B; return [...[0, 1, 2].map(i => B.units.find(x => x.team === team && x.slot === i)).filter(Boolean), ...B.bench[team]]; }
     sideInfo(slot) {
       const p = this.players[slot];
@@ -284,13 +286,13 @@ globalThis.PokeSquad = (() => {
           case "act": { if (!u) break; const t = e.t != null ? U(e.t) : null; this.add(`|move|${this.ident(u)}|${MOVES[e.key] ? MOVES[e.key].n : e.name}|${t && t !== u ? this.ident(t) : ""}`); break; }
           case "dmg": if (u) {
             // an attack's damage says how much it took (Showdown's text); poison, recoil, hazards... keep only the game's own line
-            if (!e.dot && !e.sub && e.n > 0) { const id = this.ident(u); if (e.crit) pend.push(`|-crit|${id}|[silent]`); pend.push(`|split|${SIDE[u.team]}`, `|-damage|${id}|${this.cond(u)}`, `|-damage|${id}|${this.condPub(u)}`); }
-            else this.hp(u, c => `|-damage|${this.ident(u)}|${c}|[silent]`);
+            if (!e.dot && !e.sub && e.n > 0) { const id = this.ident(u); if (e.crit) pend.push(`|-crit|${id}|[silent]`); pend.push(`|split|${SIDE[u.team]}`, `|-damage|${id}|${this.cond(u, e.hp)}`, `|-damage|${id}|${this.condPub(u, e.hp)}`); }
+            else this.hp(u, c => `|-damage|${this.ident(u)}|${c}|[silent]`, e.hp);
           } break;
-          case "heal": case "revive": if (u) this.hp(u, c => `|-heal|${this.ident(u)}|${c}|[silent]`); break;
+          case "heal": case "revive": if (u) this.hp(u, c => `|-heal|${this.ident(u)}|${c}|[silent]`, e.hp); break;
           case "death": if (u) { this.add(`|faint|${this.ident(u)}`); delete this.shown[u.uid]; } break;
           case "recall": if (u) delete this.shown[u.uid]; break;
-          case "sendin": if (u) { this.hp(u, c => `|switch|${this.ident(u)}|${this.details(u)}|${c}`); this.lastSt[u.uid] = { st: u.status || null, stages: {} }; this.shown[u.uid] = 1; } break;   // (Showdown clears a Pokémon's boosts as it comes in)   // (Showdown says "Go!" from each side)
+          case "sendin": if (u) { this.hp(u, c => `|switch|${this.ident(u)}|${this.details(u)}|${c}`, e.hp); this.lastSt[u.uid] = { st: u.status || null, stages: {} }; this.shown[u.uid] = 1; } break;   // (Showdown clears a Pokémon's boosts as it comes in)   // (Showdown says "Go!" from each side)
           case "status": case "fx": if (u) this.syncStatus(u); break;
           case "transform": if (u) this.hp(u, c => `|-formechange|${this.ident(u)}|${SD.name(e.to || u.spr)}|${c}|[silent]`); break;
           case "weather": this.add(`|-weather|${WEATHER_ID[e.w] || "none"}|[silent]`); break;

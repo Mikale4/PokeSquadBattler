@@ -355,6 +355,8 @@ function makeBattle(cfg) {
     if (sp === "wonderroom" || sp === "magicroom") return !fieldOn(sp === "wonderroom" ? "wonderRoom" : "magicRoom");
     if (sp === "iondeluge") return !fieldOn("ionDeluge");
     if (sp === "powder") return enemies(u).some(x => x.alive && !has(x, "POWDER") && !powderProof(u, x));
+    // Future Sight and Doom Desire (the owner's rule, 2026-10-20): unless one of the user's is still on the way
+    if (sp === "future") return enemies(u).some(x => x.alive) && !(B.future || []).some(f => f.by === u.uid);
     return false;
   }
   function autoField(u) {
@@ -477,7 +479,7 @@ function makeBattle(cfg) {
     for (const id in (B.side && B.side[team]) || {}) if (B.side[team][id] > B.turn) addEff(x, id, 99, null, true);   // (Reflect, Light Screen...: the side's)
     if (!B.sim && team === "E") dexSee(x.key);
     if (!TEXT_TOKENS || line) msg(line || (team === VIEW_ME ? `Go! ${x.n}!` : B.wild ? `A wild ${x.n} appeared!` : `${sideName(team)} sent out ${x.n}!`));   // (Showdown says its own)
-    ev({ k: "sendin", u: x.uid, team, slot });
+    ev({ k: "sendin", u: x.uid, team, slot, hp: x.hp });
     arrive(x); terrainSeeds();
     startEffects([x]);
     // (the screen draws every newcomer afresh: its badge and icons as it arrives, Tailwind's Speed, the weather's and the field's
