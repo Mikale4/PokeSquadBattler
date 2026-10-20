@@ -594,8 +594,9 @@ function dexEvolutions() {
 const tmFor = (k, m) => OPS[k].tms.filter(n => TM_MOVE[n] === m);
 function demoPool(k) {
   const stock = new Set(featOn("tm") ? tmStock() : []);   // (the TM corner opens in Celadon)
+  const tutor = featOn("tutor") && (S.inv.heartscale > 0 || S.lmd >= 5000 + 12000) ? [...OPS[k].egg, ...OPS[k].tutor] : [];   // (the Move Tutor: a Heart Scale it has or can buy)
   return [...pmv(k).filter(Boolean), ...levelMoves(k, S.ops[k].lvl),
-    ...OPS[k].tms.filter(n => S.tms[n] > 0 || (stock.has(n) && S.lmd - tmPrice(n) >= 12000)).map(n => TM_MOVE[n]).filter(Boolean)];
+    ...OPS[k].tms.filter(n => S.tms[n] > 0 || (stock.has(n) && S.lmd - tmPrice(n) >= 12000)).map(n => TM_MOVE[n]).filter(Boolean), ...tutor];
 }
 let PLAN = null;
 // who the Demo plans its moves and held items against (demoPlan): the Stadium's Trainers near its rating once Ranked Battles are
@@ -951,6 +952,11 @@ async function demoMoves() {
         if (S.lmd - REMIND_COST[s + 1] < 8000) continue;
         dsay("Move Reminder · " + OPS[k].n, was + MOVES[m].n);
         await openOp(k, "skills"); await tapAct("remind", { k }, "Move Reminder"); await tapAct("remindDo", { k, m }, MOVES[m].n); await closeAllModals(); did = true; continue;
+      }
+      if (featOn("tutor") && tutorable(k).includes(m)) {   // (the Move Tutor: a Heart Scale it has, or one from the Poké Mart)
+        if (!(S.inv.heartscale > 0)) { if (!affords("mart", "m_heartscale", 12000)) continue; await buy("mart", "m_heartscale", "Heart Scale"); }
+        dsay("Move Tutor · " + OPS[k].n, was + MOVES[m].n);
+        await openOp(k, "skills"); await tapAct("tutor", { k }, "Move Tutor"); await tapAct("tutorDo", { k, m }, MOVES[m].n); await closeAllModals(); did = true; continue;
       }
       const own = tmFor(k, m).find(n => S.tms[n] > 0 && tmFits(k, n));
       if (own) {

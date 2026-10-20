@@ -821,6 +821,9 @@ for (const [k, h] of Object.entries(HELD)) {
 }
 for (const n of MINT_NATURES) SHOP.mart.items.push({ id: "m_mint_" + n, n: ITEMS["mint_" + n].n, cost: 10000, give: { ["mint_" + n]: 1 } });
 SHOP.bp.items.splice(1, 0, { id: "b_capsule", n: "Ability Capsule", cost: 150, give: { abilitycapsule: 1 } }, { id: "b_patch", n: "Ability Patch", cost: 400, give: { abilitypatch: 1 } });
+// Heart Scales, for the Move Tutor (once it opens)
+SHOP.mart.items.push({ id: "m_heartscale", n: "Heart Scale", cost: 5000, give: { heartscale: 1 }, need: "tutor" });
+SHOP.bp.items.splice(3, 0, { id: "b_heartscale", n: "Heart Scale", cost: 40, give: { heartscale: 1 }, need: "tutor" });
 // what a shop shows right now: an item with `need` waits for that feature (FEATURES in a6_state.js)
 const shopItems = sh => sh.items.filter(it => !it.need || featOn(it.need));
 // the heading a shop item sits under (the evolution stones and the Linking Cord have their own: Evolution items)

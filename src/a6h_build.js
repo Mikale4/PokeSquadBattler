@@ -800,7 +800,7 @@ function npcAccess(L, tier = 0) {
     const need = H.only || H.t === 3 ? 2 : H.t === 2 ? 1 : 0;
     return tier >= need || L >= 30 + 20 * need ? 1 : 0;
   };
-  return { L, tier, tmB, tms, capsule: L >= 20, patch: tier >= 2 || L >= 60, mint: L >= 25, items };
+  return { L, tier, tmB, tms, capsule: L >= 20, patch: tier >= 2 || L >= 60, mint: L >= 25, tutor: L >= 30, items };
 }
 // one Pokémon's moves, Ability and nature from what its Trainer can get (shared between Trainers at the same stage)
 const NPC_BUILD = new Map();
@@ -809,11 +809,11 @@ function npcBuild(k, p, ac, c = {}) {
   let abs = c.ab ? [c.ab] : ac.capsule ? (ac.patch ? null : regularAbilities(k)) : [p.ab || OPS[k].ab];
   if (c.ban && c.ban.abilities.size) { const ok = (abs || [...regularAbilities(k), ...hiddenAbilities(k)]).filter(a => !banAb(a)); abs = ok.length ? ok : abs; }
   const keys = (c.keys || (c.key ? [c.key] : [])).filter(m => !banMv(m));
-  const id = [MOVE_WORTH_ON ? 1 : 0, k, p.lvl, ac.tmB, abs ? abs.join("/") : "*", ac.mint ? "" : p.nat, c.wx || "", c.terrain || "", c.tr ? 1 : 0, c.wxG ? JSON.stringify(c.wxG) : "", c.teamSpe || "", keys.join("+"), c.sts ? c.sts.any + "/" + c.sts.psn : "", c.ban ? [...c.ban.moves, ...c.ban.abilities].join(",") : "", c.favor ? [...(c.favor.moves || []), ...(c.favor.abilities || [])].join(",") : ""].join("|");
+  const id = [MOVE_WORTH_ON ? 1 : 0, k, p.lvl, ac.tmB, ac.tutor ? 1 : 0, abs ? abs.join("/") : "*", ac.mint ? "" : p.nat, c.wx || "", c.terrain || "", c.tr ? 1 : 0, c.wxG ? JSON.stringify(c.wxG) : "", c.teamSpe || "", keys.join("+"), c.sts ? c.sts.any + "/" + c.sts.psn : "", c.ban ? [...c.ban.moves, ...c.ban.abilities].join(",") : "", c.favor ? [...(c.favor.moves || []), ...(c.favor.abilities || [])].join(",") : ""].join("|");
   let x = NPC_BUILD.get(id);
   if (!x) {
     // (a Trainer's Smeargle comes already sketched: any move, the owner's rule)
-    let pool = sketcher(k) ? sketchable() : [...levelMoves(k, p.lvl), ...OPS[k].tms.filter(n => ac.tms.has(n)).map(n => TM_MOVE[n]).filter(Boolean)];
+    let pool = sketcher(k) ? sketchable() : [...levelMoves(k, p.lvl), ...OPS[k].tms.filter(n => ac.tms.has(n)).map(n => TM_MOVE[n]).filter(Boolean), ...(ac.tutor ? [...OPS[k].egg, ...OPS[k].tutor] : [])];
     if (c.ban && c.ban.moves.size) pool = pool.filter(m => !banMv(m));
     if (keys.length) pool = [...keys, ...pool.filter(m => MOVES[m] && !keys.some(x => slotOf(x) === slotOf(m)))];   // the moves its role is there for
     const B = bestBuild(k, { meta: poolMeta(), wx: c.wx, terrain: c.terrain, tr: c.tr, wxG: c.wxG, teamSpe: c.teamSpe, sts: c.sts, pool, abs: abs && abs.filter(Boolean), free: true, favor: c.favor });

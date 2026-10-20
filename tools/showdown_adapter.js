@@ -19,7 +19,9 @@ globalThis.PokeSquad = (() => {
   const setNames = f => { SD = f; };
   const ABK = {}; for (const k of Object.keys(OPS)) for (const a of OPS[k].abs) ABK[k + ":" + toID(a.k)] = a.k;
   const abKey = (k, s) => ABK[k + ":" + toID(s)] || ABK[k + ":" + toID(String(s).replace(/-/g, " "))] || null;
-  const moveKey = s => { const id = toID(s); return MOVES[id] ? id : /^hiddenpower/.test(id) && MOVES.hiddenpower ? "hiddenpower" : null; };
+  // (Sketch, Copycat and Mirror Move in S1 and S3 are "Sketch (S1)"... in Showdown's teambuilder: tools/build_showdown_data.js)
+  const moveKey = s => { const id = toID(s), slotted = id.replace(/^(sketch|copycat|mirrormove)s([13])$/, "$1$2");
+    return MOVES[id] ? id : MOVES[slotted] ? slotted : /^hiddenpower/.test(id) && MOVES.hiddenpower ? "hiddenpower" : null; };
   const itemKey = s => { const id = toID(s); return HELD[id] ? id : null; };
 
   // ---------- team validation (the Stadium's rules) ----------

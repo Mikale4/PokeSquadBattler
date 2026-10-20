@@ -388,6 +388,7 @@ function huntDrops(h, l, ids = []) {
   if (huntKind(h) === "money") return give(coin(ids, { lmd: 3000 + l * 2500 + Math.round(R() * 1000) * l }));
   if (R() < (h.stone === "linkcord" ? .1 + l * .04 : .2 + l * .08)) list.push(...give({ [h.stone]: 1 }));
   if (R() < .1 + l * .05) list.push(...give({ summ: 1 }));
+  if (featOn("tutor") && R() < .06 + l * .02) list.push(...give({ heartscale: 1 }));   // (the Move Tutor's)
   if (R() < Math.min(.9, .25 + l * .12)) {
     const pool = h.items.filter(k => HELD[k].t < 3 || l >= 4);
     list.push(...give({ held: pick(pool) }));
@@ -640,6 +641,8 @@ const ACT = {
   learnYes: () => { const q = S.learnQ.shift(); if (q && learnMove(q.k, q.m)) { toast(`${OPS[q.k].n} learned ${MOVES[q.m].n}!`, "gold"); sfx("heal"); } save(); closeModal(); rerender(); },
   learnNo: () => { const q = S.learnQ.shift(); if (q) toast(`${OPS[q.k].n} did not learn ${MOVES[q.m].n}.`); save(); closeModal(); rerender(); },
   remind: d => remindModal(d.k),
+  tutor: d => tutorModal(d.k),
+  tutorDo: d => { if (tutorMove(d.k, d.m)) { sfx("heal"); toast(`${OPS[d.k].n} learned ${MOVES[d.m].n}!`, "gold"); save(); tutorModal(d.k); rerender(); } },
   remindDo: d => { if (remindMove(d.k, d.m)) { sfx("heal"); toast(`${OPS[d.k].n} remembered ${MOVES[d.m].n}!`, "gold"); save(); remindModal(d.k); rerender(); } },
   tmCase: d => tmCaseModal(d.k),
   mint: d => mintModal(d.k),

@@ -108,3 +108,5 @@ node tools/build_teamcfg.js
 node tools/build_online.js
 # the battle engine for the Showdown server fork (showdown/server, Mikale4/PokeSquad-Showdown): src/ up to a7_engine.js plus tools/showdown_adapter.js
 node tools/build_engine.js
+# the teambuilder's data for the Showdown client fork (showdown/client, Mikale4/PokeSquad-Showdown-Client): pokesquad/data.js
+node tools/build_showdown_data.js

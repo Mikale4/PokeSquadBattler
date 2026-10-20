@@ -626,6 +626,73 @@ for pid in PIDS:
         LS[pid] = [list(x) for x in LS.get(pid_sid[pid], [])]
     if pid > MAXID and not learn_tm.get(pid):
         learn_tm[pid] = set(learn_tm.get(pid_sid[pid], set()))
+# ---------- Showdown's learnsets and every game's egg and tutor moves (the owner's picks, 2026-10-20) ----------
+# PokeAPI misses some level-up and TM moves (Ceruledge's Lv 1 Shadow Sneak, Quaquaval's Counter...): Pokémon Showdown's learnsets
+# (tools/showdown_learnsets.json, made by tools/build_showdown_learnsets.js from the Showdown fork) fill them in, at Showdown's
+# newest level. Every main game's egg moves and move-tutor moves (PokeAPI's and Showdown's) join as their own lists, eg and tu,
+# taught by the Move Tutor for a Heart Scale. A TM move with no TM in our numbering (an Omega Ruby/Alpha Sapphire-only TM like
+# Secret Power) is a tutor move. Event and transfer moves stay out.
+SD_ALIAS = {"visegrip": "vicegrip"}
+SDL = json.load(open(os.path.join(HERE, "showdown_learnsets.json"), encoding="utf-8"))
+def sd_learnset(k):
+    for _ in range(3):
+        if k in SDL:
+            return SDL[k]
+        k = SDL["_base"].get(k)
+        if not k:
+            return None
+    return None
+tm_by_gen_move = {(g, k): i for i, (g, lab, k) in MACH.items()}
+EGG, TUT = defaultdict(set), defaultdict(set)
+FILLED = {"level-up": 0, "TM": 0}
+for r in rows("pokemon_moves"):   # (PokeAPI's own egg and tutor moves, main games only)
+    pid = int(r["pokemon_id"])
+    if pid not in PIDS or r["pokemon_move_method_id"] not in ("2", "3") or VGNAME[r["version_group_id"]] in SIDE:
+        continue
+    k = key_of.get(int(r["move_id"]))
+    if k and k in MOVES:
+        (EGG if r["pokemon_move_method_id"] == "2" else TUT)[pid].add(k)
+for pid in PIDS:
+    ls = sd_learnset(pid_key[pid])
+    if not ls:
+        continue
+    norm = lambda m: SD_ALIAS.get(m, m)
+    have_lv = {k for _, k in LS.get(pid, [])}
+    have_tm = {MACH[i][2] for i in learn_tm[pid]}
+    for m, lvl in ls["L"].items():
+        m = norm(m)
+        if m in MOVES and m not in have_lv:
+            LS.setdefault(pid, []).append([max(1, lvl), m]); have_lv.add(m); FILLED["level-up"] += 1
+    for m, gens in ls["M"].items():
+        m = norm(m)
+        if m not in MOVES or m in have_tm or m in have_lv:
+            continue
+        ids = [tm_by_gen_move[(g, m)] for g in gens if (g, m) in tm_by_gen_move]
+        if ids:
+            learn_tm[pid].update(ids); have_tm.add(m); FILLED["TM"] += 1
+        else:
+            TUT[pid].add(m)
+    for m in ls["E"]:
+        if norm(m) in MOVES:
+            EGG[pid].add(norm(m))
+    for m in ls["T"]:
+        if norm(m) in MOVES:
+            TUT[pid].add(norm(m))
+# (a form with none of its own learns its species' egg and tutor moves)
+for pid in PIDS:
+    if pid > MAXID and not EGG.get(pid) and not TUT.get(pid):
+        EGG[pid] = set(EGG.get(pid_sid[pid], set())); TUT[pid] = set(TUT.get(pid_sid[pid], set()))
+    if LS.get(pid):
+        LS[pid].sort(key=lambda x: x[0])
+# (an egg move carries through evolution, as in the games: each Pokémon can also have its earlier stages' egg and tutor moves)
+key_pid = {pid_key[p]: p for p in PIDS}
+for pid in PIDS:
+    seen, k = set(), prev.get(pid)
+    while k and k in key_pid and k not in seen:
+        seen.add(k); a = key_pid[k]
+        EGG[pid] |= EGG.get(a, set()); TUT[pid] |= TUT.get(a, set())
+        k = prev.get(a)
+print(f"Showdown's learnsets filled in {FILLED['level-up']} level-up and {FILLED['TM']} TM moves")
 # the owner's rule: Hail and Snow are one weather, so a Pokémon that learns Hail or Snowscape (by level or by machine) learns the other
 # too, and one with Ice Body or Snow Cloak has the other as well (regular or Hidden, like the one it has)
 tm_of_move = defaultdict(set)
@@ -711,6 +778,12 @@ for pid in sorted(PIDS, key=lambda p: (pid_sid[p], p)):   # by Pokédex number, 
          "abs": [[a, 1 if h else 0] for a, h in abl],
          "h": int(p["height"]), "w": int(p["weight"]), "cr": int(s["capture_rate"]), "gr": int(s["growth_rate_id"]),
          "r": rarity(pid), "ls": LS.get(pid, []), "tm": sorted(learn_tm[pid]), "gen": int(s["generation_id"])}
+    known = {k for _, k in d["ls"]} | {MACH[i][2] for i in d["tm"]}
+    eg, tu = sorted(EGG.get(pid, set()) - known), sorted(TUT.get(pid, set()) - known - EGG.get(pid, set()))
+    if eg:
+        d["eg"] = eg
+    if tu:
+        d["tu"] = tu
     if sid_key[sid] in LEGEND:
         d["leg"] = 1
     if sid_key[sid] in MYTHICAL:
@@ -745,8 +818,13 @@ for base, slots in COPY_SLOTS.items():
         cl = [l for l, m in d["ls"] if m == base]
         if cl:
             d["ls"] = [x for x in d["ls"] if x[1] not in slots] + [[min(cl), k] for k in slots]
+SLOTTED = {"sketch": list(SKETCH_SLOTS), **{base: list(slots) for base, slots in COPY_SLOTS.items()}}
+for d in dex:
+    for f in ("eg", "tu"):
+        if d.get(f):
+            d[f] = sorted({x for m in d[f] for x in SLOTTED.get(m, [m])})
 used_tm = sorted(set(i for d in dex for i in d["tm"]))
-used = set(k for d in dex for _, k in d["ls"]) | set(MACH[i][2] for i in used_tm) | {"struggle"}
+used = set(k for d in dex for _, k in d["ls"]) | set(MACH[i][2] for i in used_tm) | {k for d in dex for f in ("eg", "tu") for k in d.get(f, [])} | {"struggle"}
 # Metronome can call any damaging move in the game (but not Self-Destruct, Explosion, the one-hit KOs or Struggle)
 NO_METRO = {"selfdestruct", "explosion", "mistyexplosion", "fissure", "horndrill", "guillotine", "sheercold", "struggle", "finalgambit"}
 metronome = sorted(k for k in used if MOVES[k]["p"] and MOVES[k].get("sp") not in NO_METRO)
@@ -769,7 +847,8 @@ with open(OUT, "w", encoding="utf-8") as f:
     f.write("const TMS = [\n" + ",\n".join(json.dumps(t, separators=(",", ":")) for t in TMS) + "\n];\n")
     f.write(f"const METRONOME = {json.dumps(metronome)};\n")
 print(f"wrote {OUT}: {len(dex)} Pokemon, {len(moves_out)} moves, {len(TMS)} TMs/HMs/TRs, "
-      f"{sum(len(d['ls']) for d in dex)} level-up entries, {sum(len(d['tm']) for d in dex)} TM compatibilities")
+      f"{sum(len(d['ls']) for d in dex)} level-up entries, {sum(len(d['tm']) for d in dex)} TM compatibilities, "
+      f"{sum(len(d.get('eg', [])) for d in dex)} egg moves, {sum(len(d.get('tu', [])) for d in dex)} tutor moves")
 # what they could learn but the engine can't run (left out)
 learnable = set()
 for r in rows("pokemon_moves"):

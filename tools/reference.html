@@ -193,7 +193,7 @@ const monSel = () => state.mon === "" ? null : +state.mon;
 const CUR_RANK = { "Poké Dollars": 0, BP: 1, Coins: 2, Gems: 3 };
 const priceOf = it => it.price.length ? Math.min(...it.price.map(p => (CUR_RANK[p.cur] ?? 4) * 1e7 + p.v)) : Infinity;
 const priceText = it => it.price.length ? it.price.map(p => `${fmt(p.v)} ${p.cur}`).filter((x, i, a) => a.indexOf(x) === i).join(" · ") : "—";
-const learnHow = (m, i) => { const lv = m.lv.filter(x => x[0] === i).map(x => x[1]), tm = m.tl.includes(i); return [lv.length ? "Lv " + Math.min(...lv) : "", tm ? "TM" : ""].filter(Boolean).join(" · "); };
+const learnHow = (m, i) => { const lv = m.lv.filter(x => x[0] === i).map(x => x[1]), tm = m.tl.includes(i); return [lv.length ? "Lv " + Math.min(...lv) : "", tm ? "TM" : "", (m.eg || []).includes(i) ? "Egg move" : "", (m.tu || []).includes(i) ? "Move Tutor" : ""].filter(Boolean).join(" · "); };
 
 // ---------- notes: your requests about a move, Ability, item or TM ----------
 // Kept in this browser (localStorage "pks_ref:notes") until you export them: "Export new notes" writes the new and changed ones
@@ -322,7 +322,8 @@ const TABS = {
     text: m => (m.n + " " + m.d + " " + m.tms.join(" ") + " " + m.f.join(" ")).toLowerCase(),
     filters: [
       { id: "mon", opts: monOptions, test: (m, v) => m.by.includes(+v) },
-      { id: "how", opts: [["", "Level-up or TM"], ["lv", "By level-up"], ["tm", "By TM"]], test: (m, v) => { const i = monSel(); return v === "lv" ? (i == null ? m.lv.length > 0 : m.lv.some(x => x[0] === i)) : (i == null ? m.tms.length > 0 : m.tl.includes(i)); } },
+      { id: "how", opts: [["", "Any way"], ["lv", "By level-up"], ["tm", "By TM"], ["eg", "Egg move (Move Tutor)"], ["tu", "Tutor move (Move Tutor)"]], test: (m, v) => { const i = monSel(), list = v === "eg" ? m.eg || [] : m.tu || [];
+        return v === "lv" ? (i == null ? m.lv.length > 0 : m.lv.some(x => x[0] === i)) : v === "tm" ? (i == null ? m.tms.length > 0 : m.tl.includes(i)) : (i == null ? list.length > 0 : list.includes(i)); } },
       { id: "type", opts: typeOptions, test: (m, v) => m.t === v },
       { id: "cat", opts: catOptions, test: (m, v) => m.c === v },
       { id: "slot", opts: slotOptions, test: (m, v) => m.s === +v },
@@ -339,8 +340,10 @@ const TABS = {
     more: m => `<p><b>Target:</b> ${esc(m.tg || "—")}${m.hits ? ` · <b>Strikes:</b> ${m.hits[0] === m.hits[1] ? m.hits[0] : m.hits.join("–")}` : ""}${m.pri ? ` · <b>Priority +${m.pri}:</b> 30% turn meter back afterwards` : ""}
       · <b>Slot:</b> ${slotName(m.s)} · <b>Cooldown:</b> ${cdText(m)} · <b>Accuracy:</b> ${m.a ? m.a + "%" : "never misses"}</p>
       ${m.lv.length ? `<h4>Learned by level-up (${uniq(m.lv.map(x => x[0])).length})</h4>${mons(uniq(m.lv.map(x => x[0])).map(i => ({ i, note: "Lv " + Math.min(...m.lv.filter(x => x[0] === i).map(x => x[1])) })))}` : ""}
-      ${m.tms.length ? `<h4>Taught by ${esc(m.tms.join(", "))} (${m.tl.length} Pokémon)</h4>${m.tl.length ? mons(m.tl) : `<p class="dimtxt">No Kanto Pokémon can learn it by TM.</p>`}` : ""}
-      ${!m.by.length ? `<p class="dimtxt">No Kanto Pokémon learns it by level-up or TM${m.k === "struggle" ? " (every Pokémon uses it when it has no S1 move ready)" : ""}.</p>` : ""}`,
+      ${m.tms.length ? `<h4>Taught by ${esc(m.tms.join(", "))} (${m.tl.length} Pokémon)</h4>${m.tl.length ? mons(m.tl) : `<p class="dimtxt">No Pokémon can learn it by TM.</p>`}` : ""}
+      ${(m.eg || []).length ? `<h4>Egg move, taught by the Move Tutor for a Heart Scale (${m.eg.length})</h4>${mons(m.eg)}` : ""}
+      ${(m.tu || []).length ? `<h4>Tutor move, taught by the Move Tutor for a Heart Scale (${m.tu.length})</h4>${mons(m.tu)}` : ""}
+      ${!m.by.length ? `<p class="dimtxt">No Pokémon learns it${m.k === "struggle" ? " (every Pokémon uses it when it has no S1 move ready)" : ""}.</p>` : ""}`,
   },
   abilities: {
     n: "Abilities", unit: "Abilities", rows: D.abilities, key: a => a.k,

@@ -38,11 +38,13 @@ function noteReplies() {
     const mons = OP_KEYS.slice().sort((a, b) => OPS[a].id - OPS[b].id);
     const mi = Object.fromEntries(mons.map((k, i) => [k, i]));
     const monList = mons.map(k => ({ k, n: OPS[k].n, id: OPS[k].id, t: OPS[k].types, ic: SPR.icon[k] || null }));
-    // who learns what: level-up and TMs
-    const lvBy = {}, tmBy = {};
+    // who learns what: level-up, TMs, and the Move Tutor's egg and tutor moves
+    const lvBy = {}, tmBy = {}, egBy = {}, tuBy = {};
     for (const k of mons) {
       for (const [lv, m] of OPS[k].learn) (lvBy[m] || (lvBy[m] = [])).push([mi[k], lv]);
       for (const n of OPS[k].tms || []) (tmBy[n] || (tmBy[n] = [])).push(mi[k]);
+      for (const m of OPS[k].egg || []) (egBy[m] || (egBy[m] = [])).push(mi[k]);
+      for (const m of OPS[k].tutor || []) (tuBy[m] || (tuBy[m] = [])).push(mi[k]);
     }
     const tmOf = {};
     for (const [id, , , m] of TMS) (tmOf[m] || (tmOf[m] = [])).push(id);
@@ -55,10 +57,11 @@ function noteReplies() {
       if (M.hl) flags.push('Healing'); if (M.ail) flags.push('Status'); if (M.fl) flags.push('Flinch'); if (M.cr) flags.push('High crit'); if (M.st) flags.push('Stat change');
       if (M.crash) flags.push('Crash');
       const by = new Set((lvBy[k] || []).map(x => x[0])); for (const n of tmOf[k] || []) for (const x of tmBy[n] || []) by.add(x);
+      for (const x of [...(egBy[k] || []), ...(tuBy[k] || [])]) by.add(x);
       const tmLearn = new Set(); for (const n of tmOf[k] || []) for (const x of tmBy[n] || []) tmLearn.add(x);
       return { k, n: M.n, t: M.t, c: M.c, p: M.c === 'X' ? 0 : (sk.pow || M.p || 0), vary: !!(sk.vary || sk.weight), range: sk.range || null, a: M.a || 0, pri: Math.max(0, M.pri || 0), s: slot,
         cd: sk.cd, tg: TARGET[sk.target] || sk.target || '', hits: sk.hits || null, f: flags, d: sk.desc,
-        lv: lvBy[k] || [], tms: (tmOf[k] || []).map(n => tmName(n)), tl: [...tmLearn], by: [...by] };
+        lv: lvBy[k] || [], tms: (tmOf[k] || []).map(n => tmName(n)), tl: [...tmLearn], eg: egBy[k] || [], tu: tuBy[k] || [], by: [...by] };
     });
     // Abilities: everything a Kanto Pokémon can have, and who has it
     const abReg = {}, abHid = {};

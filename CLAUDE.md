@@ -13,6 +13,12 @@ battling only, Showdown-style (the owner's ask, 2026-10-19): Teambuilder, Find a
 Both phones run the same battle from one seed and exchange only choices through `server/server.js` (plain Node, `render.yaml`
 for Render). Anything that runs during an online battle's rules must draw randomness only from `R` (never `Math.random`), and
 nothing on one phone alone may change the battle's state: the hash check calls the battle off. README: *Online battles*.
+On Pokémon Showdown (the owner's pick, approach A, in phases; README: *On Pokémon Showdown*): the server fork `showdown/server`
+(`Mikale4/PokeSquad-Showdown`, Render) runs the game's engine, `pokesquad/engine.js` from `tools/build_engine.js` (src up to
+a7_engine plus `tools/showdown_adapter.js`, the translator: `readTeam`/`validateTeam`, `moveKey`); the client fork `showdown/client`
+(`Mikale4/PokeSquad-Showdown-Client`, its Pages site) shows them, its teambuilder on the game's data: `pokesquad/data.js` from
+`tools/build_showdown_data.js` + `tools/showdown_data_loader.js` (the `gen9pokesquad` mod, `isPokeSquad`; three move slots).
+build.sh writes both; after a rules or data change, push the forks too (only when the owner asks).
 
 ## Never edit `PokeSquad Battler.html` directly
 It's a build output. Edit the parts in `src/` and rebuild. `PokeSquad Battler Reference.html` (every move, Ability, item and TM) is generated
@@ -61,7 +67,9 @@ The folder name has spaces: keep every path in shell scripts quoted, or relative
   `clientWidth`/`clientHeight`, draw it at `pxRatio()`, and turn pointer positions into its own pixels (`* el.clientWidth / rect.width`).
 - Visible text must be Pokémon terminology (Safari Zone, PP, Gems, Poké Dollars, IVs, Mastery, held items, Mail, Medals, Gym Badges; glossary in `README.md`).
 - Types, the type chart, base stats and move power/type/accuracy are the current ones (18 types; Struggle is Typeless "???"; no Stellar or Tera).
-  Moves come from every generation's level-up learnsets (the newest game's level wins) and TMs, labelled by generation: `TMS` ids are
+  Moves come from every generation's level-up learnsets (the newest game's level wins), TMs, and (the owner's pick, 2026-10-20) every main
+  game's egg and move-tutor moves, taught by the Move Tutor for a Heart Scale (`OPS[k].egg`/`.tutor`, `tutorable`, `tutorMove`;
+  PokeAPI's data filled in from Showdown's learnsets: `tools/showdown_learnsets.json`; `learnPool` covers all of it). TMs are labelled by generation: `TMS` ids are
   `gen*1000 + number`, `tmName(id)` gives "TM01 (Gen 1)" (Gen 8 TRs, Gen 9 TM001–229). `EXCLUDE` is empty: every learnable move has a rule (the PP- and position-based ones adapted: README, House rules).
   A Pokémon knows one move per slot (`prog.mv` = [S1, S2, S3]); `MOVES[k].s` is the slot.
   Losing a Journey battle brings that region's Professor's Mail with a free starter: your pick of the two you didn't choose, then the last one after another loss, two at most a region (the owner's rule: `journeyLoss`/`rescueModal`

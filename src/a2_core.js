@@ -380,6 +380,7 @@ for (const [k, n, d, badge] of [
   ["nugget", "Nugget", "The Team Rocket Crossover's currency: spend it in its shop before it ends."],
 ]) ITEMS[k] = { n, ic: RES_DATA.item[k] ? pxIcon(RES_DATA.item[k], badge) : IC.boost, d };
 ITEMS.abilitypatch = { n: "Ability Patch", ic: resIcon("abilitypatch"), d: "Gives a Pokémon its Hidden Ability (or back to a regular one)." };
+ITEMS.heartscale = { n: "Heart Scale", ic: resIcon("heartscale"), d: "The Move Tutor teaches a Pokémon one egg move or tutor move for it, from its Summary's Moves." };
 
 // ---------- terrains (Electric, Grassy, Misty and Psychic Terrain: about five rounds, for Pokémon on the ground) ----------
 const TERRAIN = {

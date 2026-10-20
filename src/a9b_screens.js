@@ -114,7 +114,7 @@ SCREENS.op = key => {
     </section>`;
   } else if (tab === "skills") {
     // one move per slot; empty slots say when it learns one. The Move Reminder and TMs teach others.
-    const nx = nextMoveLevel(key, p.lvl), rem = remindable(key).length, tmN = Object.keys(S.tms).filter(n => tmFits(key, +n)).length;
+    const nx = nextMoveLevel(key, p.lvl), rem = remindable(key).length, tmN = Object.keys(S.tms).filter(n => tmFits(key, +n)).length, tut = featOn("tutor") ? tutorable(key).length : 0;
     body = `<section class="panel stack" style="gap:10px">${[1, 2, 3].map(slot => {
       const i = slot - 1, m = p.mv[i];
       if (!m) return `<div class="ab"><div class="abicon empty">S${slot}</div><div class="stack" style="gap:2px;min-width:0"><b class="dim">No S${slot} move yet</b>
@@ -128,6 +128,7 @@ SCREENS.op = key => {
         ${r < MAX_SK ? `<button class="btn sm ghost" data-act="skUp" data-k="${key}" data-i="${i}" ${(S.inv.summ || 0) >= c.summ && S.lmd >= c.lmd ? "" : "disabled"}><span class="cost">${IC.summ}${c.summ}</span><span class="cost">${IC.lmd}${fmt(c.lmd)}</span></button>` : '<span class="tiny good">Mastered</span>'}</div></div></div>`;
     }).join('<div class="divider"></div>')}
       <div class="row" style="gap:8px"><button class="btn ghost sm" style="flex:1" data-act="remind" data-k="${key}" ${rem ? "" : "disabled"}>Move Reminder${rem ? ` · ${rem}` : ""}</button>
+        ${featOn("tutor") ? `<button class="btn ghost sm" style="flex:1" data-act="tutor" data-k="${key}" ${tut ? "" : "disabled"}>Move Tutor${tut ? ` · ${tut}` : ""}</button>` : ""}
         <button class="btn ghost sm" style="flex:1" data-act="tmCase" data-k="${key}" ${tmN ? "" : "disabled"}>${RES_DATA.item.tmcase ? pxIcon(RES_DATA.item.tmcase).replace("<svg", '<svg width="18" height="18"') : ""} Use a TM${tmN ? ` · ${tmN}` : ""}</button></div>
       <details class="lset"><summary>Level-up moves${nx ? ` · next at Lv ${nx}` : ""}</summary><div class="lsrows">${op.learn.map(([lv, k]) => `<div class="lsrow ${p.mv.includes(k) ? "on" : lv > p.lvl ? "later" : ""}"><span class="num">Lv ${lv}</span><b>${esc(MOVES[k].n)}</b>${typeChip(MOVES[k].t)}<span class="tiny">S${slotOf(k)}</span></div>`).join("")}</div></details>
       <p class="tiny dim">It knows one move per slot. New moves come with levels (it asks before forgetting one), from TMs bought at the Poké Mart, and from the Move Reminder. Mastery runs 1 to 5 (★) per slot: each rank adds 6% (damage, healing, accuracy, or turn meter given back) and ★ also cuts the cooldown by one turn. Seeds of Mastery are found while exploring.</p></section>`;
@@ -411,6 +412,18 @@ function remindModal(key) {
       <button class="btn sm" data-act="remindDo" data-k="${key}" data-m="${m}" ${S.lmd >= c ? "" : "disabled"}><span class="cost">${IC.lmd}${fmt(c)}</span></button></div>`; }).join("")}</div>`
       : `<p class="small dim">${esc(OPS[key].n)} hasn't forgotten any moves it could know by Lv ${p.lvl}.</p>`}
     <p class="tiny dim">You have ${IC.lmd.replace("<svg", '<svg width="12" height="12"')} ${fmtFull(S.lmd)} Poké Dollars.</p>
+    <button class="btn ghost wide" data-act="closeModal">Close</button></div>`);
+}
+// the Move Tutor (the owner's pick, 2026-10-20): the egg moves and tutor moves its species can learn from every game, a Heart Scale each
+function tutorModal(key) {
+  const p = S.ops[key], op = OPS[key], list = tutorable(key), hs = S.inv.heartscale || 0; pmv(key);
+  openModal(`<div class="stack"><div class="shophead"><img class="px" src="${trainerURL("movetutor")}" alt=""><div><div class="eyebrow">${esc(op.n)} · Lv ${p.lvl}</div><h2>Move Tutor</h2>
+      <p class="small dim">"Egg moves, tutor moves, from every region I've been to. One Heart Scale a move!"</p></div></div>
+    ${list.length ? `<div class="stack" style="gap:6px">${list.sort((a, b) => slotOf(a) - slotOf(b) || MOVES[a].n.localeCompare(MOVES[b].n)).map(m => { const s = slotOf(m), cur = p.mv[s - 1]; return `<div class="evorow"><span class="abicon" style="--tc:${TC[MOVES[m].t]}">S${s}</span>
+      <div style="flex:1;min-width:0"><b>${esc(MOVES[m].n)}</b> <span class="row" style="gap:3px;display:inline-flex">${typeChip(MOVES[m].t)}${catChip(MOVES[m].c)}</span><div class="tiny dim">${op.egg.includes(m) ? "Egg move · " : "Tutor move · "}${MOVES[m].p ? `Power ${powText(m)} · ` : ""}${cur ? `replaces ${esc(MOVES[cur].n)}` : `fills its empty S${s}`}</div></div>
+      <button class="btn sm" data-act="tutorDo" data-k="${key}" data-m="${m}" ${hs > 0 ? "" : "disabled"}>${ITEMS.heartscale.ic.replace("<svg", '<svg width="14" height="14"')} 1</button></div>`; }).join("")}</div>`
+      : `<p class="small dim">${esc(op.n)} has no egg or tutor moves left to learn.</p>`}
+    <p class="tiny dim">You have ${hs} Heart Scale${hs === 1 ? "" : "s"}. The Poké Mart and the BP Exchange sell them, and Explore turns some up.</p>
     <button class="btn ghost wide" data-act="closeModal">Close</button></div>`);
 }
 // the TM Case: your TMs this Pokémon can learn

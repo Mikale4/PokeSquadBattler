@@ -909,7 +909,7 @@ const OP_KEYS = [];
 const DEXN = {};
 for (const d of DEX) {
   const op = { key: d.k, id: d.id, n: d.n, short: d.n, genus: d.g, types: d.t, el: d.t[0], b: d.b, rar: d.r, leg: !!d.leg, cls: roleOf(d),
-    learn: d.ls, tms: d.tm, ab: d.ab, abs: d.abs.map(([k, h]) => ({ k, h: !!h })), passives: [abilityOf(d.ab)], evo: d.evo || [], from: d.from || null,
+    learn: d.ls, tms: d.tm, egg: d.eg || [], tutor: d.tu || [], ab: d.ab, abs: d.abs.map(([k, h]) => ({ k, h: !!h })), passives: [abilityOf(d.ab)], evo: d.evo || [], from: d.from || null,
     h: d.h, w: d.w, cr: d.cr, gr: d.gr, gen: d.gen || 1, myth: !!d.myth, form: d.form || null, bf: !!d.bf };
   // (a battle-only form, like Sunny Castform or Zen Darmanitan, is only what a Pokémon turns into in battle: never caught, owned or
   // in a team, so it isn't in OP_KEYS; a form with its own stats, like Wash Rotom, is a Pokémon of its own, but the Pokédex number

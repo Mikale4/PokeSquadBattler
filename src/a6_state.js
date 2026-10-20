@@ -354,6 +354,13 @@ function remindMove(key, m) {
   if (!remindable(key).includes(m) || S.lmd < c) return false;
   S.lmd -= c; learnMove(key, m); return true;
 }
+// the Move Tutor (the owner's pick, 2026-10-20): every main game's egg moves and move-tutor moves its species can learn, one Heart
+// Scale each (S.inv.heartscale: the Poké Mart, the BP Exchange, Explore), from a Pokémon's Summary (Moves)
+const tutorable = key => S.ops[key] ? [...new Set([...OPS[key].egg, ...OPS[key].tutor])].filter(m => MOVES[m] && !pmv(key).includes(m)) : [];
+function tutorMove(key, m) {
+  if (!featOn("tutor") || !tutorable(key).includes(m) || !(S.inv.heartscale > 0)) return false;
+  S.inv.heartscale--; learnMove(key, m); return true;
+}
 // TMs: the Poké Mart sells six of FireRed/LeafGreen's TMs and HMs at a time, a new six every 15 minutes. Each one teaches a
 // move once, to a Pokémon that's compatible with it (S.tms: machine number -> how many you have).
 const TM_ROTATE = 15 * 60e3, TM_PRICE = { 1: 1500, 2: 2500, 3: 4000 };
@@ -549,6 +556,7 @@ const FEATURES = [
   ["club", "Clubs", "3-4", "Club, on the home screen", "Join a Club: contribute every day and take on Raid Battles together."],
   ["ranked", "Ranked Battles", "3-6", "Battle tab, Battle Stadium", "Battle other Trainers' Registered Teams for points, from the Beginner tier up to Legend. The weekly Ranked Race pays your place by Mail."],
   ["tm", "TMs", "4-3", "Shops, TMs", "{store}'s TM corner: six TMs at a time, each teaching its move once."],
+  ["tutor", "Move Tutor", "4-3", "a Pokémon's Summary, Moves", "The Move Tutor teaches egg moves and tutor moves from every game, a Heart Scale each. The Poké Mart sells Heart Scales."],
   ["boutique", "Boutique", "4-3", "Shops, Boutique", "{store}'s Boutique: new looks for your Trainer (every Trainer you meet wears one), worn from your Trainer Card."],
   ["prize", "Prize Corner", "4-4", "Shops, Prize Corner", "Trade Game Corner Coins for rare Pokémon and Safari Balls."],
   ["slots", "Game Corner", "4-4", "Shops, Prize Corner", "Smeargle's slot machine: 3 Coins a spin, and 7-7-7 starts the Starter Bonus. Game Corner Fever on Mondays gives 20 free spins."],

@@ -111,13 +111,14 @@ function chunks(parts, max = 150) {
   return out;
 }
 const tmText = s => String(s).replace(/^(TM|HM|TR)(\d+) \(Gen (\d)\)$/, "$1$2, Gen $3");
-// every move it can know: level-up (any level) and TMs
-const learnPool = k => [...OPS[k].learn.map(([, m]) => m), ...OPS[k].tms.map(n => TM_MOVE[n]).filter(Boolean), ...(sketcher(k) ? sketchable() : [])];   // (Smeargle: anything it could sketch)
+// every move it can know: level-up (any level), TMs, and the Move Tutor's egg and tutor moves (the owner's pick, 2026-10-20)
+const learnPool = k => [...OPS[k].learn.map(([, m]) => m), ...OPS[k].tms.map(n => TM_MOVE[n]).filter(Boolean), ...OPS[k].egg, ...OPS[k].tutor, ...(sketcher(k) ? sketchable() : [])];   // (Smeargle: anything it could sketch)
 function howLearn(k, m) {
   const lv = OPS[k].learn.find(([, x]) => x === m);
   if (lv) return `Lv ${lv[0] || 1}`;
   const tm = TMS.find(([id, , , mm]) => mm === m && OPS[k].tms.includes(id));
-  return tm ? tm[2] : "a TM";
+  if (tm) return tm[2];
+  return OPS[k].egg.includes(m) ? "the Move Tutor (an egg move, a Heart Scale)" : OPS[k].tutor.includes(m) ? "the Move Tutor (a Heart Scale)" : "a TM";
 }
 // where an item comes from, in a few words
 function itemWhere(k) {
