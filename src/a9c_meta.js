@@ -403,7 +403,7 @@ SCREENS.settings = () => {
       <button class="btn ghost wide" data-act="toTitle">Return to the title screen</button>
       ${SESSION && !["guest", "demo", "hot"].includes(SESSION.id) ? `<button class="btn ghost wide" data-act="logout">Log out</button>` : ""}
       <button class="btn red wide" data-act="askReset">Delete save data</button></section>
-    <p class="tiny dim" style="text-align:center">Pokémon Kanto Squad · Ver ${GAME_VER}<br>An unofficial, non-commercial fan game. Pokémon © Nintendo, Game Freak and Creatures Inc. Sprites from Pokémon Showdown; data from PokeAPI.</p>
+    <p class="tiny dim" style="text-align:center">PokeSquad Battler · Ver ${GAME_VER}<br>An unofficial, non-commercial fan game. Pokémon © Nintendo, Game Freak and Creatures Inc. Sprites from Pokémon Showdown; data from PokeAPI.</p>
   </div>`;
 };
 function resetModal() {
@@ -435,7 +435,7 @@ function showTitle(msg) {
   let el = $("#title");
   if (!el) { el = document.createElement("div"); el.id = "title"; $("#screen").appendChild(el); }
   el.innerHTML = `<canvas id="tcv"></canvas>
-    <div class="tlogo"><div class="tball">${IC.pokeball}</div><h1>Pokémon</h1><div class="tsub">Kanto Squad</div></div>
+    <div class="tlogo"><div class="tball">${IC.pokeball}</div><h1>PokeSquad</h1><div class="tsub">Battler</div></div>
     <div class="tload" id="tload"><div class="tbar"><i id="tbarI"></i></div><span id="tloadT">Loading Pokémon… 0%</span></div>
     <div class="ttap" id="ttap" hidden>PRESS START</div>
     <div class="tfoot l"><button class="tbtn" data-act="titleAcct">${IC.ops}<span>Trainer Club</span></button><button class="tbtn" data-act="titleNews">${IC.mail}<span>News</span></button></div>
@@ -561,7 +561,7 @@ const META_ACT = {
   titleDemo: () => { sfx("tap"); demoPanel(); },
   titleCredits: () => {
     openModal(`<div class="stack" style="text-align:center"><h2>Credits</h2>
-      <p class="small dim">Pokémon Kanto Squad is an unofficial, non-commercial fan game made with love for Pokémon Red and Blue.</p>
+      <p class="small dim">PokeSquad Battler is an unofficial, non-commercial fan game made with love for Pokémon Red and Blue.</p>
       <p class="small dim">Pokémon and all related names are © Nintendo, Game Freak and Creatures Inc.</p>
       <p class="small dim">Pokémon battle and overworld sprites, trainer sprites, item icons and cries come from the owner's collections, with trainer sprites from Pokémon Showdown's sprite collection too; the Berserk Gene's icon is Pokémon Showdown's (the games never drew one). Species, move and ability data come from PokeAPI.</p>
       <p class="small dim">Type icons by icedt (DS style) and Squid Eevee (Minecraft style). Overworld item balls by OneWingedNatu. Battle backgrounds and platforms from Pokémon Platinum, ripped by Sunday-Domeko. Cut-in strips and Medals ripped by redblueyellow. HP bars ripped by GameMaster12. Chat emotes ripped by Lemon. Move animations, weather and battle text from Pokémon Showdown (smogon/pokemon-showdown and pokemon-showdown-client) by Guangcong Luo and its contributors; its effect art by SailorCosmos, Kalalokki, Modeling Clay, Jajoken and Ridaz, rocks from Pokémon Online (Gilad). The Game Corner's slot machine ripped by Smol_Sanston. Gym Badges by VictorV111 (deviantart.com/victorv111). Area previews, the Trainer Card, the Poké Balls and the music are from Pokémon FireRed and LeafGreen.</p>

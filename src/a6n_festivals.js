@@ -9,7 +9,7 @@ const FESTS = {
   lunar: { n: "Lunar New Year", cur: "stardust", six: ["gyarados"], five: ["arcanine", "ninetales", "persian"], col: "#c22e28", d: "Red lanterns line Saffron City; a red Gyarados story goes round the Union Room." },
   valentine: { n: "Valentine's Week", cur: "stardust", six: ["chansey"], five: ["clefable", "wigglytuff", "jynx"], col: "#f06aa8", d: "Pink everywhere: Chansey and the Fairy types are out in force." },
   easter: { n: "Spring Egg Hunt", cur: "stardust", six: ["chansey", "exeggutor"], five: ["clefable", "tangela", "venomoth"], col: "#8ac84c", d: "Eggs are hidden all over the Safari Zone. Who laid them?" },
-  anniv: { n: "Anniversary Festival", cur: "cometshard", six: ["mew"], five: ["dragonair", "porygon", "lapras"], col: "#e8b82e", d: "Kanto Squad's anniversary: Mew comes out to celebrate, and every Gem pack's double bonus is back." },
+  anniv: { n: "Anniversary Festival", cur: "cometshard", six: ["mew"], five: ["dragonair", "porygon", "lapras"], col: "#e8b82e", d: "PokeSquad Battler's anniversary: Mew comes out to celebrate, and every Gem pack's double bonus is back." },
   summer: { n: "Summer Beach Festival", cur: "stardust", six: ["lapras", "blastoise"], five: ["starmie", "golduck", "kingler"], col: "#3aa8d8", d: "Cinnabar's beaches are packed, and so are the waters." },
   halloween: { n: "Lavender Halloween", cur: "stardust", six: ["gengar"], five: ["haunter", "marowak", "hypno"], col: "#735797", d: "Lavender Town after dark. Bring a Silph Scope." },
   harvest: { n: "Harvest Festival", cur: "stardust", six: ["venusaur", "exeggutor"], five: ["victreebel", "vileplume", "tangela"], col: "#c8902e", d: "Berries are in season: Grass types gather for the harvest." },

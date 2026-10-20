@@ -1,7 +1,7 @@
 {
-  "name": "pokemon-kanto-squad",
+  "name": "pokesquad-battler",
   "private": true,
-  "description": "Pokémon Kanto Squad: the 151 Kanto Pokémon in a phone-first squad battler, built as a single HTML file.",
+  "description": "PokeSquad Battler: the 151 Kanto Pokémon in a phone-first squad battler, built as a single HTML file.",
   "scripts": {
     "build": "sh src/build.sh",
     "test": "node tests/phone.js",

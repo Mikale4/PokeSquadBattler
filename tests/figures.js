@@ -5,7 +5,7 @@
 const path = require('path'), fs = require('fs');
 const { chromium } = require('playwright');
 const SH = path.join(__dirname, 'shots') + '/'; fs.mkdirSync(SH, { recursive: true });
-const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../PokeSquad Battler.html')).href;
 (async () => {
   const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });

@@ -1,7 +1,7 @@
 // Music: the FireRed/LeafGreen tracks in resources/audio/music (and the Johto Journey's HeartGold/SoulSilver ones in resources/audio/johto, the Hoenn Journey's Ruby/Sapphire ones in resources/audio/hoenn, the Sinnoh Journey's Diamond/Pearl and Platinum ones in resources/audio/sinnoh, the Kalos Journey's X and Y ones in resources/audio/kalos) load and play on the right screens, in battle and after a win,
 // the jingles play over them, and the volume setting works. Run: node tests/music.js
 const path = require('path'), fs = require('fs');
-const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../PokeSquad Battler.html')).href;
 const { chromium } = require('playwright');
 (async () => {
   const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'], ...(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {}) });

@@ -100,6 +100,9 @@ function say(t, big) {
 }
 const msgWait = t => clamp(t.length * 16, 320, 900);
 
+// the side a team is drawn on: your own is always the near one ("A"), so in an online battle the second player's team E is drawn
+// as the near side and team A as the far one (VIEW_ME in a7_engine.js; the battle itself is the same on both phones)
+const vteam = t => VIEW_ME === "A" || (t !== "A" && t !== "E") ? t : t === "A" ? "E" : "A";
 // ---------- playback ----------
 async function gate() { while (BT.paused && BT.on) await new Promise(r => setTimeout(r, 120)); }
 async function play(evs) {
@@ -107,7 +110,7 @@ async function play(evs) {
 }
 function updateStrip() {
   const el = $("#bStrip"); if (!el || !BT.B) return;
-  el.innerHTML = BT.B.predictOrder(7).map(uid => { const u = BT.B.byId(uid); return `<img class="px ${u.team === "E" ? "en" : ""}" src="${sprFront(u.spr || u.key)}" alt="">`; }).join("");
+  el.innerHTML = BT.B.predictOrder(7).map(uid => { const u = BT.B.byId(uid); return `<img class="px ${vteam(u.team) === "E" ? "en" : ""}" src="${sprFront(u.spr || u.key)}" alt="">`; }).join("");
 }
 async function handle(e) {
   const vu = e.u != null ? VU(e.u) : null;
@@ -149,11 +152,11 @@ async function handle(e) {
     }
     case "sendin": {
       const u = BT.B.byId(e.u); if (!u) break;
-      for (const [uid, v] of BT.vus) if (v.team === e.team && v.u.slot === e.slot && uid !== e.u && (v.dead || v.gone)) BT.vus.delete(uid);
+      for (const [uid, v] of BT.vus) if (v.team === vteam(e.team) && v.u.slot === e.slot && uid !== e.u && (v.dead || v.gone)) BT.vus.delete(uid);
       const v = addVU(u, true);
       camTo({ ...nudgeShot(v.home.x, v.home.z, .3, .9) }, 2.4);
-      if (e.team === "E" && BT.B.wild) { v.spawnT = BT.clock + 100; cry(u.key, { at: .1, vol: .45 }); await bwait(620); }
-      else { await throwBall(v, e.team === "A" ? "poke" : BT.cfg.ball || "poke", .45); await bwait(360); }
+      if (vteam(e.team) === "E" && BT.B.wild) { v.spawnT = BT.clock + 100; cry(u.key, { at: .1, vol: .45 }); await bwait(620); }
+      else { await throwBall(v, vteam(e.team) === "A" ? "poke" : BT.cfg.ball || "poke", .45); await bwait(360); }
       updateStrip();
       break;
     }
@@ -213,7 +216,7 @@ async function handle(e) {
     }
     case "txt": if (vu) { floatText(e.u, e.s, e.c); if (/[▲▼]/.test(e.s)) battleSound(e.c === "buff" ? "up" : "down"); await bwait(50); } break;
     case "fx": if (vu) { vu.effs = e.list; vu.sh = e.sh; vu.st = e.st; vu.stages = e.stages; } break;
-    case "side": if (BT.field) BT.field.hz[e.team] = e.hz; break;
+    case "side": if (BT.field) BT.field.hz[vteam(e.team)] = e.hz; break;
     case "status": if (vu) { psStatus(e.s, vu); if (!battleSound(e.s)) sfx("zap"); await bwait(200); } break;
     case "aura": if (vu) { const group = e.team ? [...BT.vus.values()].filter(v => v.team === vu.team && !v.dead) : [vu]; for (const v of group) psOther("selfstatus", v, v); await bwait(300); } break;
     case "transform": if (vu) { vu.flash = BT.clock + 400; if (e.hp != null) vu.hp = e.hp; psOther("shiny", vu, vu); sfx("warp"); vu.spawnT = BT.clock; await bwait(420); updateStrip(); } break;
@@ -365,8 +368,8 @@ function showBench(c, list, title, hint, onPick, back) {
 }
 // after a faint: you choose who comes in (on Auto too). Link Battles keep their move timer: when it runs out, the best
 // matchup goes in.
-function pickReplacement() {
-  const B = BT.B, list = B.benchOf("A");
+function pickReplacement(timer) {
+  const B = BT.B, list = B.benchOf(B.needTeam || "A");
   return new Promise(res => {
     BT.inputRes = res; BT.picking = false; GB.hl = 0;
     const piv = B.needPivot && B.byId(B.needPivot.uid);
@@ -374,7 +377,7 @@ function pickReplacement() {
       if (BT.inputRes !== res) return;
       BT.inputRes = null; hideControls(); res(uid);
     }, null);
-    if (BT.cfg.timer) turnTimer(res, BT.cfg.timer);
+    if (timer || BT.cfg.timer) turnTimer(res, timer || BT.cfg.timer);
   });
 }
 function skillPop(u, sk) {
@@ -387,7 +390,7 @@ function unitPop(u) {
   const B = BT.B, e = B.effStat, ab = u.passives[0];
   const ss = B.shownStages ? B.shownStages(u) : u.stages;   // (the stages moves made plus the fixed ones: items, Abilities, the field, a status)
   const stg = s => ss[s] ? ` <span class="${ss[s] > 0 ? "good" : "bad"}">(${ss[s] > 0 ? "+" : ""}${ss[s]})</span>` : "";
-  return `<div class="row"><img class="bpt px" src="${sprFront(u.spr || u.key)}" alt=""><div><div class="eyebrow">${u.team === "A" ? "Your Pokémon" : B.wild ? "Wild Pokémon" : "Opposing Pokémon"}${u.boss ? " · Boss" : ""}</div><h3>${esc(u.n)} <span class="small dim">Lv ${u.lvl}</span></h3>
+  return `<div class="row"><img class="bpt px" src="${sprFront(u.spr || u.key)}" alt=""><div><div class="eyebrow">${u.team === VIEW_ME ? "Your Pokémon" : B.wild ? "Wild Pokémon" : "Opposing Pokémon"}${u.boss ? " · Boss" : ""}</div><h3>${esc(u.n)} <span class="small dim">Lv ${u.lvl}</span></h3>
     <div class="row" style="gap:4px;margin-top:3px">${typeChips(u.types)}</div></div></div>
     <div class="statgrid" style="margin-top:10px">
       <div><span>HP</span><b>${fmtFull(u.hp)} / ${fmtFull(u.max.hp)}</b></div><div><span>Status</span><b>${u.status ? FX[u.status].n : "Healthy"}</b></div>
@@ -430,10 +433,10 @@ function unitAt(x, y) {
 
 // ---------- lifecycle ----------
 function addVU(u, hidden) {
-  const slot = SLOTS[Math.max(0, u.slot) % SLOTS.length], dir = u.team === "A" ? 1 : -1;
-  const vu = { uid: u.uid, u, team: u.team, dir, face: dir, home: { x: -dir * slot[0], z: slot[1] }, pos: { x: -dir * slot[0], z: slot[1] }, y: 0,
+  const vt = vteam(u.team), slot = SLOTS[Math.max(0, u.slot) % SLOTS.length], dir = vt === "A" ? 1 : -1;
+  const vu = { uid: u.uid, u, team: vt, dir, face: dir, home: { x: -dir * slot[0], z: slot[1] }, pos: { x: -dir * slot[0], z: slot[1] }, y: 0,
     bs: u.boss ? 1.25 : 1, pose: { name: "idle", t0: 0, dur: 0 }, ph: R() * 6, hp: u.hp, lag: u.hp, sh: u.shield, tm: u.atb, tmT: u.atb,
-    effs: [], st: u.status, stages: {}, dead: false, gone: false, trail: [], spawnT: hidden ? 1e15 : null, out: null, back: u.team === "A", want: dir };
+    effs: [], st: u.status, stages: {}, dead: false, gone: false, trail: [], spawnT: hidden ? 1e15 : null, out: null, back: vt === "A", want: dir };
   BT.vus.set(u.uid, vu);
   return vu;
 }
@@ -462,13 +465,25 @@ function fieldRow(rd, fx) {
   const long = f => f.id.startsWith("wx:") ? W(f).n : nm(f), left = f => f.n == null ? "it stays all battle" : f.n === 1 ? "this is its last turn" : `${f.n} more turns`;
   const num = f => f.n != null ? ` <b>${f.n}</b>` : "";
   const chips = fx.filter(f => !f.side).map(f => `<span class="bfc" data-tip="${esc(long(f) + ": " + left(f))}">${f.id.startsWith("wx:") ? W(f).ic + " " : ""}${esc(nm(f))}${num(f)}</span>`);
-  for (const tm of ["A", "E"]) { const mine = fx.filter(f => f.side === tm); if (!mine.length) continue;
+  for (const tm of ["A", "E"]) { const mine = fx.filter(f => vteam(f.side) === tm); if (!mine.length) continue;
     chips.push(`<span class="bfc s${tm}" data-tip="${esc((tm === "A" ? "Your team: " : "The opposing team: ") + mine.map(f => long(f) + ", " + left(f)).join("; "))}">${mine.map(f => esc(nm(f)) + num(f)).join(" · ")}</span>`); }
   el.innerHTML = `<span class="bfc turn" data-tip="Turn ${rd}: a turn is every Pokémon on the field moving once">Turn <b>${rd}</b></span>` + chips.join("");
   if (!el.onclick) el.onclick = ev => { const c = ev.target.closest(".bfc"); if (c && c.dataset.tip) toast(c.dataset.tip); };
 }
 function startBattle(cfg) {
-  const B = makeBattle({ allies: cfg.allies, waves: cfg.waves, auto: S.settings.auto, aiStyle: S.settings.ai, enemyStyle: cfg.enemyStyle, turnLimit: cfg.turnLimit, weather: cfg.weather, trainer: cfg.trainer, wild: cfg.wild, waveByWave: cfg.waveByWave, pick: true });
+  // an online battle (cfg.online, the owner's ask, 2026-10-19) is played by two people: the same seed on both phones, both teams
+  // human, no Auto; the second player's phone tells and draws it from team E's side (VIEW_ME, vteam)
+  const O = cfg.online;
+  VIEW_ME = O ? O.me : "A";
+  const mk = () => makeBattle({ allies: cfg.allies, waves: cfg.waves, auto: O ? false : S.settings.auto, aiStyle: O ? "balanced" : S.settings.ai, enemyStyle: O ? "balanced" : cfg.enemyStyle, turnLimit: cfg.turnLimit, weather: cfg.weather, trainer: cfg.trainer, wild: cfg.wild, waveByWave: cfg.waveByWave, pick: true, humans: O ? ["E"] : null });
+  let B;
+  if (O) {
+    // (both phones build the same battle from the same seed, with the Pokémon numbered alike, and the rules draw only from that
+    // battle's own dice: the screen's effects and the AI's look-ahead keep using their own random numbers)
+    const dice = seeded(O.seed), real = R; UID = 0;
+    R = dice; try { B = mk(); } finally { R = real; }
+    for (const f of ["step", "playerAct", "playerSwitch", "replace"]) { const g = B[f]; B[f] = (...a) => { const prev = R; R = dice; try { return g(...a); } finally { R = prev; } }; }
+  } else B = mk();
   Object.assign(BT, { B, cfg, quit: false, paused: false, speed: S.settings.speed, clock: 0, last: 0, parts: [], bolts: [], floats: [], rings: [], psScenes: [], balls: [],
     waits: [], tweens: [], target: null, active: null, picking: false, allyPick: null, orbit: false, act: null, inputRes: null, home: null, shake: 0, shx: 0, shy: 0, flash: 0, letterbox: 1, letterboxT: 1,
     tr: null, benchMode: null, benchPick: null });
@@ -487,7 +502,7 @@ function startBattle(cfg) {
     <canvas id="bcv"></canvas>
     <div class="btop">
       <div class="bt-title"><small>${esc(cfg.sub || "")}</small><b>${esc(cfg.title || "Battle")}</b></div>
-      <button class="tog ${B.auto ? "on" : ""}" id="bAuto" aria-label="Auto battle">AUTO</button>
+      ${O ? "" : `<button class="tog ${B.auto ? "on" : ""}" id="bAuto" aria-label="Auto battle">AUTO</button>`}
       <button class="tog" id="bSpd" aria-label="Battle speed">${BT.speed}×</button>
       <button class="tog" id="bPause" aria-label="Pause">II</button>
     </div>
@@ -503,7 +518,7 @@ function startBattle(cfg) {
   trainerSetup(cfg); sizeCanvas();
   for (const u of B.units) addVU(u, true);
   BT.on = true; BT.raf = requestAnimationFrame(frame);
-  $("#bAuto").onclick = () => {
+  if ($("#bAuto")) $("#bAuto").onclick = () => {
     B.auto = !B.auto; S.settings.auto = B.auto; save(); $("#bAuto").classList.toggle("on", B.auto); sfx("tap");
     if (B.auto && BT.inputRes) { const r = BT.inputRes; BT.inputRes = null; hideControls(); r("auto"); }
   };
@@ -512,7 +527,7 @@ function startBattle(cfg) {
     BT.paused = true; sfx("tap");
     popup(`<h2>Paused</h2><p class="small dim" style="margin:6px 0 12px">${esc(cfg.title || "")}</p>
       <div class="stack" style="gap:8px"><button class="btn wide" id="bRes">Resume</button>
-      <button class="btn ghost wide" id="bAi" data-tip="${esc(AI_TIP[S.settings.ai])}">Auto tactics: ${AI_NAME[S.settings.ai]}</button>
+      ${O ? "" : `<button class="btn ghost wide" id="bAi" data-tip="${esc(AI_TIP[S.settings.ai])}">Auto tactics: ${AI_NAME[S.settings.ai]}</button>`}
       <button class="btn ghost wide" id="bMus">Music: ${musicVol() > 0 ? "On" : "Off"}</button>
       <button class="btn ghost wide" id="bSnd">Sound: ${S.settings.sound ? "On" : "Off"}</button>
       <button class="btn red wide" id="bQuit">${cfg.wild ? "Run away" : "Forfeit"}</button></div>`);
@@ -520,10 +535,10 @@ function startBattle(cfg) {
     const close = () => { $("#bPop").hidden = true; BT.paused = false; };
     $("#bPop").onclick = ev => { if (ev.target === $("#bPop")) close(); };
     $("#bRes").onclick = close;
-    $("#bAi").onclick = () => { S.settings.ai = AI_STYLES[(AI_STYLES.indexOf(S.settings.ai) + 1) % AI_STYLES.length]; B.aiStyle = S.settings.ai; save(); $("#bAi").textContent = "Auto tactics: " + AI_NAME[S.settings.ai]; $("#bAi").dataset.tip = AI_TIP[S.settings.ai]; };
+    if ($("#bAi")) $("#bAi").onclick = () => { S.settings.ai = AI_STYLES[(AI_STYLES.indexOf(S.settings.ai) + 1) % AI_STYLES.length]; B.aiStyle = S.settings.ai; save(); $("#bAi").textContent = "Auto tactics: " + AI_NAME[S.settings.ai]; $("#bAi").dataset.tip = AI_TIP[S.settings.ai]; };
     $("#bMus").onclick = () => { setMusicVol(musicVol() > 0 ? 0 : .55); save(); $("#bMus").textContent = "Music: " + (musicVol() > 0 ? "On" : "Off"); };
     $("#bSnd").onclick = () => { S.settings.sound = !S.settings.sound; setDevicePref("sound", S.settings.sound); save(); $("#bSnd").textContent = "Sound: " + (S.settings.sound ? "On" : "Off"); };
-    $("#bQuit").onclick = () => { BT.quit = true; BT.paused = false; if (BT.inputRes) { BT.inputRes("quit"); BT.inputRes = null; } closeBattle(); cfg.onQuit && cfg.onQuit(); };
+    $("#bQuit").onclick = () => { if (O) O.forfeit(); BT.quit = true; BT.paused = false; if (BT.inputRes) { BT.inputRes("quit"); BT.inputRes = null; } closeBattle(); cfg.onQuit && cfg.onQuit(); };
   };
   press(BT.cv, ev => {
     const r = BT.cv.getBoundingClientRect(), k = BT.W / r.width, vu = unitAt((ev.clientX - r.left) * k, (ev.clientY - r.top) * k);
@@ -587,7 +602,31 @@ async function runBattle() {
   await play(B.ev.splice(0));
   while (!B.over && !BT.quit && BT.on) {
     const r = B.step();
-    if (r === "replace") {
+    const O = BT.cfg.online;
+    if (O && (r === "replace" || r === "input")) {
+      // (an online battle: the other player's choice comes over the network, yours goes out; one the timer makes, or Auto's, is
+      // worked out on your own phone and sent like any other, so both phones play the same. A rejoined battle replays the
+      // choices already made first: O.queued)
+      await play(B.ev.splice(0));
+      if (BT.quit || !BT.on) return;
+      const rep = r === "replace", team = rep ? B.needTeam || "A" : B.waiting.team;
+      let ch = O.queued();
+      if (ch == null && team !== O.me) { hideControls(`${esc(B.trainer || "Your opponent")} is choosing…`); ch = await O.wait(); }
+      else if (ch == null) {
+        camHome(3);
+        ch = await (rep ? pickReplacement(O.timer) : new Promise(res => { BT.inputRes = res; showControls(B.waiting); turnTimer(res, O.timer); }));
+        if (ch === "quit" || BT.quit) return;
+        if (rep) ch = { uid: ch === "auto" ? (B.aiReplacement(team) || {}).uid ?? null : ch };
+        else ch = ch === "auto" ? B.aiChoice(B.waiting) : ch.sw ? { sw: ch.sw } : { slot: ch.slot, t: ch.t ? ch.t.uid : null };
+        O.send(ch);
+      }
+      if (ch === "quit" || BT.quit || !BT.on) return;
+      if (rep) B.replace(ch.uid);
+      else if (ch.sw) { if (!B.playerSwitch(ch.sw)) B.playerAct(1, null); }
+      else B.playerAct(ch.slot, ch.t != null ? B.byId(ch.t) : null);
+      hideControls();
+      O.check(B);
+    } else if (r === "replace") {
       await play(B.ev.splice(0));
       if (BT.quit || !BT.on) return;
       camHome(3);
@@ -612,7 +651,9 @@ async function runBattle() {
   await outro();
 }
 async function outro() {
-  const B = BT.B, res = B.result, h = BT.home, cfg = BT.cfg;
+  const B = BT.B, h = BT.home, cfg = BT.cfg, res0 = B.result;
+  // (an online battle's second player is team E: the result is turned round for its phone)
+  const res = VIEW_ME === "A" || res0.stalemate || res0.timeUp ? res0 : { ...res0, win: !res0.win };
   hideControls(); BT.active = null;
   await bwait(250);
   const mine = [...BT.vus.values()].filter(v => v.team === "A" && !v.dead);

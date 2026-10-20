@@ -5,7 +5,7 @@
 //   node tools/move_worth_check.js table.json [table2.json ...] [--teams=40] [--workers=4] [--skip=0]
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
-const PAGE = require('url').pathToFileURL(path.join(__dirname, '..', 'Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.join(__dirname, '..', 'PokeSquad Battler.html')).href;
 const files = process.argv.slice(2).filter(a => !a.startsWith('--')), opt = Object.fromEntries(process.argv.slice(2).filter(a => a.startsWith('--')).map(a => a.slice(2).split('=')));
 const TEAMS = +(opt.teams || 40), WORKERS = +(opt.workers || 4), SKIP = +(opt.skip || 0);
 const tables = files.map(f => ({ f: path.basename(f), t: JSON.parse(fs.readFileSync(f, 'utf8')) }));

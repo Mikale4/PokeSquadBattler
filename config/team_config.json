@@ -1,6 +1,6 @@
 {
  "version": 1,
- "about": "Pokémon Kanto Squad's Trainer teams: roles, archetypes, rules and tiers for every Stadium mode (Ranked, Link, Friendly and any added later). Edit it with 'Pokemon Kanto Squad Team Config.html'; the game reads it when it's built (sh src/build.sh).",
+ "about": "PokeSquad Battler's Trainer teams: roles, archetypes, rules and tiers for every Stadium mode (Ranked, Link, Friendly and any added later). Edit it with 'PokeSquad Battler Team Config.html'; the game reads it when it's built (sh src/build.sh).",
  "roles": {
   "rain_setter": {
    "name": "Rain · setter",

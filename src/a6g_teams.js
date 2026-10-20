@@ -71,7 +71,7 @@ const pvpText = g => `In Stadium battles a team can have ${({ 1: "one", 2: "two"
 const COMP_POOL = () => COMP_POOL.v || (COMP_POOL.v = OP_KEYS.filter(k => (!OPS[k].evo.length || (TEAM_CONFIG.rules.nfe || []).includes(k)) && OPS[k].skills.length >= 2));
 
 // ---------- the archetypes: from the team config (config/team_config.json, edited on the Team Config page,
-// "Pokemon Kanto Squad Team Config.html"; build.sh embeds it as TEAM_CONFIG). Never write archetypes or roles here. ----------
+// "PokeSquad Battler Team Config.html"; build.sh embeds it as TEAM_CONFIG). Never write archetypes or roles here. ----------
 // A role (TEAM_CONFIG.roles[id]): the Pokémon that fit it, each with a fit score (higher is picked first), the moves, Abilities and
 // items it's there for and which of them it keeps (the rest is optimized), whether it leads, waits on the bench (a backup setter)
 // or is needed (a team that can't fill it isn't that archetype), whether it keeps a priority move beside its job (turn meter by its priority

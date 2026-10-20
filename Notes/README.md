@@ -1,6 +1,6 @@
 # Notes
 
-Your requests about moves, Abilities, items and TMs, written in `Pokemon Kanto Squad Reference.html`.
+Your requests about moves, Abilities, items and TMs, written in `PokeSquad Battler Reference.html`.
 
 1. In the Reference, tap **+ Note** on any move, Ability, item or TM and write what you'd like changed. Notes stay in that browser
    until you export them.

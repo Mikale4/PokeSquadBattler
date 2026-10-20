@@ -2,7 +2,7 @@
 // Screenshots go to tests/shots/. Run: node tests/social.js
 const path = require('path'), fs = require('fs');
 const SH = path.join(__dirname, 'shots') + '/'; fs.mkdirSync(SH, { recursive: true });
-const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../PokeSquad Battler.html')).href;
 const { chromium } = require('playwright');
 (async () => {
   const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});

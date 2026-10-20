@@ -1,4 +1,4 @@
-# Live service: how the gacha event spec becomes Kanto Squad
+# Live service: how the gacha event spec becomes PokeSquad Battler
 
 Update (2026-10-07, the owner's review): there is one server now (no server list, opening rushes, groups or merges); the launch
 events became Rookie Week (a new Trainer's 7-day login bonus and Rookie Missions for their first 7 days) and the weekly Ranked Race;
@@ -16,7 +16,7 @@ a **Recharge** stands in for every purchase (see Phase 1).
 
 ## Words: spec → game
 
-| Spec | Kanto Squad |
+| Spec | PokeSquad Battler |
 |---|---|
 | Summon / pull / recruitment | Safari throw (the Safari Zone is the gacha) |
 | Banner | Safari area (weekly areas, plus the event areas below) |

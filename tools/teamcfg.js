@@ -1,5 +1,5 @@
 // =====================================================================
-//  TEAM CONFIG — "Pokemon Kanto Squad Team Config.html" (tools/build_teamcfg.js puts this into a copy of the built game).
+//  TEAM CONFIG — "PokeSquad Battler Team Config.html" (tools/build_teamcfg.js puts this into a copy of the built game).
 //  The owner's editor for how Trainer teams are made in every Stadium mode (Ranked, Link, Friendly and any added later):
 //    Roles       the Pokémon that fit each role (with how well), the moves, Abilities and held items it's there for, and which of
 //                those it always keeps (the rest of its set is optimized), whether it leads, keeps a priority move, sets up
@@ -310,7 +310,7 @@
     PICK = {};
     const y = root && root.querySelector(".body") ? root.querySelector(".body").scrollTop : 0;
     const body = { roles: rolesTab, archetypes: archTab, rules: rulesTab, tiers: tiersTab, modes: modesTab, check: checkTab }[UI2.tab]();
-    root.innerHTML = `<header class="top"><h1>Team Config <small>Pokémon Kanto Squad · how Trainer teams are made</small></h1>
+    root.innerHTML = `<header class="top"><h1>Team Config <small>PokeSquad Battler · how Trainer teams are made</small></h1>
         <nav class="tabs">${TABS.map(([k, n]) => `<button class="${UI2.tab === k ? "on" : ""}" data-a="tab" data-k="${k}">${n}</button>`).join("")}</nav>
         <span class="state ${dirty ? "dirty" : ""}">${dirty ? "Unsaved changes" : "Saved"}</span><button data-a="export">Export</button></header>
       ${note ? `<div class="note">${esc2(note)} <button class="g sm" data-a="hidenote">OK</button></div>` : ""}
@@ -399,7 +399,7 @@
       let dir = await idb("get");
       if (dir && (await dir.queryPermission({ mode: "readwrite" })) !== "granted" && (await dir.requestPermission({ mode: "readwrite" })) !== "granted") dir = null;
       if (!dir) {
-        alert("Pick the project folder: the one this page is in (Pokemon Kanto Squad).");
+        alert("Pick the project folder: the one this page is in (the game's project folder).");
         dir = await showDirectoryPicker({ id: "pks_project", mode: "readwrite" });
       }
       // the project folder has src/ and config/ (or at least src/)
@@ -530,7 +530,7 @@
 
   // the game stays out of sight underneath (no save is opened: this page only reads the game's data)
   try { if (typeof hideTitle === "function") hideTitle(); } catch (e) { /* fine */ }
-  document.title = "Pokémon Kanto Squad · Team Config";
+  document.title = "PokeSquad Battler · Team Config";
   // the page at once (a click never lands on the game underneath); the Pokémon pictures fill in when the sprites are ready
   mount();
   const pics = () => (typeof SPR !== "undefined" && SPR.ready) ? render() : setTimeout(pics, 150);

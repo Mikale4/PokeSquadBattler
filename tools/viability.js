@@ -5,7 +5,7 @@
 //   (--patch: a JSON file of { roles: {id: role}, archetypes: [archetype] } laid over the team config first, to try changes
 //   without a build: roles replace those with the same id, archetypes those with the same id or join the list)
 const { chromium } = require('playwright');
-const PAGE = require('url').pathToFileURL(require('path').join(__dirname, '..', 'Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(require('path').join(__dirname, '..', 'PokeSquad Battler.html')).href;
 const args = process.argv.slice(2).filter(a => !a.startsWith('--')), PATCH = (process.argv.find(a => a.startsWith('--patch=')) || '').slice(8);
 const N = +args[0] || 8, ONLY = args.slice(1), PATCHED = PATCH ? JSON.parse(require('fs').readFileSync(PATCH, 'utf8')) : null;
 (async () => {

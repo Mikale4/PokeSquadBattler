@@ -1,11 +1,11 @@
-// Builds "Pokemon Kanto Squad Reference.html": every move, Ability, item and TM in the game with what it does, searchable,
+// Builds "PokeSquad Battler Reference.html": every move, Ability, item and TM in the game with what it does, searchable,
 // filterable and sortable. Everything comes from the built game (the same descriptions it shows), so rerun this after a rebuild.
 // Run: node tools/build_reference.js
 const path = require('path'), fs = require('fs');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '..');
-const GAME = require('url').pathToFileURL(path.join(ROOT, 'Pokemon Kanto Squad.html')).href;
-const OUT = path.join(ROOT, 'Pokemon Kanto Squad Reference.html');
+const GAME = require('url').pathToFileURL(path.join(ROOT, 'PokeSquad Battler.html')).href;
+const OUT = path.join(ROOT, 'PokeSquad Battler Reference.html');
 const TEMPLATE = path.join(__dirname, 'reference.html');
 // the owner's notes, once Claude has done them: Notes/done/*.md, each note's section with its id and version
 // (<!-- note: move:thunderbolt @1760000000000 -->) and a **Done:** or **Not done:** line; the page shows them as replies

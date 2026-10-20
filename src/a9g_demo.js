@@ -1548,7 +1548,7 @@ function demoPanel1() {
   const regs = REGION_IDS.filter(id => journeyOf(id));
   const chips = () => `<button class="chip ${!DEMO.pickR ? "on" : ""}" data-r="">Its pick</button>` + regs.map(id => `<button class="chip ${DEMO.pickR === id ? "on" : ""}" data-r="${id}">${REGION_NAME[id]}</button>`).join("");
   const p = titlePanel(`<div class="eyebrow">Demo</div><h2>Watch the runner</h2>
-    <p class="small dim">A runner plays Pokémon Kanto Squad like an expert Trainer, from a brand-new save to 100%: every Journey stage with 3 stars,
+    <p class="small dim">A runner plays PokeSquad Battler like an expert Trainer, from a brand-new save to 100%: every Journey stage with 3 stars,
       every Explore area, every open wing of the Battle Tower, the Legend tier in Ranked and Link Battles, and a complete Pokédex.</p>
     <div class="small" style="margin:8px 0 4px"><b>A new Demo starts in</b></div>
     <div class="chips" id="tDemoReg">${chips()}</div>

@@ -1,11 +1,11 @@
-// Phone-size playthrough of Pokémon Kanto Squad: title, Trainer Club (play as Guest), new game (name + look), Oak's intro, starter choice, the first
+// Phone-size playthrough of PokeSquad Battler: title, Trainer Club (play as Guest), new game (name + look), Oak's intro, starter choice, the first
 // rival battle, Route 1 (manual then auto), every hub screen, Mail and its free throws, Safari Zone, Pokédex, summary
 // tabs, evolution, Brock with a strong team, a landscape battle, and finally deleting the save. Screenshots go to tests/shots/.
 // Run after `npm install` and `npx playwright install chromium`.
 const path = require('path'), fs = require('fs');
 const { chromium } = require('playwright');
 const SH = path.join(__dirname, 'shots') + '/'; fs.mkdirSync(SH, { recursive: true });
-const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../PokeSquad Battler.html')).href;
 (async () => {
   const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });

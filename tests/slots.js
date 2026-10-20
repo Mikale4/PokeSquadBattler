@@ -2,7 +2,7 @@
 // Champion Lottery's draw, tapping the reels and the Game Boy's buttons. Screenshots in tests/shots/.
 const { chromium } = require('playwright');
 const path = require('path');
-const PAGE = require('url').pathToFileURL(path.join(__dirname, '..', 'Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.join(__dirname, '..', 'PokeSquad Battler.html')).href;
 const SHOTS = path.join(__dirname, 'shots');
 let bad = 0; const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) bad++; };
 (async () => {

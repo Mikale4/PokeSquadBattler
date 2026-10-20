@@ -16,7 +16,10 @@ function psT(id, key, v = {}) {
     .replace(/\{(\w+)\}/g, (m, k) => v[k] != null ? v[k] : m).replace(/\*\*/g, "").trim().replace(/^\((.*)\)$/, "$1");
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
-const psTeam = team => team === "A" ? "your team" : "the opposing team";
+// whose side the battle text is told from (online battles, the owner's ask, 2026-10-19: the second player is team E and reads the
+// same battle from their side); "A" everywhere else
+let VIEW_ME = "A";
+const psTeam = team => team === VIEW_ME ? "your team" : "the opposing team";
 // the weather and terrain lines in their tables (a2_core.js) are Showdown's: started, still going (each turn), ended
 for (const [w, id] of Object.entries({ sun: "sunnyday", rain: "raindance", sand: "sandstorm", hail: "hail" })) if (WEATHER[w] && psT(id, "start"))
   Object.assign(WEATHER[w], { turn: psT(id, "start"), start: psT(id, "upkeep"), end: psT(id, "end") });
@@ -122,7 +125,7 @@ function makeBattle(cfg) {
     fxEv(u);
   }
   // "the opposing Onix" mid-sentence, "The opposing Onix" at the start of one
-  const nm = u => (u.team === "E" ? (B.wild ? "the wild " : "the opposing ") : "") + u.n;
+  const nm = u => (u.team !== VIEW_ME ? (B.wild ? "the wild " : "the opposing ") : "") + u.n;
   const Nm = u => { const s = nm(u); return s.charAt(0).toUpperCase() + s.slice(1); };
   const fxEv = u => {
     const list = [];
@@ -454,7 +457,7 @@ function makeBattle(cfg) {
   const benchOf = team => B.bench[team].filter(x => x.alive);
   const emptySlots = team => [0, 1, 2].filter(s => !B.units.some(x => x.team === team && x.alive && x.slot === s));
   const aliveCount = team => B.units.filter(x => x.team === team && x.alive).length + benchOf(team).length;
-  const sideName = team => team === "A" ? "You" : B.trainer || "The opponent";
+  const sideName = team => team === VIEW_ME ? "You" : B.trainer || "The opponent";
   // a Pokémon from the bench takes a place on the field (events: the line, then "sendin" for the Poké Ball)
   function enter(team, slot, x, line, atb) {
     B.bench[team].splice(B.bench[team].indexOf(x), 1);
@@ -1551,6 +1554,10 @@ function makeBattle(cfg) {
   const sideLeft = team => [...B.units.filter(x => x.alive && x.team === team), ...(B.bench[team] || []).filter(x => x.alive)];
   // tests only (cfg.legacyAI = "A" or "E"): that side plays by the AI's rules from before the absorb and switching fixes
   const legacy = u => !!cfg.legacyAI && u && u.team === cfg.legacyAI;
+  // a team a person plays: you (team A, unless on Auto), and in an online battle the other player too (cfg.humans); picks: who
+  // chooses its Pokémon after a faint or a pivot move on the picker (cfg.pick: you; an online battle: both)
+  const humanT = t => !!(cfg.humans && cfg.humans.includes(t));
+  const picks = t => t === "A" ? !!cfg.pick : humanT(t);
   // the AI's combo know-how (Protect or Substitute into Focus Punch, Endure into Reversal, Defense Curl into Rollout, Charge,
   // phazing into hazards, Weakness Policy, Rest's wake-up helpers); cfg.noCombo turns it off for one side in head-to-heads
   // what a hit that lands 2 rounds later is worth against one landing now (Future Sight, Doom Desire; tuned in head-to-heads)
@@ -2999,7 +3006,7 @@ function makeBattle(cfg) {
     while (B.pivotQ.length) {
       const pv0 = B.pivotQ.shift(), u = B.units.find(x => x.uid === pv0.uid);
       if (u && u.alive && benchOf(u.team).length && !fieldOn("fairyLock")) {
-        if (u.team === "A" && cfg.pick) { B.needPick = u.slot; B.needPivot = pv0; return "replace"; }
+        if (picks(u.team)) { B.needPick = u.slot; B.needPivot = pv0; B.needTeam = u.team; return "replace"; }
         switchOut(u, aiReplacement(u.team), pv0.keep ? (pv0.keep === "shed" ? { sub: pv0.sub } : "baton") : false); return "sendin";
       }
     }
@@ -3007,7 +3014,7 @@ function makeBattle(cfg) {
     // on the field), then you, on the picker even on Auto (B.replace answers); headless battles pick the best matchup
     for (const team of ["E", "A"]) for (const slot of emptySlots(team)) {
       if (!benchOf(team).length) break;
-      if (team === "A" && cfg.pick) { B.needPick = slot; return "replace"; }
+      if (picks(team)) { B.needPick = slot; B.needTeam = team; return "replace"; }
       sendIn(team, slot, aiReplacement(team, slot)); return "sendin";
     }
     const u = advance(); B.actor = u; B.turn++;
@@ -3043,7 +3050,7 @@ function makeBattle(cfg) {
     if (up && commanding(u)) { ev({ k: "end", u: u.uid }); endTurn(u); return "acted"; }   // (Commander: inside Dondozo, it doesn't act)
     if (!up || !canMove(u)) { if (u.flags.semi) { u.flags.semi = null; ev({ k: "semi", u: u.uid, on: 0 }); } ev({ k: "end", u: u.uid }); endTurn(u); return "acted"; }
     if (u.flags.semi) { const s = u.flags.semi; u.flags.semi = null; act(u, s.slot, B.byId(s.t), s); return "acted"; }
-    if (u.team === "A" && !B.auto) { B.waiting = u; return "input"; }
+    if (u.team === "A" ? !B.auto : humanT(u.team)) { B.waiting = u; return "input"; }
     const ch = aiChoose(u, u.team === "A" ? B.aiStyle : B.enemyStyle); if (cfg.onDecide) cfg.onDecide(u, ch, B); perform(u, ch); return "acted";
   };
   function perform(u, ch) { if (ch.sw) doSwitch(u, ch.sw); else act(u, ch.slot, ch.t); }
@@ -3071,13 +3078,16 @@ function makeBattle(cfg) {
   B.autoAct = () => { const u = B.waiting; if (!u) return; const ch = aiChoose(u, B.aiStyle); if (cfg.onDecide) cfg.onDecide(u, ch, B); perform(u, ch); };
   // your pick for an empty place (B.step returned "replace"); a missing pick gets the best matchup
   B.replace = uid => {
-    const slot = B.needPick; if (slot == null) return;
-    const x = benchOf("A").find(y => y.uid === uid) || aiReplacement("A");
-    const piv = B.needPivot; B.needPick = null; B.needPivot = null;
+    const slot = B.needPick, team = B.needTeam || "A"; if (slot == null) return;
+    const x = benchOf(team).find(y => y.uid === uid) || aiReplacement(team);
+    const piv = B.needPivot; B.needPick = null; B.needPivot = null; B.needTeam = null;
     if (!x) return;
     if (piv) { const u = B.units.find(y => y.uid === piv.uid); if (u && u.alive) switchOut(u, x, piv.keep ? (piv.keep === "shed" ? { sub: piv.sub } : "baton") : false); }
-    else sendIn("A", slot, x);
+    else sendIn(team, slot, x);
   };
+  // what the AI would do for this Pokémon, without doing it (an online battle's timer runs out: the player's own phone works the move
+  // out and sends it, so both phones play the same; the Pokémon it would switch to comes back as its uid)
+  B.aiChoice = u => { const ch = aiChoose(u, "balanced"); return ch.sw ? { sw: ch.sw.uid } : { slot: ch.slot, t: ch.t ? ch.t.uid : null }; };
   B.benchOf = benchOf; B.canSwitch = canSwitch; B.aiReplacement = aiReplacement; B.aiSwitch = aiSwitch; B.matchup = x => matchup(x, fieldFoes(x.team));
 
   // ---------- setup ----------

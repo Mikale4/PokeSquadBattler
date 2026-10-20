@@ -2,7 +2,7 @@
 // would have there (Pokémon picked so their evolution stage fits the level). Run: node tests/sim.js [runs]
 const path = require('path');
 const { chromium } = require('playwright');
-const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../PokeSquad Battler.html')).href;
 const RUNS = +process.argv[2] || 24;
 (async () => {
   const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});

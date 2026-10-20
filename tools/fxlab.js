@@ -1,5 +1,5 @@
 // =====================================================================
-//  MOVE LAB — "Pokemon Kanto Squad Move Lab.html" (tools/build_fxlab.js puts this into a copy of the built game).
+//  MOVE LAB — "PokeSquad Battler Move Lab.html" (tools/build_fxlab.js puts this into a copy of the built game).
 //  A battle of one to three Pokémon a side where any move can be played by any of them, either way round, slowed down, step
 //  by step, to check its animation (a move that hits every opponent hits each one on the other side, as in battle).
 //  It plays the game's own battle events (handle in a8b_battle.js), so a move looks exactly as it does in battle: Pokémon
@@ -201,7 +201,7 @@
   hideTitle(); SESSION = { id: "lab", name: "Lab" };
   enterGame("pks_move_lab", { save: sv });
   closeModal();
-  document.title = "Pokémon Kanto Squad · Move Lab";
+  document.title = "PokeSquad Battler · Move Lab";
   ui();
   const go = () => SPR.ready ? start() : setTimeout(go, 100);
   go();

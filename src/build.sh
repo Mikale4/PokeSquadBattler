@@ -1,6 +1,6 @@
 #!/bin/sh
-# Assemble Pokémon Kanto Squad from the parts in this folder (order matters: later parts use earlier globals).
-#   Pokemon Kanto Squad.html  full document
+# Assemble PokeSquad Battler from the parts in this folder (order matters: later parts use earlier globals).
+#   PokeSquad Battler.html  full document
 #   dist/index.html           body-only copy for a claude.ai artifact (gitignored)
 # Sprites in resources/sprites/ (tools/fetch_sprites.sh) are embedded as base64 so the game is a single file.
 set -e
@@ -64,7 +64,7 @@ fs.writeFileSync("dist/res.js", "<script>\n// Item icons, trainer pictures, area
 '
 BODY="dist/res.js dist/teamcfg.js dist/moveworth.js src/a2_core.js src/a3a_dex.js src/a3b_kits.js src/a3c_showdown_text.js dist/sprites.js src/a4_story.js src/a4b_johto.js src/a4c_hoenn.js src/a4d_sinnoh.js src/a4e_unova.js src/a4f_kalos.js src/a4g_alola.js src/a4h_galar.js src/a4i_paldea.js src/a5_sprites.js src/a6_state.js src/a6b_ladder.js src/a6c_lines.js src/a6c2_traits.js src/a6d_safari.js src/a6e_people.js src/a6f_talk.js src/a6g_teams.js src/a6h_build.js src/a6i_servers.js src/a6j_live.js src/a6k_offers.js src/a6l_passes.js src/a6m_lucky.js src/a6n_festivals.js src/a7_engine.js src/a8a_render.js src/a8c_sfx.js src/a8b_battle.js src/a8d_showdown.js src/a8e_showdown_scene.js src/a9a_screens.js src/a9b_screens.js src/a9c_meta.js src/a9d_gameboy.js src/a9e_accounts.js src/a9f_stadium.js src/a9g_demo.js src/a9h_social.js src/a9i_home.js src/a9j_slots.js src/a10_boot.js"
 # Trainer teams (roles, archetypes, rules, tiers, modes): config/team_config.json, written by the Team Config page
-# ("Pokemon Kanto Squad Team Config.html", tools/teamcfg.js), embedded as TEAM_CONFIG ahead of a2_core.js (a3b_kits.js reads its Item Clause)
+# ("PokeSquad Battler Team Config.html", tools/teamcfg.js), embedded as TEAM_CONFIG ahead of a2_core.js (a3b_kits.js reads its Item Clause)
 node -e '
 const fs = require("fs"), f = "config/team_config.json";
 if (!fs.existsSync(f)) throw new Error("no " + f + " (the Team Config page writes it; config/team_config.default.json is the original)");
@@ -98,9 +98,11 @@ awk '/<script>/{f=1;next}/<\/script>/{f=0}f' $BODY > dist/check.js
 node --check dist/check.js || { echo "syntax check failed: the game file was not replaced"; exit 1; }
 echo "syntax ok"
 # Only replace the playable file once the build has passed the syntax check.
-mv dist/game.html "Pokemon Kanto Squad.html"
-wc -c "Pokemon Kanto Squad.html"
+mv dist/game.html "PokeSquad Battler.html"
+wc -c "PokeSquad Battler.html"
 # the Move Lab: the same game with a panel to play any move's animation in a 1v1 (tools/fxlab.js)
 node tools/build_fxlab.js
 # the Team Config page: the same game with the editor for how Trainer teams are made (tools/teamcfg.js); it exports config/team_config.json
 node tools/build_teamcfg.js
+# the online battle page: the same game with the Teambuilder and battles against other players (tools/online.js, server/server.js)
+node tools/build_online.js

@@ -1,7 +1,7 @@
 // Runs the title screen's Demo headless at top speed until it reaches 100% (or a time limit) and reports progress.
 // Run: node tests/demo.js [minutes=90]
 const path = require('path'), fs = require('fs');
-const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../PokeSquad Battler.html')).href;
 const LIMIT = (+process.argv[2] || 90) * 60000;
 const SH = path.join(__dirname, 'shots') + '/'; fs.mkdirSync(SH, { recursive: true });
 const { chromium } = require('playwright');

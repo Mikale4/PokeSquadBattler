@@ -2,7 +2,7 @@
 // log out, the remembered Trainer, a wrong password, adventures from the old server list coming together on the one
 // server. Run: node tests/accounts.js
 const path = require('path');
-const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.resolve(__dirname, '../PokeSquad Battler.html')).href;
 const { chromium } = require('playwright');
 // throwaway local test account (stored only in the test browser's localStorage)
 const TEST_ID = 'TestTrainer', TEST_PW = 'test-pass-1234';

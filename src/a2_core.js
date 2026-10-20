@@ -17,7 +17,7 @@
       <div id="toast"></div>
     </div>
   </div>
-  <div class="gb-logo"><small>Pokémon</small><b>KANTO SQUAD</b></div>
+  <div class="gb-logo"><small>PokeSquad</small><b>BATTLER</b></div>
   <div class="gb-ctl">
     <div class="gb-dpad" aria-label="D-pad"><button data-gb="up" aria-label="Up"></button><button data-gb="left" aria-label="Left"></button><i></i><button data-gb="right" aria-label="Right"></button><button data-gb="down" aria-label="Down"></button></div>
     <div class="gb-ab"><span><button data-gb="b" aria-label="B button"></button><em>B</em></span><span><button data-gb="a" aria-label="A button"></button><em>A</em></span></div>
@@ -28,7 +28,7 @@
 <script>
 "use strict";
 /* =====================================================================
-   POKÉMON KANTO SQUAD — an unofficial, non-commercial fan game.
+   POKESQUAD BATTLER — an unofficial, non-commercial fan game.
    Pokémon and all related names belong to Nintendo, Game Freak and Creatures Inc.
    Pokémon and trainer sprites are from Pokémon Showdown's sprite collection; species
    data comes from PokeAPI.

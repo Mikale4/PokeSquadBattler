@@ -5,7 +5,7 @@
 #   resources/sprites/pokemon sprites/front|back animated/<id>.png + anim.json                                                 } pack_sprites.py
 #   resources/sprites/trainer sprites/more trainers/<n>.png             FireRed/LeafGreen trainer sprites, plus the player looks
 # <id> is Showdown's species id: the lowercase name with everything but a-z0-9 removed (mrmime, nidoranf).
-# build.sh embeds the results into Pokemon Kanto Squad.html as data URIs, so the game stays a single file.
+# build.sh embeds the results into PokeSquad Battler.html as data URIs, so the game stays a single file.
 set -e
 DIR=$(cd "$(dirname "$0")/.." && pwd)
 BASE=https://play.pokemonshowdown.com/sprites

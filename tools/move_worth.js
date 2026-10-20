@@ -12,7 +12,7 @@
 //                            [--raw=file: keep the samples] [--fit=file: fit kept samples, no battles] [--out=file]
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
-const PAGE = require('url').pathToFileURL(path.join(__dirname, '..', 'Pokemon Kanto Squad.html')).href;
+const PAGE = require('url').pathToFileURL(path.join(__dirname, '..', 'PokeSquad Battler.html')).href;
 const pos = process.argv.slice(2).filter(a => !a.startsWith('--')), opt = Object.fromEntries(process.argv.slice(2).filter(a => a.startsWith('--')).map(a => a.slice(2).split('=')));
 const MIN = +pos[0] || 20, WORKERS = +pos[1] || 4, TOP = +pos[2] || 160;
 const MODE = opt.mode || 'marginal', DAMP = +(opt.damp || 1), OUT = opt.out || path.join(__dirname, 'move_worth.json');

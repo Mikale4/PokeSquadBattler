@@ -213,7 +213,7 @@ function oneServer(who, go) {
     return keep(named.find(x => x.srv === last) || named.sort((a, b) => (b.s.playMs || 0) - (a.s.playMs || 0))[0] || list.find(x => x.srv === 1) || null);
   }
   const p = titlePanel(`<div class="eyebrow">One server</div><h2>Which adventure continues?</h2>
-    <p class="tnote">Kanto Squad now runs on a single server, where every Trainer plays together. You have adventures from ${named.length} of the old servers: pick the one to keep playing. The others stay saved on this device.</p>
+    <p class="tnote">PokeSquad Battler now runs on a single server, where every Trainer plays together. You have adventures from ${named.length} of the old servers: pick the one to keep playing. The others stay saved on this device.</p>
     <div class="stack srvlist" style="gap:6px">${named.sort((a, b) => (b.s.playMs || 0) - (a.s.playMs || 0)).map(x => `<button class="srvrow" data-keep="${x.srv}">
       <span class="srvn"><b>${esc(x.s.name)}</b><span class="tiny dim">from S${x.srv}</span></span>
       <span class="tiny srvme">Trainer Level ${x.s.lvl} · ${x.s.badges || 0} Badge${x.s.badges === 1 ? "" : "s"} · ${Object.keys(x.s.ops || {}).length} Pokémon · ${Math.round((x.s.playMs || 0) / 36e5)} h played</span></button>`).join("")}</div>`);
@@ -228,7 +228,7 @@ function joinOneServer(s) {
   s.ladder = { ...fresh, pts: L.pts, best: L.best, tickets: L.tickets, tTime: L.tTime, wins: L.wins, losses: L.losses, week: L.week, day: L.day };
   const club = s.guild && s.gw && (s.gw.list || []).find(g => g.id === s.guild);
   s.guild = null; s.gw = null; s.gReq = []; s.chat = null; s.npc = {}; s.server = 1;
-  mailTo(s, { from: "Event Center", tag: "gift", title: "Welcome to the one server!", body: `Kanto Squad now runs on a single server. Your adventure came along; the Trainers you meet are new to you${club ? `, and ${club.name} stayed behind, so find a new Club in the Clubs list` : ""}. Here's something to start again with.`, rewards: { orundum: 1000, permit: 5 } });
+  mailTo(s, { from: "Event Center", tag: "gift", title: "Welcome to the one server!", body: `PokeSquad Battler now runs on a single server. Your adventure came along; the Trainers you meet are new to you${club ? `, and ${club.name} stayed behind, so find a new Club in the Clubs list` : ""}. Here's something to start again with.`, rewards: { orundum: 1000, permit: 5 } });
 }
 
 // ---------- Rookie Week: a new Trainer's first days ----------
