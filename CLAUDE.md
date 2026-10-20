@@ -182,7 +182,9 @@ The folder name has spaces: keep every path in shell scripts quoted, or relative
 - The battle AI (`aiPlan` in `a7_engine.js`, weights in `AIW`) plans the whole team's turn: focus fire, KOs first, no attacking into immunities
   or resists when a better target exists, no wasted turns. A switch (and the Expert's pick after a faint) is played out first on copies
   of the battle with the same dice (`aiSwitch`, `lookPick`, `lookRoll`, weights in `AISW`): a switched-in Pokémon is unprotected, a
-  replacement after a faint is protected, so a worn-down Pokémon usually stays (the owner's ask, 2026-10-19). The Demo's team picks (`squadFor` in `a9g_demo.js`) weigh the real damage math and the
+  replacement after a faint is protected, so a worn-down Pokémon usually stays (the owner's ask, 2026-10-19); a switch by choice is rated very low
+  (the owner's rule, 2026-10-20: three on three with a turn meter, so all three foes move before the one that comes in): at half HP or less
+  it never switches out, otherwise only for half a healthy Pokémon's worth (`AISW.low`, `AISW.margin`; the combo key "stay"). The Demo's team picks (`squadFor` in `a9g_demo.js`) weigh the real damage math and the
   plain type matchup. Tune either with head-to-head battles on fixed seeds, not single games. Its combo know-how is `combos(u, key)`
   (`cfg.noCombo`/`cfg.comboKeys` switch pieces off for one side in head-to-heads); the optimizer's is `comboBonus` in a6h_build.js.
 - **Trainer teams come from `config/team_config.json`** (the owner's rule): roles (the Pokémon that fit, with fit scores; the moves,

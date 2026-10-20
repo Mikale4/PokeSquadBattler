@@ -333,6 +333,14 @@ function fieldItems(K) {
     [[.33, 40], [.67, 24]].slice(0, hz.tspikes || 0).forEach(([f, o]) => put("poisoncaltrop", f, o, 0, .5));
     if (hz.web) put("web", .5, 36, 0, .9, .55);   // Sticky Web
   }
+  // protection (Protect, Detect, or a replacement after a faint until its first turn): Showdown's Protect panel over the Pokémon,
+  // just in front of it, from when it's out of its Poké Ball for as long as it lasts (the owner's ask, 2026-10-20)
+  for (const v of BT.vus.values()) {
+    if (v.dead || v.gone || v.recallT != null || !(v.effs || []).some(e => e[0] === "PROTECT")) { v.protT = null; continue; }
+    if (v.spawnT != null) continue;
+    if (v.protT == null) v.protT = BT.clock;
+    const q = proj(K, v.pos.x, 40, v.pos.z); if (q) items.push({ prot: v, t0: v.protT, depth: q[3] - 1 });
+  }
   return items;
 }
 // the field items for this frame, and their shadows on the ground (under every Pokémon, like theirs)
@@ -344,6 +352,14 @@ function fieldGround(K) {
 }
 function psDrawFieldItem(K, it) {
   const g = BT.g;
+  if (it.prot) {   // Protect: Showdown's panel (#DD88DD, edged #AA66AA, 100 by 70), growing in (opacity .1 to .9 in 400ms), then .4 in 300ms
+    const v = it.prot, t = BT.clock - it.t0, ys = clamp(t / 400, 0, 1), op = t < 400 ? lerp(.1, .9, t / 400) : t < 700 ? lerp(.9, .4, (t - 400) / 300) : .4;
+    const q = proj(K, v.pos.x, psMid(v), v.pos.z); if (!q) return;
+    const w = 100 * v.bs * q[2], h = 70 * v.bs * q[2] * ys;
+    g.save(); g.globalAlpha = op; g.fillStyle = "#DD88DD"; g.fillRect(q[0] - w / 2, q[1] - h / 2, w, h);
+    g.strokeStyle = "#AA66AA"; g.lineWidth = Math.max(1, v.bs * q[2]); g.strokeRect(q[0] - w / 2, q[1] - h / 2, w, h); g.restore();
+    return;
+  }
   if (it.screen) {   // a screen: Showdown's panel, growing in (yscale 0 to 1, opacity .1 to .7 in 400ms, then .3 in 300ms)
     const t = BT.clock - it.t0, ys = clamp(t / 400, 0, 1), op = t < 400 ? lerp(.1, .7, t / 400) : t < 700 ? lerp(.7, .3, (t - 400) / 300) : .3;
     const y0 = it.H / 2 * (1 - ys), y1 = it.H / 2 * (1 + ys), [[x0, z0], [x1, z1]] = it.ends;

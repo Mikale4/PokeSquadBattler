@@ -43,7 +43,7 @@ const AIW = { twMix: .75, killBase: .25, killTw: .6, fuOver: .35, fuSetup: .3, r
 // bench Pokémon played out and the margin one must win by over the best matchup; how many rounds each copy plays out (the Expert
 // AI two: 55.6% against one round's 49% in head-to-heads, 2026-10-19); and what a replacement's guaranteed first turn counts for when
 // a copy ends before it (owedHit)
-const AISW = { alive: .15, margin: .1, k: 8, rounds: 3, cands: 2, status: .1, stage: .03, better: .4, repCands: 3, repMargin: .05, rounds0: 1, roundsX: 2, owed: 1 };
+const AISW = { alive: .15, margin: .5, margin0: .1, low: .5, k: 8, rounds: 3, cands: 2, status: .1, stage: .03, better: .4, repCands: 3, repMargin: .05, rounds0: 1, roundsX: 2, owed: 1 };
 function makeBattle(cfg) {
   const B = { units: [], ev: [], wave: 0, waves: cfg.waves, over: false, result: null, turn: 0, allyTurns: 0, actor: null, waiting: null,
     tally: { crits: 0, kills: 0, payday: 0, superEff: 0 }, auto: !!cfg.auto, aiStyle: cfg.aiStyle || "balanced", enemyStyle: cfg.enemyStyle || "balanced", weather: (cfg.weather === "snow" ? "hail" : cfg.weather) || null,
@@ -1884,7 +1884,12 @@ function makeBattle(cfg) {
   // Pokémon's HP and whether it's still standing (a Pokémon still standing is worth a turn later), status conditions and the stat
   // stages of those on the field. A switch has to come out ahead by a margin. It's only played out when one could pay: this one is
   // stuck, its best move is weak or its matchup is bad, or someone on the bench matches up much better. Never right after coming in
-  // (unless stuck), never a boss or a wild Pokémon, never a Trainer's Follow Me user or backup setter (the owner's rules)
+  // (unless stuck), never a boss or a wild Pokémon, never a Trainer's Follow Me user or backup setter (the owner's rules).
+  // A switch by choice is rated very low (the owner's rule, 2026-10-20): this is three on three with a turn meter, not singles, so
+  // the Pokémon that comes in starts with an empty meter and all three opposing Pokémon move before it does, and the switch costs
+  // the turn. So one at half its HP or less never switches out (it takes its last turns: the one that replaces it after it faints
+  // comes in protected), and otherwise a switch has to come out ahead by half a healthy Pokémon's worth (AISW.margin; the combo
+  // key "stay" off: the old way, AISW.margin0, for head-to-heads)
   function swValue(C, team) {
     let v = 0; const owed = combos({ team }, "owed");
     for (const x of [...C.units, ...C.bench.A, ...C.bench.E]) {
@@ -1949,6 +1954,8 @@ function makeBattle(cfg) {
     const stuck = bestV <= AIW.swStuckV;
     if ((u.fresh && !stuck) || u.boss || (B.wild && u.team === "E") || !canSwitch(u)) return null;
     if (u.npc && u.skills.some(s => REDIRECTS.has(s.M.sp))) return null;
+    const stay = combos(u, "stay");
+    if (stay && u.hp <= AISW.low * u.max.hp) return null;
     const foes = fieldFoes(u.team); if (!foes.length) return null;
     const hurts = y => y.skills.some(s => isDmgSkill(s) && foes.some(f => expectedDamage(y, f, s) > 0));
     const cur = matchup(u, foes);
@@ -1957,7 +1964,7 @@ function makeBattle(cfg) {
     if (!stuck && bestV >= AIW.swWeakV && cur > -.2 && cands[0][1] - cur < AISW.better) return null;   // (nothing to gain: no need to play it out)
     const mine = C => { const cu = C.byId(u.uid); C.waiting = cu; C.actor = cu; return cu; };
     const look = cfg.onSwitchLook ? [] : null;   // (tests: each copy's value, per option)
-    const k = lookPick(u.team, [C => { mine(C); C.playerAct(ch.slot, ch.t ? C.byId(ch.t.uid) : null); }, ...cands.map(([y]) => C => { mine(C); C.playerSwitch(y.uid); })], AISW.margin, look);
+    const k = lookPick(u.team, [C => { mine(C); C.playerAct(ch.slot, ch.t ? C.byId(ch.t.uid) : null); }, ...cands.map(([y]) => C => { mine(C); C.playerSwitch(y.uid); })], stay ? AISW.margin : AISW.margin0, look);
     const best = k ? cands[k - 1][0] : null;
     if (look) { const avg = a => a ? a.reduce((x, y) => x + y, 0) / a.length : 0; cfg.onSwitchLook(u, { stay: avg(look[0]), tried: cands.map(([y], i) => [y.n, avg(look[i + 1])]), best: best && best.n, bestV, stuck, cur }); }
     return best;

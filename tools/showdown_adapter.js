@@ -100,7 +100,7 @@ globalThis.PokeSquad = (() => {
       this.players = { p1: null, p2: null }; this.sides = [{ id: "p1", requestState: "" }, { id: "p2", requestState: "" }];
       this.lines = []; this.log = []; this.B = null; this.round = 0; this.ended = false; this.prngSeed = this.seed;
       this.prng = { getSeed: () => this.seed };
-      this.lastSt = {};
+      this.lastSt = {}; this.shown = {};
     }
     // (Showdown's battle-stream calls)
     setPlayer(slot, o) {
@@ -186,7 +186,7 @@ globalThis.PokeSquad = (() => {
       this.run(() => { UID = 0; this.B = makeBattle({ allies: t("p1"), waves: [t("p2")], auto: false, pick: true, humans: ["E"], sim: true, aiStyle: "balanced", enemyStyle: "balanced", trainer: this.players.p2.name }); });
       this.add("|start");
       // (the leads come onto the field, as in Showdown: player 1's, then player 2's)
-      for (const t of ["A", "E"]) for (const u of this.B.units.filter(x => x.team === t).sort((a, b) => a.slot - b.slot)) this.add(`|switch|${this.ident(u)}|${this.details(u)}|${this.cond(u)}`);
+      for (const t of ["A", "E"]) for (const u of this.B.units.filter(x => x.team === t).sort((a, b) => a.slot - b.slot)) { this.add(`|switch|${this.ident(u)}|${this.details(u)}|${this.cond(u)}`); this.shown[u.uid] = 1; }
       this.go();
     }
     // play on until someone has to choose (or it's over), turning the events into Showdown's lines
@@ -257,8 +257,9 @@ globalThis.PokeSquad = (() => {
           case "act": { if (!u) break; const t = e.t != null ? U(e.t) : null; this.add(`|move|${this.ident(u)}|${MOVES[e.key] ? MOVES[e.key].n : e.name}|${t && t !== u ? this.ident(t) : ""}`); break; }
           case "dmg": if (u) { this.add(`|-damage|${this.ident(u)}|${this.cond(u)}|[silent]`); if (e.crit) this.add(`|-crit|${this.ident(u)}|[silent]`); } break;
           case "heal": case "revive": if (u) this.add(`|-heal|${this.ident(u)}|${this.cond(u)}|[silent]`); break;
-          case "death": if (u) this.add(`|faint|${this.ident(u)}`); break;
-          case "sendin": if (u) { this.add(`|switch|${this.ident(u)}|${this.details(u)}|${this.cond(u)}`); this.lastSt[u.uid] = { st: u.status || null, stages: {} }; } break;   // (Showdown clears a Pokémon's boosts as it comes in)   // (Showdown says "Go!" from each side)
+          case "death": if (u) { this.add(`|faint|${this.ident(u)}`); delete this.shown[u.uid]; } break;
+          case "recall": if (u) delete this.shown[u.uid]; break;
+          case "sendin": if (u) { this.add(`|switch|${this.ident(u)}|${this.details(u)}|${this.cond(u)}`); this.lastSt[u.uid] = { st: u.status || null, stages: {} }; this.shown[u.uid] = 1; } break;   // (Showdown clears a Pokémon's boosts as it comes in)   // (Showdown says "Go!" from each side)
           case "status": case "fx": if (u) this.syncStatus(u); break;
           case "transform": if (u) this.add(`|-formechange|${this.ident(u)}|${SD.name(e.to || u.spr)}|${this.cond(u)}|[silent]`); break;
           case "weather": this.add(`|-weather|${WEATHER_ID[e.w] || "none"}|[silent]`); break;
@@ -302,8 +303,11 @@ globalThis.PokeSquad = (() => {
         + (order ? `|${order.map(id).filter(Boolean).join(";")}` : "");
     }
     syncStatus(u) {
+      if (!this.shown[u.uid]) return;   // (not before Showdown has it on the field: its switch-in line comes first)
       // (the stat badge: the stages moves made plus the ones fixed to an item, an Ability, the weather or a status, as the game shows them)
-      const id = this.ident(u), was = this.lastSt[u.uid] || { st: null, stages: {} }, now = { st: u.status || null, stages: this.B.shownStages(u) };
+      // (protection, from Protect or as a replacement after a faint until its first turn: Showdown's Protect bubble, the owner's ask)
+      const id = this.ident(u), was = this.lastSt[u.uid] || { st: null, stages: {} }, now = { st: u.status || null, stages: this.B.shownStages(u), prot: u.eff.some(e => e.id === "PROTECT") };
+      if (now.prot !== !!was.prot) this.add(`|-${now.prot ? "start" : "end"}|${id}|Protect|[silent]`);
       if (now.st !== was.st) this.add(now.st ? `|-status|${id}|${STATUS[now.st] || now.st.toLowerCase()}|[silent]` : `|-curestatus|${id}|${STATUS[was.st] || ""}|[silent]`);
       for (const k in STAT) { const d = (now.stages[k] || 0) - (was.stages[k] || 0); if (d) this.add(`|-${d > 0 ? "boost" : "unboost"}|${id}|${STAT[k]}|${Math.abs(d)}|[silent]`); }
       this.lastSt[u.uid] = now;
