@@ -15,8 +15,12 @@
 		var W = window;
 		return W.BattleTeambuilderTable && W.BattleTeambuilderTable.learnsets && W.BattleTeambuilderTable.gen8 && W.BattleMovedex && W.BattleMovedex.tackle &&
 			W.BattlePokedex && W.BattlePokedex.bulbasaur && W.BattleItems && W.BattleItems.leftovers &&
-			W.BattleAbilities && W.BattleAbilities.static && W.BattleText && W.BattleText.en && W.BattleText.en.Moves &&
-			W.BattleSearchIndex && W.BattleSearchIndex.length && W.BattleSearchIndexOffset && W.BattleSearchIndexOffset.length;
+			W.BattleAbilities && W.BattleAbilities.static && W.BattleText && W.BattleText.en && W.BattleText.en.Moves;
+	}
+	// (the search index is the teambuilder's: a replay has none, so its new entries go in whenever it's there)
+	var unindexed = [];
+	function indexReady() {
+		return window.BattleSearchIndex && BattleSearchIndex.length && window.BattleSearchIndexOffset && BattleSearchIndexOffset.length;
 	}
 	function text(table, id, name, shortDesc, desc) {
 		var t = BattleText.en[table] || (BattleText.en[table] = {}), e = t[id] || (t[id] = {});
@@ -49,7 +53,7 @@
 				for (var key in BattleMovedex[m[10]]) copy[key] = BattleMovedex[m[10]][key];
 				copy.name = m[1];
 				BattleMovedex[id] = copy;
-				addToIndex(id, 'move');
+				unindexed.push(id);
 			}
 			T.slots[id] = m[2];
 			T.overrideMoveData[id] = { type: m[3], category: CAT[m[4]] || 'Status', basePower: m[5], accuracy: m[6] || true, priority: m[7] };
@@ -103,6 +107,7 @@
 	(function wait() {
 		if (!loaded()) return setTimeout(wait, 50);
 		if (!BattleTeambuilderTable[MOD]) apply();
+		if (unindexed.length && indexReady()) { unindexed.forEach(function (id) { addToIndex(id, 'move'); }); unindexed = []; }
 		// (a data file that loads again replaces Showdown's tables: lay the game's back over them)
 		setTimeout(wait, 2000);
 	})();
