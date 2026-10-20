@@ -16,7 +16,9 @@ On Pokémon Showdown (the owner's pick, approach A, in phases; README: *On Poké
 a7_engine plus `tools/showdown_adapter.js`, the translator: `readTeam`/`validateTeam`, `moveKey`); the client fork `showdown/client`
 (`Mikale4/PokeSquad-Showdown-Client`, its Pages site) shows them, its teambuilder on the game's data: `pokesquad/data.js` from
 `tools/build_showdown_data.js` + `tools/showdown_data_loader.js` (the `gen9pokesquad` mod, `isPokeSquad`; three move slots).
-build.sh writes both; after a rules or data change, push the forks too (only when the owner asks).
+build.sh writes both; after a rules or data change, push the forks too (only when the owner asks). The server's
+PokeSquad Bot (`server/chat-plugins/pokesquad-bot.ts`, the client's Battle the Bot) plays top Trainer teams from
+`showdown/server/pokesquad/bot-teams.json`: rerun `node tools/build_bot_teams.js` after a team config, optimizer or rules change.
 
 ## Never edit `PokeSquad Battler.html` directly
 It's a build output. Edit the parts in `src/` and rebuild. `PokeSquad Battler Reference.html` (every move, Ability, item and TM) is generated
