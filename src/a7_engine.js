@@ -354,8 +354,11 @@ function makeBattle(cfg) {
   const ENTRY_SIDE = { reflect: "REFLECT", lightscreen: "LSCREEN", auroraveil: "VEIL", safeguard: "SAFEGUARD", mist: "MIST", luckychant: "LUCKY" };
   const ENTRY_HZ = { stealthrock: h => h.sr, spikes: h => h.spikes >= 3, toxicspikes: h => h.tspikes >= 2, stickyweb: h => h.web };
   const powderProof = (u, x) => x.types.includes("Grass") || item(x, "safetygoggles") || tab(u, x, "OVERCOAT");   // (powder moves don't affect it)
+  const ACU_STATS = ["atk", "def", "spa", "sdf", "spe", "acc", "eva"];
   function entryReady(u, s) {
     const sp = s.M.sp;
+    if (sp === "camouflage") return !has(u, "CAMOUFLAGE");   // (Acupressure and Camouflage, the owner's rule, 2026-10-21)
+    if (sp === "acupressure") return ACU_STATS.some(x => u.stages[x] < 6);
     if (WX_MOVE[sp]) return B.weather !== WX_MOVE[sp];
     if (sp === "terrain") return !!TERRAIN_MOVE[s.key] && !(B.terrain && B.terrain.t === TERRAIN_MOVE[s.key]);
     if (ENTRY_HZ[sp]) return benchOf(foeTeam(u)).length > 0 && !ENTRY_HZ[sp](sideHz(foeTeam(u))) && !enemies(u).some(x => x.alive && pv(x, "MAGIC_BOUNCE"));
@@ -958,7 +961,6 @@ function makeBattle(cfg) {
   function movePower(att, tar, sk) {
     const M = sk.M, sp = M.sp, hp = att.hp / att.max.hp, thp = tar.hp / tar.max.hp;
     if (MAG_ROLL.has(sk.key)) return sk.rolled || (item(att, "loadeddice") ? 150 : 71);   // (rolled when used; its average when the AI sizes it up)
-    if (sp === "flail") return hp >= .6875 ? 20 : hp >= .354 ? 40 : hp >= .208 ? 80 : hp >= .104 ? 100 : hp >= .042 ? 150 : 200;
     if (sp === "present") return B.presentPow || (item(att, "loadeddice") ? 120 : 65);   // (its roll; 65 when the AI sizes it up, 120 with Loaded Dice)
     if (sp === "lastrespects") return 50 + 50 * Math.min(5, fainted(att.team));   // Last Respects: +50 for each fainted teammate
     if (sp === "naturalgift") return (NG[att.held] || [0, 0])[1];
@@ -966,7 +968,7 @@ function makeBattle(cfg) {
     if (sp === "spitup") return 100 * (att.flags.stock || 0);
     if (sp === "trumpcard") return [40, 50, 60, 80, 200][Math.min(4, att.flags.trump || 0)];
     if (sp === "fickle") return B.fickleX ? 160 : 80;                 // Fickle Beam: double power half the time (the owner's rule)
-    if (sp === "ragefist") return Math.min(250, (M.p || 50) + 50 * (att.hitsTaken || 0));   // Rage Fist, Rage, Punishment and Payback: 50, +50 a hit taken, up to 250
+    if (sp === "ragefist") return Math.min(250, (M.p || 50) + 50 * (att.hitsTaken || 0));   // Rage Fist, Rage, Punishment, Payback, Flail and Reversal: 50, +50 a hit taken, up to 250
     // Stored Power and Power Trip (the owner's rule, 2026-10-21): 50, +50 for every raised stage on the user's stat badge (moves' stages
     // and the ones fixed to an item, an Ability or the field; accuracy and evasion too), up to 250
     if (sp === "storedpower") { const st = shownStages(att); let n = 0; for (const s in st) if (st[s] > 0) n += st[s]; return Math.min(250, (M.p || 50) + 50 * n); }
@@ -994,13 +996,13 @@ function makeBattle(cfg) {
     // (the owner's rules) Solar Beam and Solar Blade: x1.5 in harsh sunlight, x0.5 in rain, sandstorm, hail and snow
     if (sp === "solar") { if (inWeather("sun")) p *= 1.5; else if (["rain", "sand", "hail", "snow"].some(w => inWeather(w))) p *= .5; }
     // Rollout, Fury Cutter, Echoed Voice, Round: double power for every earlier use in this battle (other moves in between don't reset it)
-    if (sp === "ramp") p *= 2 ** rampN(att, sk.key);
+    if (sp === "ramp") p = Math.min(120, p + 40 * rampN(att, sk.key));
     if (sp === "pursuit" && tar.flags.leaving) p *= 2;
-    if (sk.key === "rollout" && has(att, "DEFCURL")) p *= 2;   // Defense Curl: Rollout twice as strong
     return p;
   }
-  // the doubling moves: how many times the user has used this one (up to RAMP_MAX doublings: 16x, Rollout's most in the games)
-  const RAMP_MAX = 4;
+  // Rollout, Ice Ball, Fury Cutter, Echoed Voice and Round (the owner's rule, 2026-10-21): 40 power, +40 for each time in a row the user's
+  // use of this one landed, other moves in between or not (up to RAMP_MAX: 120); a use that lands on nobody starts it over (useMove)
+  const RAMP_MAX = 2;
   const rampN = (u, key) => Math.min(RAMP_MAX, u.flags["ramp:" + key] || 0);
   // out of reach (Fly, Bounce, Dig, Dive, Phantom Force) until the user's next turn: only the games' own exceptions reach it (some
   // twice as hard), and No Guard or Lock-On
@@ -1377,7 +1379,11 @@ function makeBattle(cfg) {
   function damp() { return B.units.some(x => x.alive && pv(x, "DAMP")); }
 
   // ---------- targeting + AI ----------
-  function targetable(u) { return enemies(u); }
+  // Camouflage (the owner's rule, 2026-10-21): while a partner of its user is on the field, the other side's single-target moves can't
+  // pick it (spread moves still hit it); when every Pokémon on that side is hidden, any of them can be picked again
+  const camo = x => has(x, "CAMOUFLAGE") && allies(x).some(a => a !== x && a.alive);
+  const hiddenFrom = (u, x) => !!x && x.team !== u.team && camo(x) && enemies(u).some(f => f.alive && !camo(f));
+  function targetable(u) { return enemies(u).filter(x => !hiddenFrom(u, x)); }
   // value of a status move against (or for) a target, roughly on the same scale as "fraction of HP removed"
   function statusValue(u, sk, t) {
     const M = sk.M, sp = M.sp;
@@ -1400,9 +1406,9 @@ function makeBattle(cfg) {
     }
     if (sp === "endure") {
       if (has(u, "ENDURE")) return -1;
-      const payoff = combos(u, "endure") && u.skills.some(s => ["reversal", "flail", "endeavor"].includes(s.key) && (u.cool[s.slot] || 0) <= 1);
+      const payoff = combos(u, "endure") && u.skills.some(s => s.key === "endeavor" && (u.cool[s.slot] || 0) <= 1);
       const lethal = enemies(u).reduce((a, f) => a + bestHitOn(f, u), 0) >= u.hp;
-      if (payoff && lethal) return .55;   // hang on at 1 HP, then Reversal or Flail at full power, or Endeavor
+      if (payoff && lethal) return .55;   // hang on at 1 HP, then Endeavor
       return u.hp > u.max.hp * .35 ? -1 : .3;
     }
     if (sp === "safeguard") return has(u, "SAFEGUARD") ? -1 : .2 + .1 * enemies(u).filter(f => f.skills.some(s => s.M.c === "X" && s.M.ail)).length;
@@ -1430,7 +1436,6 @@ function makeBattle(cfg) {
       const f = legacy(u) ? old : gain;
       return .05 + allies(u).reduce((a, x) => a + f(x), 0) - enemies(u).reduce((a, x) => a + f(x), 0);
     }
-    if (sp === "defensecurl" && combos(u, "curl") && !has(u, "DEFCURL") && u.skills.some(s => s.key === "rollout" || s.key === "iceball")) return .4;
     if (sp === "charge" && combos(u, "charge") && !has(u, "CHARGE") && u.skills.some(s => s.M.t === "Electric" && s.M.c !== "X" && s.M.p > 0 && skillReady(u, s) && s !== sk)) return .35;
     if (sp === "bellydrum") return u.hp > u.max.hp * .65 && u.stages.atk < 2 && u.max.atk >= u.max.spa ? .8 : -1;
     if (sp === "psychup") { const d = t ? Object.keys(t.stages).reduce((a, s) => a + t.stages[s] - u.stages[s], 0) : 0; return d > 1 ? d * .15 : -1; }
@@ -1588,13 +1593,14 @@ function makeBattle(cfg) {
       case "curse": return u.types.includes("Ghost") ? (t && !has(t, "CURSE") && hpf(u) > .55 ? .45 : -1) : (u.stages.atk < 4 && u.max.atk >= u.max.spa ? .3 : -1);
       case "taunt": return t && !has(t, "TAUNT") && !((pv(t, "NO_STATUS") || {}).list || []).includes("TAUNT") && t.skills.some(s => s.M.c === "X" && skillReady(t, s)) ? .3 : .02;
       case "gastroacid": return t && !t.flags.noAbility && t.passives[0] && t.passives[0].id !== "NONE" ? .15 : -1;
-      case "worryseed": case "soak": case "reflecttype": case "conversion": case "camouflage": case "roleplay": case "skillswap": return .05;
+      case "worryseed": case "soak": case "reflecttype": case "conversion": case "roleplay": case "skillswap": return .05;
+      case "camouflage": return has(u, "CAMOUFLAGE") || !allies(u).some(a => a !== u && a.alive) ? -1 : .2;
       case "magnetrise": return !has(u, "MAGNETRISE") && foes.some(f => f.skills.some(s => s.M.t === "Ground" && s.M.c !== "X")) ? .3 : -1;
       case "meanlook": return t && !has(t, "NOSWITCH") && !pv(t, "RUN_AWAY") ? .04 : -1;
       case "destinybond": return hpf(u) < .3 ? .45 : -1;
       case "lockon": return u.skills.some(s => s.M.c !== "X" && (OHKO.has(s.M.sp) || (s.M.a && s.M.a < 80))) && !has(u, "LOCKON") ? .25 : -1;
       case "laserfocus": return has(u, "LASER") ? -1 : .2;
-      case "acupressure": return .25;
+      case "acupressure": return ACU_STATS.some(s => u.stages[s] < 6) ? .25 : -1;
       case "powerswap": case "guardswap": { if (!t) return -1; const ks = sp === "powerswap" ? ["atk", "spa"] : ["def", "sdf"]; const d = ks.reduce((a, s) => a + t.stages[s] - u.stages[s], 0); return d > 1 ? d * .15 : -1; }
       case "speedswap": return t && t.max.spe > u.max.spe * 1.2 ? .2 : -1;
       case "trick": return t && u.held && ["flameorb", "toxicorb", "laggingtail", "ironball", "stickybarb"].includes(u.held) ? .25 : -1;   // (Choice items don't lock here: they'd be a gift)
@@ -1732,11 +1738,12 @@ function makeBattle(cfg) {
     try { return aiPlan0(u, style, fast); } finally { AI_ACTOR = prev; }
   }
   function aiPlan0(u, style, fast) {
-    const foes = targetable(u), al = allies(u), out = [];
+    // (foes: the ones its single-target moves can pick; every: all of them, for spread moves and how dangerous each is: Camouflage)
+    const foes = targetable(u), every = enemies(u), al = allies(u), out = [];
     if (!foes.length) return [{ slot: 1, t: null, v: 0 }];
     const T = new Map(); let tsum = 0;
-    for (const f of foes) { const r = threatRaw(f, fast); T.set(f, r); tsum += r; }
-    const tavg = tsum / foes.length || 1;
+    for (const f of every) { const r = threatRaw(f, fast); T.set(f, r); tsum += r; }
+    const tavg = tsum / every.length || 1;
     const tw = f => 1 - AIW.twMix + AIW.twMix * T.get(f) / tavg;   // how dangerous a foe is, against the average foe (1)
     const selfW = 1 - AIW.twMix + AIW.twMix * threatRaw(u, fast) / tavg;
     // who on our side moves before each foe's next turn, and what they could add to a knockout
@@ -1798,13 +1805,13 @@ function makeBattle(cfg) {
         // faints; a third off lost 37-43 in 80 mirror battles, 2026-10-10)
         if (sp === "future" && combos(u, "future")) {
           if ((B.future || []).some(x => x.by === u.uid)) { push(s, null, harmless); continue; }
-          let v = 0; for (const f of foes) { const d = expectedDamage(u, f, s); if (d > 0) v += tw(f) * Math.min(.95, d / Math.max(1, hpEff(s, f))); }
+          let v = 0; for (const f of every) { const d = expectedDamage(u, f, s); if (d > 0) v += tw(f) * Math.min(.95, d / Math.max(1, hpEff(s, f))); }
           if (s.M.t === "Psychic" && inTerrain("psychic", u)) v *= .25;   // (in Psychic Terrain the boosted Psychic attacks land now: the owner's rule)
           push(s, null, v > 0 ? v * FUTURE_WAIT - cdCost(s) : harmless); continue;
         }
         if (s.target === "aoe_enemies") {
           let v = 0, kills = 0, dealt = 0;
-          for (const f of foes) { const d = expectedDamage(u, f, s), r = dmgValue(s, f, d); v += r.v; kills += r.kill ? 1 : 0; dealt += Math.max(0, d); }
+          for (const f of every) { const d = expectedDamage(u, f, s), r = dmgValue(s, f, d); v += r.v; kills += r.kill ? 1 : 0; dealt += Math.max(0, d); }
           push(s, null, dealt <= 0 && v >= 0 ? harmless - cdCost(s) : adjust(v, kills, dealt));
         } else for (const f of foes) {
           const d = expectedDamage(u, f, s), r = dmgValue(s, f, d);
@@ -2374,7 +2381,7 @@ function makeBattle(cfg) {
     if (M.sp === "spotlight" && t && t !== u && t.alive && t.team === u.team && B.units.includes(t)) targets = [t];
     else if (M.sp === "bide" && t && t.alive && t.team !== u.team && B.units.includes(t)) targets = [t];   // (Bide going off: bideStrikes)   // (Spotlight on a partner, as in the main games: autoRedirect, redirectNow)
     else if (sk.target === "enemy") {
-      if (!t || !t.alive || t.team === u.team || !B.units.includes(t)) t = defaultTarget(u, sk);
+      if (!t || !t.alive || t.team === u.team || !B.units.includes(t) || hiddenFrom(u, t)) t = defaultTarget(u, sk);
       const r = redirect(u, sk, t); if (r && r !== t && drawsIn(u, r, mtype(u, sk)) && !has(r, "FOLLOWME")) rodMsg = r; t = r;   // (Lightning Rod, Storm Drain or Earth Eater)
       // Illusion (the owner's rule): the first opposing single-target move after it comes in goes for one of the attacker's partners
       // instead (with no partner there, it hits as normal); either way the illusion is used up
@@ -2427,7 +2434,7 @@ function makeBattle(cfg) {
     removeEff(u, "ELECTRIFY");   // (Powder stays until a Fire-type move sets it off: the owner's rule, 2026-10-19)
     // Dancer: a dance move is danced again right away by every other Dancer on the field
     if (DANCES.has(sk.key) && !B.dancing) { B.dancing = true; for (const x of B.units.slice()) if (x !== u && x.alive && pv(x, "DANCER")) { msg(`${Nm(x)}'s Dancer!`); callMove(x, sk.key, sk.slot); } B.dancing = false; }
-    if (M.sp === "ramp") u.flags["ramp:" + sk.key] = rampN(u, sk.key) + 1;
+    if (M.sp === "ramp") u.flags["ramp:" + sk.key] = u.flags.landed === B.actN ? rampN(u, sk.key) + 1 : 0;   // (a miss, Protect, no effect or a failure: back to 40)
     B.acting = false; B.spreadN = null; u.flags.failed = B.failed; B.lastMove = sk.key;
     if (u.alive && M.so && item(u, "throatspray") && !sheerOf(u, sk)) { useUp(u, `${Nm(u)}'s Throat Spray kicked in!`); stage(u, u, "spa", 1); }
     // one-shot boosts are used up by the move
@@ -2821,13 +2828,13 @@ function makeBattle(cfg) {
       case "soak": if (!t) return fail(); t.types = ["Water"]; msg(`${Nm(t)} transformed into the Water type!`); fxEv(t); return true;
       case "reflecttype": if (!t) return fail(); u.types = t.types.slice(); msg(`${Nm(u)}'s type became the same as ${nm(t)}'s type!`); fxEv(u); return true;
       case "conversion": { const ty = u.skills[0] && u.skills[0].type; if (!ty || (u.types.length === 1 && u.types[0] === ty)) return fail(); u.types = [ty]; msg(`${Nm(u)} transformed into the ${ty} type!`); fxEv(u); return true; }
-      case "camouflage": { const ty = (B.terrain && TERRAIN_TYPE[B.terrain.t]) || "Normal"; u.types = [ty]; msg(`${Nm(u)} transformed into the ${ty} type!`); fxEv(u); return true; }
+      case "camouflage": { if (has(u, "CAMOUFLAGE")) return fail(); addEff(u, "CAMOUFLAGE", 999, u, true); msg(`${Nm(u)} blended into its surroundings!`); ev({ k: "aura", u: u.uid }); return true; }   // (until it leaves the field: the owner's rule, 2026-10-21)
       case "magnetrise": if (has(u, "MAGNETRISE")) return fail(); addEff(u, "MAGNETRISE", 5, u, true); msg(`${Nm(u)} levitated with electromagnetism!`); return true;
       case "meanlook": if (!t || has(t, "NOSWITCH")) return fail(); if (tab(u, t, "RUN_AWAY")) { msg(`${Nm(t)}'s Run Away keeps it from being trapped!`); return true; } addEff(t, "NOSWITCH", 99, u, true); msg(`${Nm(t)} can no longer escape!`); return true;
       case "destinybond": addEff(u, "DBOND", 99, u, true); msg(`${Nm(u)} is hoping to take its attacker down with it!`); return true;
       case "lockon": addEff(u, "LOCKON", 1, u, true); msg(`${Nm(u)} took aim at ${t ? nm(t) : "the target"}!`); return true;   // (until the end of its next turn)
       case "laserfocus": addEff(u, "LASER", 1, u, true); msg(`${Nm(u)} concentrated intensely!`); return true;   // (until the end of its next turn)
-      case "acupressure": { const st = ["atk", "def", "spa", "sdf", "spe", "acc", "eva"].filter(s => u.stages[s] < 6); if (!st.length) return fail(); stage(u, u, pick(st), 2); return true; }
+      case "acupressure": { const st = ACU_STATS.filter(s => u.stages[s] < 6); if (!st.length) return fail(); stage(u, u, pick(st), 2); return true; }
       case "powerswap": case "guardswap": {
         if (!t) return fail(); for (const s of sp === "powerswap" ? ["atk", "spa"] : ["def", "sdf"]) [u.stages[s], t.stages[s]] = [t.stages[s], u.stages[s]];
         msg(psT("default", sp === "powerswap" ? "swapOffensiveBoost" : "swapDefensiveBoost", { POKEMON: nm(u) })); fxEv(u); fxEv(t); return true;
@@ -2980,7 +2987,7 @@ function makeBattle(cfg) {
           B.hitIdx = h;
           const r = attackOnce(u, x, sk, h === 0, nHits === 1);
           if (r.immune || r.absorbed) break;
-          hitsDone++; anyHit = true; dealtHere += r.dealt; total += r.dealt; effSeen = r.e; if (r.sub) subHit = true;
+          hitsDone++; anyHit = true; u.flags.landed = B.actN; dealtHere += r.dealt; total += r.dealt; effSeen = r.e; if (r.sub) subHit = true;
           // each strike of a multi-strike move rolls the added effects, as in the games: King's Rock, Razor Fang and Stench flinch,
           // Twineedle's poison, Double Iron Bash's flinch (the owner's ask, 2026-10-16); a single strike rolls them after its messages
           if (nHits > 1 && !r.sub) secondary(u, x, sk, fx);
@@ -3089,7 +3096,6 @@ function makeBattle(cfg) {
     if (sp === "psychup") { const t = targets[0]; if (!t) { msg("But it failed!"); return; } u.stages = { ...t.stages }; msg(`${Nm(u)} copied ${nm(t)}'s stat changes!`); fxEv(u); return; }
     if (sp === "refresh") { if (!["BRN", "PSN", "TOX", "PAR"].includes(u.status)) { msg("But it failed!"); return; } u.status = null; u.sTurn = 0; msg(`${Nm(u)}'s status returned to normal!`); fxEv(u); return; }
     if (sp === "charge") { addEff(u, "CHARGE", 99, u, true); msg(psT("charge", "start", { POKEMON: nm(u) })); }
-    if (sp === "defensecurl") addEff(u, "DEFCURL", 99, u, true);
     if (sp === "minimize") addEff(u, "MINIMIZE", 99, u, true);
     if (sk.target === "partners" && !targets.length) { msg("But it failed!"); return; }
     if (SUB_BLOCKS.has(sk.key) && !M.so && !pv(u, "INFILTRATOR")) {

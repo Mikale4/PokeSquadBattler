@@ -311,7 +311,7 @@ guard-swap speed-swap role-play skill-swap helping-hand mirror-move copycat slee
 flower-shield dragon-cheer misty-explosion triple-axel""".split()}
 SPECIAL.update({"giga-impact": "hyperbeam", "blast-burn": "hyperbeam", "hydro-cannon": "hyperbeam", "frenzy-plant": "hyperbeam", "rock-wrecker": "hyperbeam",
     "heal-bell": "aromatherapy", "avalanche": "revenge", "psychic-fangs": "brickbreak", "raging-bull": "brickbreak", "low-kick": "weight",
-    "grass-knot": "weight", "heavy-slam": "heavy", "heat-crash": "heavy", "flail": "flail", "reversal": "flail", "stomping-tantrum": "tantrum",
+    "grass-knot": "weight", "heavy-slam": "heavy", "heat-crash": "heavy", "flail": "ragefist", "reversal": "ragefist", "stomping-tantrum": "tantrum",
     "temper-flare": "tantrum", "power-trip": "storedpower", "psyshock": "psyshock", "psystrike": "psyshock", "chip-away": "chipaway",
     "darkest-lariat": "chipaway", "storm-throw": "alwayscrit", "frost-breath": "alwayscrit", "surging-strikes": "alwayscrit", "wicked-blow": "alwayscrit", "thief": "thief", "covet": "thief",
     "pluck": "pluck", "bug-bite": "pluck", "u-turn": "uturn", "volt-switch": "uturn", "flip-turn": "uturn", "dragon-tail": "dragontail",
@@ -381,6 +381,12 @@ META_FIX = {
     "beat-up": {"hit": [2, 5], "p": 25},
     # the owner's rules, 2026-10-16: Triple Kick from 20 (20, 40 and 60, as Triple Axel: above), Rage, Punishment and Stored Power 50
     "rage": {"p": 50}, "punishment": {"p": 50}, "stored-power": {"p": 50}, "power-trip": {"p": 50},
+    # the owner's rules, 2026-10-21: Rollout, Ice Ball, Fury Cutter, Echoed Voice and Round 40 power, 90% accuracy, S1 (SLOT_FIX "ramp");
+    # Constrict's Speed drop every time
+    "rollout": {"p": 40, "a": 90}, "ice-ball": {"p": 40, "a": 90}, "fury-cutter": {"p": 40, "a": 90}, "echoed-voice": {"p": 40, "a": 90},
+    "round": {"p": 40, "a": 90}, "constrict": {"sc": 100},
+    # Flail and Reversal work like Rage Fist (the owner's rule, 2026-10-21): 50 power, +50 a hit taken, up to 250, S2
+    "flail": {"p": 50}, "reversal": {"p": 50},
     "wave-crash": {"dr": -33}, "axe-kick": {"ail": "CNF", "ac": 30, "crash": 1}, "supercell-slam": {"crash": 1},
     "pounce": {"st": [["spe", -1]], "sc": 100, "sw": "target"}, "trailblaze": {"st": [["spe", 1]], "sc": 100, "sw": "self"},
     "chilling-water": {"st": [["atk", -1]], "sc": 100, "sw": "target"}, "alluring-voice": {"ail": "CNF", "ac": 100}, "psychic-noise": {}, "ice-spinner": {},
@@ -527,11 +533,11 @@ def supported(mid):
 SLOT_FIX = {"splash": 1, "transform": 3, "sonicboom": 1, "dragonrage": 2, "nightshade": 2, "seismictoss": 2, "psywave": 2,
             "superfang": 3, "endeavor": 3, "focuspunch": 3, "hyperbeam": 3, "selfdestruct": 3, "explosion": 3, "mistyexplosion": 3,
             "fissure": 3, "horndrill": 3, "guillotine": 3, "sheercold": 3, "finalgambit": 3, "struggle": 1, "weight": 2, "heavy": 2,
-            "gyroball": 2, "electroball": 2, "flail": 2, "wringout": 2, "hardpress": 2, "counter": 2, "mirrorcoat": 2,
+            "gyroball": 2, "electroball": 2, "wringout": 2, "hardpress": 2, "counter": 2, "mirrorcoat": 2,
             "ragefist": 2, "storedpower": 3, "revenge": 2, "assurance": 2, "venoshock": 2, "hex": 2, "fakeout": 2, "tripleaxel": 2, "whirlwind": 1, "pursuit": 2, "metalburst": 2, "present": 2,
             "eruption": 3, "hiddenpower": 1, "sketch": 2, "lastrespects": 2, "filletaway": 2, "shedtail": 2,
             "bide": 2, "spitup": 3, "naturalgift": 2, "fling": 2, "trumpcard": 2, "beatup": 2, "future": 3, "conversion": 2, "conversion2": 3,
-            "ramp": 2}   # (the doubling moves: Rollout, Fury Cutter, Echoed Voice, Round; slots are looked up by a move's special rule first)
+            "ramp": 1}   # (Rollout, Ice Ball, Fury Cutter, Echoed Voice, Round: S1, the owner's rule, 2026-10-21; slots are looked up by a move's special rule first)
 # (Fake Out is a house rule: it works on any turn, not just the first, so it's an S2 move with a cooldown; so is Pursuit, which strikes
 # by itself whenever the other side switches a Pokémon out. The owner's rules: the moves like Rage Fist (Rage, Punishment, Stored
 # Power) are S2, and the doubling moves Rollout, Fury Cutter, Echoed Voice and Round, which double every time they're used, are S2;

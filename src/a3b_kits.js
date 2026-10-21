@@ -81,8 +81,9 @@ const SHIELD_TXT = {
 // the field moves that go up by themselves as their user comes onto the field (the owner's rule, like Trick Room: autoField in a7_engine.js)
 const ENTRY_MOVES = new Set(["sunnyday", "raindance", "sandstorm", "hail", "snowscape", "terrain", "stealthrock", "spikes", "toxicspikes", "stickyweb",
   "reflect", "lightscreen", "auroraveil", "safeguard", "mist", "luckychant", "gravity", "wonderroom", "magicroom", "iondeluge", "powder",
-  "future", "laserfocus", "lockon"]);   // (Ion Deluge and Powder: the owner's rules, 2026-10-19; Future Sight and Doom Desire, 2026-10-20; Laser Focus and Lock-On, 2026-10-21)
+  "future", "laserfocus", "lockon", "acupressure", "camouflage"]);   // (Ion Deluge and Powder: the owner's rules, 2026-10-19; Future Sight and Doom Desire, 2026-10-20; Laser Focus and Lock-On, Acupressure and Camouflage, 2026-10-21)
 const entryTxt = sp => sp === "future" ? "It's used by itself the moment its user comes onto the field, if it's ready and none of the user's attacks is already on the way (that isn't the user's turn: the move just goes on cooldown); it can still be used by hand" :
+  sp === "acupressure" || sp === "camouflage" ? "It's used by itself the moment its user comes onto the field, if it's ready (that isn't the user's turn: the move just goes on cooldown); it can still be used by hand" :
   sp === "laserfocus" || sp === "lockon" ? "It's used by itself the moment its user comes onto the field, if it's ready (that isn't the user's turn: the move just goes on cooldown), and lasts until the end of the user's next turn; it can still be used by hand" : `It goes up by itself the moment its user comes onto the field${["stealthrock", "spikes", "toxicspikes", "stickyweb"].includes(sp) ? " (with a Pokémon left on the other side's bench to hit)" : sp === "auroraveil" ? " in hail or snow" : sp === "powder" ? " (on the opposing Pokémon there that aren't covered yet)" : ""}, if it's ready (that isn't the user's turn: the move just goes on cooldown). `
   + `While ${["stealthrock", "spikes", "toxicspikes", "stickyweb"].includes(sp) ? "every layer is" : "it's"} already up the move stays ready${["sunnyday", "raindance", "sandstorm", "hail", "snowscape", "terrain"].includes(sp) ? ", and it replaces any other " + (sp === "terrain" ? "terrain" : "weather") + ", whoever set it" : ""}; it can still be used by hand`;
 function moveDesc(sk) {
@@ -134,7 +135,7 @@ function moveDesc(sk) {
     struggle: "Used when nothing else can be: the user takes 25% of the damage as recoil",
     weight: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)", heavy: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)",
     gyroball: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)", electroball: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)",
-    flail: "The less HP the user has left, the stronger (20 to 200 power)", wringout: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)",
+    wringout: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)",
     hardpress: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)", hex: "Double power against a target with a status condition",
     venoshock: "Double power against a poisoned target", brine: "Double power against a target at half HP or less", acrobatics: "Double power if the user holds no item",
     wakeupslap: "Double power against a sleeping target, and wakes it up", assurance: "Double power if the target was already hit since the user's last turn",
@@ -221,7 +222,7 @@ function moveDesc(sk) {
     yawn: "Makes the target drowsy: it falls asleep at the end of its next turn", curse: "Ghost types: lose half their HP to curse the target (1/4 HP every turn); others: Attack and Defense +1, Speed −1",
     taunt: "The target can only use damaging moves for 3 turns", gastroacid: "Suppresses the target's Ability", worryseed: "Changes the target's Ability to Insomnia",
     soak: "Makes the target pure Water type", reflecttype: "The user takes on the target's types", conversion: "It can't be chosen: just before an opposing attack's damage, the user becomes a type that resists it, if this is ready (that isn't the user's turn: the move just goes on cooldown; the type lasts until it leaves the field)",
-    camouflage: "The user takes the terrain's type (Electric, Grass, Fairy or Psychic), or becomes Normal type with none", magnetrise: "The user floats: Ground moves can't hit it for 5 turns", meanlook: "The target can't be switched out",
+    camouflage: "While a partner of the user is on the field, the other side's single-target moves can't pick the user (spread moves still hit it), until it leaves the field; when every Pokémon on its side is hidden, any of them can be picked", magnetrise: "The user floats: Ground moves can't hit it for 5 turns", meanlook: "The target can't be switched out",
     destinybond: "If a move knocks the user out before its next turn, the attacker faints too", lockon: "The user's next attack can't miss, until the end of its next turn",
     laserfocus: "The user's next attack is a critical hit, until the end of its next turn", acupressure: "A random stat of the user's +2", powerswap: "Swaps Attack and Sp. Atk changes with the target",
     guardswap: "Swaps Defense and Sp. Def changes with the target", speedswap: "Swaps Speed stats with the target", roleplay: "Copies the target's Ability",
@@ -233,13 +234,13 @@ function moveDesc(sk) {
     dragoncheer: "Your teammates get pumped (Dragon types more)", brickbreak: "Shatters Reflect, Light Screen and Aurora Veil first",
     solar: "×1.5 in harsh sunlight, ×0.5 in rain, sandstorm, hail or snow",
     semi: `The user goes out of reach (only a few moves can hit it) and the move lands on its next turn${M.n === "Phantom Force" || M.n === "Shadow Force" ? "; it breaks through Protect" : ""}`,
-    ramp: "Doubles in power every time the user uses it in a battle, other moves in between or not (up to 16×)",
+    ramp: "40 power, plus 40 every time the user uses it in a battle, other moves in between or not (up to 120); a miss, Protect, no effect or any other failure starts it over",
     uproar: "Nobody on the field can fall asleep for three turns (using it again while that lasts doesn't stretch it)", pursuit: "When the other side switches a Pokémon out or uses U-turn, Volt Switch, Flip Turn, Teleport or Baton Pass, the user strikes it first by itself, at double power (outside its own turn; then Pursuit goes on cooldown)",
     magnitude: "Random power from 10 to 150 (Loaded Dice: always 150)",
     fellstinger: "If it knocks the target out, the user's Attack +3", icespinner: "Ends the terrain", flameburst: "The bursting flame hits the target's partners for 1/16 of their max HP",
     smackdown: "Knocks the target down for as long as it stays in: Ground moves hit it (Flying types too), and it falls out of Fly or Bounce",
     snore: "Only works while the user is asleep, and then it snores by itself", charge: "The user's next Electric move has double power",
-    defensecurl: "Rollout is twice as strong for as long as the user stays in", minimize: "Stomp, Body Slam, Dragon Rush, Heavy Slam, Heat Crash and Steamroller hit it twice as hard and never miss it",
+    minimize: "Stomp, Body Slam, Dragon Rush, Heavy Slam, Heat Crash and Steamroller hit it twice as hard and never miss it",
     growth: "+2 to each in harsh sunlight", pollenpuff: "Also restores half the max HP of each of the user's partners on the field", triattack: "20% chance to burn, paralyze or freeze the target",
     throatchop: "The target can't use sound moves for 2 turns", psychicnoise: "The target can't restore HP or use healing moves for 2 turns",
     secretpower: "30% chance of an extra effect from the field: Electric Terrain paralyzes, Grassy Terrain puts to sleep, Misty Terrain Sp. Atk −1, Psychic Terrain Speed −1; harsh sunlight burns, rain Attack −1, sandstorm accuracy −1, hail or snow freezes (both, with weather and terrain up; paralysis on a plain field)" }[M.sp];
@@ -810,7 +811,7 @@ const canLearnTM = (k, n) => OPS[k].tms.includes(n);
 const FIXED_V = { dragonrage: 55, sonicboom: 35, nightshade: 65, seismictoss: 65, psywave: 55, superfang: 80, endeavor: 45, finalgambit: 45, counter: 50,
   mirrorcoat: 50, metalburst: 55 };
 // variable-power moves: a typical power
-const VAR_P = { weight: 71, heavy: 71, gyroball: 71, electroball: 71, flail: 60, wringout: 71, hardpress: 71, ragefist: 100, storedpower: 100,
+const VAR_P = { weight: 71, heavy: 71, gyroball: 71, electroball: 71, wringout: 71, hardpress: 71, ragefist: 100, storedpower: 100,
   eruption: 71, present: 45, spitup: 100, naturalgift: 80, fling: 40, trumpcard: 60, bide: 50 };
 function moveValue(k, m) { const M = MOVES[m], v = moveValue0(k, m); return M && M.c === "X" && M.pri > 0 ? v * (1 + priBracket(M) / 15) : v; }   // (its turn meter on entry: +3, 30%, is ×1.2)
 // a move's strikes (a 2-5-strike move: 3 on average, the engine's 2, 2, 2, 3, 3, 3, 4, 5), the most with Skill Link or Loaded Dice
@@ -860,7 +861,7 @@ function moveValue0(k, m) {
     focusenergy: 30, roar: 25, disable: 30, teleport: 20, batonpass: 30, spikes: 35, toxicspikes: 30, stealthrock: 45, defog: 15,
     roost: 70, synthesis: 65, wish: 55, aquaring: 30, ingrain: 30, lifedew: 40, healpulse: 40, painsplit: 40, healingwish: 20, memento: 25,
     tailwind: 45, auroraveil: 40, luckychant: 15, trickroom: op.b[5] < 60 ? 55 : 10, terrain: 30, yawn: 55, curse: op.types.includes("Ghost") ? 45 : 40,
-    taunt: 30, gastroacid: 25, worryseed: 20, soak: 15, reflecttype: 10, conversion: 25, camouflage: 10, magnetrise: 25, meanlook: 15, destinybond: 30,
+    taunt: 30, gastroacid: 25, worryseed: 20, soak: 15, reflecttype: 10, conversion: 25, camouflage: 30, magnetrise: 25, meanlook: 15, destinybond: 30,
     lockon: 15, laserfocus: 25, acupressure: 35, powerswap: 15, guardswap: 15, speedswap: 15, roleplay: 15, skillswap: 15, trick: 20, helpinghand: 20,
     followme: 25, mirrormove: 30, copycat: 30, sleeptalk: 35, naturepower: 55, venomdrench: 20, rototiller: 20, magneticflux: 15, flowershield: 15,
     dragoncheer: 20, healblock: 15, strengthsap: at > sa ? 45 : 60, partingshot: 40, sketch: 50,

@@ -106,7 +106,7 @@ globalThis.PokeSquad = (() => {
     AQUARING: "Aqua Ring", MAGNETRISE: "Magnet Rise", SMACKDOWN: "Smack Down", FOCUS: "Focus Energy", CHARGE: "Charge", FLASHFIRE: "Flash Fire",
     IMPRISON: "Imprison", TELEKINESIS: "Telekinesis", OCTOLOCK: "Octolock", SALTCURE: "Salt Cure", POWDER: "Powder", ELECTRIFY: "Electrify",
     LASER: "Laser Focus", FOLLOWME: "Follow Me", MAGICCOAT: "Magic Coat", SNATCH: "Snatch", GRUDGE: "Grudge", DBOND: "Destiny Bond",
-    ENDURE: "Endure", BIDE: "Bide", THROAT: "Throat Chop", HELPED: "Helping Hand", SUB: "Substitute", PROTECT: "Protect" };
+    ENDURE: "Endure", BIDE: "Bide", THROAT: "Throat Chop", HELPED: "Helping Hand", SUB: "Substitute", PROTECT: "Protect", CAMOUFLAGE: "Camouflage" };
   const volOf = e => e.id === "PERISH" ? `perish${Math.max(0, Math.min(3, e.turns))}` : VOL[e.id] || null;
   // the effects on a side (B.side: the turn each ends; B.tailwind) and on the whole field (Trick Room goes with the terrain: syncField)
   const SIDE_FX = { REFLECT: "Reflect", LSCREEN: "Light Screen", VEIL: "Aurora Veil", SAFEGUARD: "Safeguard", LUCKY: "Lucky Chant", MIST: "Mist" };

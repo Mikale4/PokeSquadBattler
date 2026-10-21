@@ -483,9 +483,9 @@ function moveIn0(k, m, ab, held, c) {
 // combos a set can carry: Protect, Detect or a Substitute before Focus Punch (nothing hits it in between, so it can't fail),
 // Rest with Snore or Sleep Talk (they only work asleep, so without Rest they're dead weight), Defense Curl before Rollout,
 // Charge before an Electric attack, Endure before Reversal, Flail or Endeavor, and Focus Energy with a high critical-hit move
-const COVERS = ["protect", "detect", "substitute"], PINCH = ["reversal", "flail", "endeavor"];
-const COMBO_MATE = new Set([...COVERS, ...PINCH, "rest", "rollout", "iceball"]);
-const COMBO_PART = new Set(["focuspunch", "snore", "sleeptalk", "defensecurl", "charge", "endure", "focusenergy", "batonpass", "hex", "venoshock", "toxic", "leechseed", "followme", "ragepowder"]);
+const COVERS = ["protect", "detect", "substitute"], PINCH = ["endeavor"];
+const COMBO_MATE = new Set([...COVERS, ...PINCH, "rest"]);
+const COMBO_PART = new Set(["focuspunch", "snore", "sleeptalk", "charge", "endure", "focusenergy", "batonpass", "hex", "venoshock", "toxic", "leechseed", "followme", "ragepowder"]);
 function comboBonus(k, mv, ab, held, c) {
   const has = m => mv.includes(m); let v = 0;
   if (has("snore") || has("sleeptalk")) v += has("rest") ? 25 : -40;
@@ -714,7 +714,7 @@ function itemValue0(k, h, b, c = {}) {
     case "blacksludge": return types.includes("Poison") ? .06 + .04 * (1 - frail) + (rdr ? .06 : 0) : -.1;
     case "assaultvest": return DEF * (1 - meta.phys) * .3;   // (status moves allowed: the owner's rule)
     case "rockyhelmet": return meta.contact * .06 * (1.5 - frail);
-    case "focussash": return (A.id === "STURDY" ? .005 : .02 + .08 * frail) + (has(["reversal", "flail", "endeavor", "counter", "mirrorcoat"]) ? .06 : 0);   // hang on at 1 HP, then hit back
+    case "focussash": return (A.id === "STURDY" ? .005 : .02 + .08 * frail) + (has(["endeavor", "counter", "mirrorcoat"]) ? .06 : 0);   // hang on at 1 HP, then hit back
     case "lumberry": return meta.statusAny * .3 + .01 + (has(["rest"]) ? .15 : 0);
     case "weaknesspolicy": return .04 + .04 * (1 - frail) + (c.screens ? .08 : 0);   // behind the team's screens it survives the hit that powers it up
     case "airballoon": return typeEff("Ground", types) > 0 && A.id !== "IMMUNE_TYPE" ? DEF * part("Ground") * .5 : 0;
