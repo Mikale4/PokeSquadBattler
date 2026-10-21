@@ -8,7 +8,7 @@
 // =====================================================================
 const CAT_N = { P: "Physical", S: "Special", X: "Status" };
 const CD = { 1: 0, 2: 3, 3: 4 };
-const SPREAD = .75; // moves that hit every opposing Pokémon deal 75% damage, as in Double Battles
+const SPREAD = .75; // moves that hit every opposing Pokémon deal 75% damage when they hit two or more, as in Double Battles
 function moveTarget(M) {
   if (M.tg === "foes") return "aoe_enemies";
   if (M.tg === "self") return "self";
@@ -81,8 +81,9 @@ const SHIELD_TXT = {
 // the field moves that go up by themselves as their user comes onto the field (the owner's rule, like Trick Room: autoField in a7_engine.js)
 const ENTRY_MOVES = new Set(["sunnyday", "raindance", "sandstorm", "hail", "snowscape", "terrain", "stealthrock", "spikes", "toxicspikes", "stickyweb",
   "reflect", "lightscreen", "auroraveil", "safeguard", "mist", "luckychant", "gravity", "wonderroom", "magicroom", "iondeluge", "powder",
-  "future"]);   // (Ion Deluge and Powder: the owner's rules, 2026-10-19; Future Sight and Doom Desire, 2026-10-20)
-const entryTxt = sp => sp === "future" ? "It's used by itself the moment its user comes onto the field, if it's ready and none of the user's attacks is already on the way (that isn't the user's turn: the move just goes on cooldown); it can still be used by hand" : `It goes up by itself the moment its user comes onto the field${["stealthrock", "spikes", "toxicspikes", "stickyweb"].includes(sp) ? " (with a Pokémon left on the other side's bench to hit)" : sp === "auroraveil" ? " in hail or snow" : sp === "powder" ? " (on the opposing Pokémon there that aren't covered yet)" : ""}, if it's ready (that isn't the user's turn: the move just goes on cooldown). `
+  "future", "laserfocus", "lockon"]);   // (Ion Deluge and Powder: the owner's rules, 2026-10-19; Future Sight and Doom Desire, 2026-10-20; Laser Focus and Lock-On, 2026-10-21)
+const entryTxt = sp => sp === "future" ? "It's used by itself the moment its user comes onto the field, if it's ready and none of the user's attacks is already on the way (that isn't the user's turn: the move just goes on cooldown); it can still be used by hand" :
+  sp === "laserfocus" || sp === "lockon" ? "It's used by itself the moment its user comes onto the field, if it's ready (that isn't the user's turn: the move just goes on cooldown), and lasts until the end of the user's next turn; it can still be used by hand" : `It goes up by itself the moment its user comes onto the field${["stealthrock", "spikes", "toxicspikes", "stickyweb"].includes(sp) ? " (with a Pokémon left on the other side's bench to hit)" : sp === "auroraveil" ? " in hail or snow" : sp === "powder" ? " (on the opposing Pokémon there that aren't covered yet)" : ""}, if it's ready (that isn't the user's turn: the move just goes on cooldown). `
   + `While ${["stealthrock", "spikes", "toxicspikes", "stickyweb"].includes(sp) ? "every layer is" : "it's"} already up the move stays ready${["sunnyday", "raindance", "sandstorm", "hail", "snowscape", "terrain"].includes(sp) ? ", and it replaces any other " + (sp === "terrain" ? "terrain" : "weather") + ", whoever set it" : ""}; it can still be used by hand`;
 function moveDesc(sk) {
   const M = sk.M, out = [], who = sk.target === "aoe_enemies" ? "each target" : "the target";
@@ -90,7 +91,7 @@ function moveDesc(sk) {
     psywave: "Deals random damage between half and 1.5× the user's level (Loaded Dice: always 1.5×)", superfang: "Takes half the target's current HP", endeavor: "Cuts the target's HP down to the user's" }[M.sp];
   if (fixed) out.push(fixed + " (+6% per Mastery rank)");
   if (M.crash) out.push("If it misses, the user crashes and loses a quarter of its max HP");
-  if (sk.target === "aoe_enemies" && M.p) out.push(`Hits every opposing Pokémon (${P(SPREAD)} damage each)`);
+  if (sk.target === "aoe_enemies" && M.p) out.push(`Hits every opposing Pokémon (${P(SPREAD)} damage each when it hits two or more)`);
   if (M.hit && M.sp !== "tripleaxel") out.push(M.hit[0] === M.hit[1] ? `Strikes ${M.hit[0]} times` : `Strikes ${M.hit[0]} to ${M.hit[1]} times`);
   if (M.pri > 0) out.push(`Priority +${M.pri}: the user gets +${M.pri * 10}% turn meter when it's sent out (each priority move it knows adds its own)`);
   if (M.n === "Thunder" || M.n === "Hurricane") out.push("Never misses in rain; 50% accuracy in harsh sunlight");
@@ -111,7 +112,7 @@ function moveDesc(sk) {
   if (M.dr < 0) out.push(`The user takes ${-M.dr}% of the damage dealt as recoil`);
   if (M.hl && sk.target !== "partners" && sk.target !== "team") out.push(`Restores ${M.hl}% of the user's max HP (+6% per Mastery rank)`);
   const sp = { transform: "Transforms into the target: copies its types, stats, stat changes and moves. The copy has an HP bar of its own, as big as the user's max HP: when it's knocked out, the user turns back into itself with the HP and status it had (the stat changes stay)", metronome: "Uses a random damaging move",
-    splash: "But nothing happens!", haze: "Resets the stat changes of every Pokémon in battle", rest: "Fully restores HP and cures status, then sleeps for 2 turns",
+    splash: "But nothing happens!", haze: "Resets the stat changes of every Pokémon in battle", rest: "Fully restores HP and cures status, then sleeps through its next turn (fails at full HP)",
     reflect: "Reflect: your team takes a third less physical damage for 5 turns", lightscreen: "Light Screen: your team takes a third less special damage for 5 turns",
     substitute: "Uses 1/4 of the user's max HP to make a Substitute that takes hits for it", mist: "Mist: your team's stats can't be lowered for 5 turns",
     focusenergy: "Focus Energy: the user's critical-hit ratio rises sharply",
@@ -153,7 +154,7 @@ function moveDesc(sk) {
     eruption: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)", metalburst: "It can't be chosen: when an opposing attack damages the user, it hits back at that attacker by itself for 1.5 times the damage once the attack is over, if it's ready (that isn't the user's turn: the move just goes on cooldown)",
     present: "A gift of 40 (40%), 80 (30%) or 120 power (10%), or it restores 1/4 of the target's max HP (20%); physical when the user's Attack is higher than its Sp. Atk, special otherwise; with Loaded Dice, always the 120-power gift, and it never misses",
     fusion: "Double power if the other Fusion move (Fusion Flare or Fusion Bolt) was used since the user's last turn",
-    smellingsalts: "Double power against a paralyzed target, and cures its paralysis", healblock: "The other side can't restore HP for 4 turns",
+    smellingsalts: "Double power against a paralyzed target, and cures its paralysis", healblock: "The other side can't restore HP for 5 turns",
     strengthsap: "Restores HP equal to the target's Attack stat, then lowers its Attack", partingshot: "Lowers the target's Attack and Sp. Atk, then the user switches out",
     hiddenpower: "Takes the type of the last attack used on the user (its own first type until then), and it's physical when the user's Attack is higher than its Sp. Atk (a house rule)", sketch: "Copies the move the opposing Pokémon has in this Sketch's slot (S1 Sketch its S1 move, S2 Sketch its S2, S3 Sketch its S3) and uses it at once. The copied move takes Sketch's place for good, in every battle; the Move Reminder teaches Sketch again",
     hazardhit: M.n === "Stone Axe" ? "Leaves pointed stones around the other side (Stealth Rock)" : "Leaves a layer of spikes around the other side (Spikes)",
@@ -211,7 +212,7 @@ function moveDesc(sk) {
     toxicspikes: "Poisons each Pokémon sent in on the other side (2 layers: badly)", stealthrock: "Pointed stones hurt each Pokémon sent in on the other side, more for Rock weaknesses",
     defog: "Clears hazards, the target's screens and the terrain, and lowers the target's evasiveness", roost: "Restores half of the user's max HP",
     synthesis: "Restores half the user's max HP (2/3 in harsh sunlight, 1/4 in other weather)", wish: "Half of the user's max HP comes back to its place at the end of its next turn",
-    aquaring: "Restores 1/16 of the user's max HP every turn", ingrain: "Restores 1/16 of the user's max HP every turn, but it can't be switched out",
+    aquaring: "Restores 1/16 of the user's max HP every turn", ingrain: "Restores 1/16 of the user's max HP every turn, but it can't be switched out; nothing can drag it out, and it's on the ground",
     lifedew: "Restores 1/4 of the max HP of the user and its teammates on the field", healpulse: "Restores half of the max HP of each of the user's partners on the field",
     painsplit: "Shares out the user's and the target's HP evenly", healingwish: "The user faints; the next Pokémon sent in is fully healed",
     memento: "The user faints; the target's Attack and Sp. Atk −2", tailwind: "Your team's Speed +2 for about 4 rounds, and +10% turn meter at once for the user and its partners on the field",
@@ -221,8 +222,8 @@ function moveDesc(sk) {
     taunt: "The target can only use damaging moves for 3 turns", gastroacid: "Suppresses the target's Ability", worryseed: "Changes the target's Ability to Insomnia",
     soak: "Makes the target pure Water type", reflecttype: "The user takes on the target's types", conversion: "It can't be chosen: just before an opposing attack's damage, the user becomes a type that resists it, if this is ready (that isn't the user's turn: the move just goes on cooldown; the type lasts until it leaves the field)",
     camouflage: "The user takes the terrain's type (Electric, Grass, Fairy or Psychic), or becomes Normal type with none", magnetrise: "The user floats: Ground moves can't hit it for 5 turns", meanlook: "The target can't be switched out",
-    destinybond: "If a move knocks the user out before its next turn, the attacker faints too", lockon: "The user's next move can't miss",
-    laserfocus: "The user's next move is a critical hit", acupressure: "A random stat of the user's +2", powerswap: "Swaps Attack and Sp. Atk changes with the target",
+    destinybond: "If a move knocks the user out before its next turn, the attacker faints too", lockon: "The user's next attack can't miss, until the end of its next turn",
+    laserfocus: "The user's next attack is a critical hit, until the end of its next turn", acupressure: "A random stat of the user's +2", powerswap: "Swaps Attack and Sp. Atk changes with the target",
     guardswap: "Swaps Defense and Sp. Def changes with the target", speedswap: "Swaps Speed stats with the target", roleplay: "Copies the target's Ability",
     skillswap: "Swaps Abilities with the target", trick: "Swaps held items with the target", helpinghand: "A teammate's next move is 50% stronger",
     followme: "Draws the other side's single-target moves to the user for as long as it stays on the field (with two up on one side, the newest draws them). It goes up by itself the moment its user comes onto the field with a partner beside it, if it's ready (that isn't the user's turn: the move just goes on cooldown)", mirrormove: "Uses the move the opposing target has in this Mirror Move's slot, at once and with the user's own stats, this one time: the Mirror Move stays (S1, S2 and S3 Mirror Move; a house rule)",
