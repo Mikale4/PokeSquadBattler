@@ -400,7 +400,7 @@ const FX = {
   SLP: { n: "Sleep", s: "SLP", c: "#8a90a0", major: 1, d: "Can't move until it wakes up." },
   FRZ: { n: "Freeze", s: "FRZ", c: "#58c8e0", major: 1, d: "Can't move. Each turn it has a 20% chance to thaw; a Fire move thaws it at once." },
   CNF: { n: "Confusion", s: "CNF", c: "#c86ab8", d: "Each turn there is a 33% chance it hurts itself in its confusion instead of moving." },
-  INFAT: { n: "Infatuation", s: "LOV", c: "#f26aa8", d: "Each turn there is a 50% chance it is immobilized by love." },
+  INFAT: { n: "Infatuation", s: "LOV", c: "#f26aa8", d: "Like confusion, but each turn there is a 1 in 3 chance it attacks one of its partners instead of moving (itself, with no partner beside it). 2 to 4 turns, over sooner if the one it's in love with leaves the field." },
   SEED: { n: "Leech Seed", s: "SED", c: "#5aa83a", d: "Loses 1/8 of its max HP every turn; the Pokémon that planted it gets the HP." },
   TRAP: { n: "Bound", s: "BND", c: "#a87a4a", d: "Squeezed every turn for 1/8 of its max HP." },
   DISABLE: { n: "Disable", s: "DIS", c: "#6a7286", d: "Can't use its S2 or S3 moves." },

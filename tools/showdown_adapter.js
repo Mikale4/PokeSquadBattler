@@ -91,6 +91,15 @@ globalThis.PokeSquad = (() => {
   const WEATHER_ID = { sun: "SunnyDay", rain: "RainDance", sand: "Sandstorm", hail: "Hail", snow: "Snowscape" };
   const TERRAIN_NAME = { electric: "Electric Terrain", grassy: "Grassy Terrain", misty: "Misty Terrain", psychic: "Psychic Terrain" };
   const HZ = { sr: "Stealth Rock", spikes: "Spikes", tspikes: "Toxic Spikes", web: "Sticky Web" };
+  // a Pokémon's effects as Showdown's volatiles (the badges on its HP bar: "Confused", "Leech Seed", "Drowsy"...; the owner's ask,
+  // 2026-10-20), by the names Showdown's client knows them by; Protect is its bubble too; the Perish count by the turns left
+  const VOL = { CNF: "confusion", INFAT: "Attract", SEED: "Leech Seed", TRAP: "Bind", TAUNT: "Taunt", ENCORE: "Encore", DISABLE: "Disable",
+    HEALBLOCK: "Heal Block", TORMENT: "Torment", EMBARGO: "Embargo", YAWN: "Yawn", CURSE: "Curse", NIGHTMARE: "Nightmare", INGRAIN: "Ingrain",
+    AQUARING: "Aqua Ring", MAGNETRISE: "Magnet Rise", SMACKDOWN: "Smack Down", FOCUS: "Focus Energy", CHARGE: "Charge", FLASHFIRE: "Flash Fire",
+    IMPRISON: "Imprison", TELEKINESIS: "Telekinesis", OCTOLOCK: "Octolock", SALTCURE: "Salt Cure", POWDER: "Powder", ELECTRIFY: "Electrify",
+    LASER: "Laser Focus", FOLLOWME: "Follow Me", MAGICCOAT: "Magic Coat", SNATCH: "Snatch", GRUDGE: "Grudge", DBOND: "Destiny Bond",
+    ENDURE: "Endure", BIDE: "Bide", THROAT: "Throat Chop", HELPED: "Helping Hand", SUB: "Substitute", PROTECT: "Protect" };
+  const volOf = e => e.id === "PERISH" ? `perish${Math.max(0, Math.min(3, e.turns))}` : VOL[e.id] || null;
   // the effects on a side (B.side: the turn each ends; B.tailwind) and on the whole field (Trick Room goes with the terrain: syncField)
   const SIDE_FX = { REFLECT: "Reflect", LSCREEN: "Light Screen", VEIL: "Aurora Veil", SAFEGUARD: "Safeguard", LUCKY: "Lucky Chant", MIST: "Mist" };
   const ROOMS = { gravity: "Gravity", wonderRoom: "Wonder Room", magicRoom: "Magic Room" };
@@ -339,9 +348,10 @@ globalThis.PokeSquad = (() => {
     syncStatus(u) {
       if (!this.shown[u.uid]) return;   // (not before Showdown has it on the field: its switch-in line comes first)
       // (the stat badge: the stages moves made plus the ones fixed to an item, an Ability, the weather or a status, as the game shows them)
-      // (protection, from Protect or as a replacement after a faint until its first turn: Showdown's Protect bubble, the owner's ask)
-      const id = this.ident(u), was = this.lastSt[u.uid] || { st: null, stages: {} }, now = { st: u.status || null, stages: this.B.shownStages(u), prot: u.eff.some(e => e.id === "PROTECT") };
-      if (now.prot !== !!was.prot) this.add(`|-${now.prot ? "start" : "end"}|${id}|Protect|[silent]`);
+      // (its effects as Showdown's volatiles: the badges on its HP bar, Protect's bubble, a Substitute's doll: VOL)
+      const id = this.ident(u), was = this.lastSt[u.uid] || { st: null, stages: {} }, now = { st: u.status || null, stages: this.B.shownStages(u), vol: [...new Set(u.eff.map(volOf).filter(Boolean))] };
+      for (const v of was.vol || []) if (!now.vol.includes(v)) this.add(`|-end|${id}|${v}|[silent]`);
+      for (const v of now.vol) if (!(was.vol || []).includes(v)) this.add(`|-start|${id}|${v}|[silent]`);
       if (now.st !== was.st) this.add(now.st ? `|-status|${id}|${STATUS[now.st] || now.st.toLowerCase()}|[silent]` : `|-curestatus|${id}|${STATUS[was.st] || ""}|[silent]`);
       for (const k in STAT) { const d = (now.stages[k] || 0) - (was.stages[k] || 0); if (d) this.add(`|-${d > 0 ? "boost" : "unboost"}|${id}|${STAT[k]}|${Math.abs(d)}|[silent]`); }
       this.lastSt[u.uid] = now;

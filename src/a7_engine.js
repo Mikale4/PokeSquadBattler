@@ -714,7 +714,7 @@ function makeBattle(cfg) {
       if (pv(tar, "SYNC") && src && src !== tar && src.alive && ["BRN", "PSN", "TOX", "PAR"].includes(what)) { msg(`${Nm(tar)}'s Synchronize!`); tryStatus(tar, src, what, false); }
       if ((what === "PSN" || what === "TOX") && src && src !== tar && pv(src, "PUPPETEER")) tryStatus(src, tar, "CNF", false);   // Poison Puppeteer
     } else {
-      const turns = { CNF: ri(2, 4), INFAT: 3, SEED: 99, TRAP: src && item(src, "gripclaw") ? 7 : ri(2, 4), DISABLE: 2 }[what] || 2;
+      const turns = { CNF: ri(2, 4), INFAT: ri(2, 4), SEED: 99, TRAP: src && item(src, "gripclaw") ? 7 : ri(2, 4), DISABLE: 2 }[what] || 2;
       tar.eff.push({ id: what, turns, skip: tar === B.actor, src: src && src.uid });
       msg(statusLine(what, tar, src)); fxEv(tar);
     }
@@ -2205,7 +2205,21 @@ function makeBattle(cfg) {
     }
     if (stun) { msg(`${Nm(u)} flinched and couldn't move!`); ev({ k: "txt", u: u.uid, s: "Flinch", c: "debuff" }); return false; }
     if (u.status === "PAR" && R() < .25) { msg(`${Nm(u)} is paralyzed! It can't move!`); ev({ k: "txt", u: u.uid, s: "PAR", c: "debuff" }); return false; }
-    if (has(u, "INFAT") && R() < .5) { msg(`${Nm(u)} is immobilized by love!`); return false; }
+    // Infatuation (the owner's house rule, 2026-10-20): it works like confusion, but the hit goes to a partner: a 1 in 3 chance each
+    // turn that it attacks one of its partners on the field instead of moving (confusion's 40-power typeless hit, its Attack against
+    // the partner's Defense) and loses its turn; with no partner there it hits itself. It lasts 2 to 4 turns (tryStatus), over
+    // sooner if the one it's in love with leaves the field (loveEnds)
+    if (has(u, "INFAT")) {
+      const lv = effOf(u, "INFAT"), by = lv && lv.src != null ? B.byId(lv.src) : null;
+      if (by) msg(psT("attract", "activate", { POKEMON: nm(u), TARGET: nm(by) }));
+      if (R() < 1 / 3) {
+        const mates = allies(u).filter(x => x !== u && x.alive && B.units.includes(x)), tg = mates.length ? pick(mates) : u;
+        msg(tg === u ? `${Nm(u)} hurt itself in its infatuation!` : `${Nm(u)} attacked ${nm(tg)} in its infatuation!`);
+        const d = Math.max(1, Math.round((((2 * u.lvl / 5 + 2) * 40 * statOf(u, "atk") / Math.max(1, statOf(tg, "def"))) / 50 + 2) * DMG_SCALE));
+        applyDamage(null, tg, d, { trueDmg: true });
+        return false;
+      }
+    }
     if (has(u, "CNF")) {
       msg(`${Nm(u)} is confused!`);
       if (R() < 1 / 3) {
