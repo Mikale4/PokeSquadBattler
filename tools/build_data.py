@@ -365,6 +365,8 @@ FIXED_POWER = {"magnitude": 70, "return": 102, "frustration": 102}
 SPECIAL["rage"] = "ragefist"
 SPECIAL["punishment"] = "ragefist"
 SPECIAL["stored-power"] = "ragefist"
+# (and Payback, the owner's rule, 2026-10-21: 50 power, +50 for every hit the user has taken, an S2 move like the others)
+SPECIAL["payback"] = "ragefist"
 # house rule (the owner's): Whirlwind is a 60-power attack (special: it's a wind; Normal type, never misses, moves last, an S1 move)
 # that still blows the target away
 # Gen 8 and 9 moves PokeAPI has no effect data for
@@ -428,6 +430,8 @@ for _k, _v in {
     "shell-trap": {"sp": "shelltrap"}, "spectral-thief": {"sp": "spectralthief"}, "thousand-arrows": {"sp": "thousandarrows"},
     "thousand-waves": {"sp": "anchor"}, "anchor-shot": {"sp": "anchor"}, "spirit-shackle": {"sp": "anchor"},
     "bolt-beak": {"sp": "boltbeak"}, "fishious-rend": {"sp": "boltbeak"}, "core-enforcer": {"sp": "coreenforcer"}, "flying-press": {"sp": "flyingpress"},
+    # (Burning Jealousy's burn is its own rule, a target with a stat at +2 or higher: the owner's, 2026-10-21; never the plain 100%)
+    "burning-jealousy": {"ail": None, "ac": None},
 }.items():
     META_FIX[_k] = {**META_FIX.get(_k, {}), **_v}
 TARGET = {"7": "self", "10": "one", "11": "foes", "9": "foes", "8": "one", "13": "team", "4": "team", "3": "ally", "5": "self",

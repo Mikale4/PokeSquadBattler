@@ -319,12 +319,12 @@ function makeBattle(cfg) {
           const t = pick(foes.filter(f => !["TRACE", "IMPOSTER", "NEUTRAL", "NONE"].includes((f.passives[0] || {}).id)));
           if (t) { u.passives = [abilityOf(t.passives[0].key)]; msg(`${Nm(u)} traced ${nm(t)}'s ${t.passives[0].name}!`); abilityCure(u); }
         }
-        else if (p.id === "FRISK") { const it = foes.filter(f => f.held && !f.flags.itemUsed); if (it.length) for (const f of it) msg(psT("frisk", "activate", { POKEMON: nm(u), TARGET: nm(f), ITEM: HELD[f.held].n })); }
-        else if (p.id === "FOREWARN" && foes.length) {
-          let best = null; for (const f of foes) for (const s of f.skills) if (s.M.c !== "X" && (!best || s.pow > best.s.pow)) best = { f, s };
-          if (best) msg(`${Nm(u)}'s Forewarn alerted it to ${best.s.name}!`);
+        // Frisk (the owner's rule, 2026-10-21): it knocks off a random opposing Pokémon's held item as it comes in, once a battle (as
+        // Knock Off does: Sticky Hold keeps it; with no item to take it waits for its next time in)
+        else if (p.id === "FRISK" && !u.flags.frisked) {
+          const f = pick(foes.filter(f => f.held && !f.flags.itemUsed && !tab(u, f, "STICKY")));
+          if (f) { const h = f.held; u.flags.frisked = 1; f.held = null; f.flags.unburden = true; msg(`${Nm(u)} frisked ${nm(f)} and knocked off its ${HELD[h].n}!`); fxEv(f); }
         }
-        else if (p.id === "ANTICIPATION" && foes.some(f => f.skills.some(s => s.M.c !== "X" && (OHKO.has(s.M.sp) || typeEff(s.M.t, u.types) > 1)))) msg(`${Nm(u)} shuddered!`);
       }
     }
     for (const u of list) autoTrickRoom(u);   // (Trick Room sets itself up as its user comes in: the owner's rule)
@@ -520,12 +520,17 @@ function makeBattle(cfg) {
   }
   // a Pokémon sent in to take a fainted one's place (the owner's rule): protected like Protect until its first turn (moves from the
   // other side fail; Feint and the like break it, Unseen Fist gets through). Entry hazards, the weather and its status still hurt it.
-  // Not one dragged in (Roar, Dragon Tail...) or coming in on a pivot move (U-turn, Volt Switch...): those go through switchOut
+  // Not one dragged in (Roar, Dragon Tail...) or coming in on a pivot move (U-turn, Volt Switch...): those go through switchOut. One
+  // sent in by Emergency Exit, Wimp Out, Defeatist, an Eject Button or an Eject Pack is protected the same way (the owner's rule,
+  // 2026-10-21: a pivotQ entry's guard)
+  function guardIn(x) {
+    if (x.alive && B.units.includes(x) && !has(x, "PROTECT")) { addEff(x, "PROTECT", 99, x, true); const pe = effOf(x, "PROTECT"); if (pe) pe.shield = "replace"; msg(`${Nm(x)} is protected until its first turn!`); ev({ k: "aura", u: x.uid }); }
+  }
   function sendIn(team, slot, x) {
     const old = B.units.find(u => u.team === team && u.slot === slot && !u.alive);
     if (old) { B.units.splice(B.units.indexOf(old), 1); B.gone.push(old); ev({ k: "clear", u: old.uid }); }
     enter(team, slot, x, null, R() * 10);
-    if (x.alive && B.units.includes(x) && !has(x, "PROTECT")) { addEff(x, "PROTECT", 99, x, true); const pe = effOf(x, "PROTECT"); if (pe) pe.shield = "replace"; msg(`${Nm(x)} is protected until its first turn!`); ev({ k: "aura", u: x.uid }); }
+    guardIn(x);
   }
   // leaving the field ends stat changes and volatile effects (a status condition stays), as in the games
   // (as on Showdown: Bind and its kin, Mean Look and Octolock end once the Pokémon that did it is gone from the field)
@@ -651,8 +656,8 @@ function makeBattle(cfg) {
     if (s !== "acc" && s !== "eva") {
       // Protosynthesis and Quark Drive: its highest stat in harsh sunlight or Electric Terrain, or while it holds Booster Energy
       const px = pv(u, "PARADOX"); if (px && s === bestStat(u) && (item(u, "boosterenergy") || (px.w ? inWeather(px.w) : inTerrain(px.t)))) n += 1;
-      // the Ruin Abilities: everyone else's stat −1
-      if (s !== "spe" && B.units.some(x => x.alive && x !== u && (pv(x, "RUIN") || {}).stat === s)) n -= 1;
+      // the Ruin Abilities: the other side's stat −1 (the owner's rule, 2026-10-21: never its own partners)
+      if (s !== "spe" && B.units.some(x => x.alive && x.team !== u.team && (pv(x, "RUIN") || {}).stat === s)) n -= 1;
     }
     return n;
   }
@@ -805,7 +810,7 @@ function makeBattle(cfg) {
     fxEv(tar);
     if (n < 0 && src && src !== tar && src.team !== tar.team) { const df = pv(tar, "DEFIANT"); if (df) stage(tar, tar, df.stat, 2, tar.passives[0].name); }
     if (v < old && item(tar, "whiteherb")) { for (const k in tar.stages) if (tar.stages[k] < 0) tar.stages[k] = 0; useUp(tar, `${Nm(tar)} returned its stats to normal using its White Herb!`); }
-    if (v < old && src && src !== tar && item(tar, "ejectpack") && benchOf(tar.team).length && B.units.includes(tar)) { useUp(tar, `${Nm(tar)} is switched out with the Eject Pack!`); B.pivotQ.push({ uid: tar.uid }); }
+    if (v < old && src && src !== tar && item(tar, "ejectpack") && benchOf(tar.team).length && B.units.includes(tar)) { useUp(tar, `${Nm(tar)} is switched out with the Eject Pack!`); B.pivotQ.push({ uid: tar.uid, guard: 1 }); }
     if (v > old && !B.mirroring) for (const f of enemies(tar)) if (pv(f, "OPPORTUNIST")) { B.mirroring = true; stage(f, f, s, v - old, "Opportunist"); B.mirroring = false; }
     if (v > old && !B.mirroring) for (const f of enemies(tar)) if (pv(f, "RIVALRY")) { B.mirroring = true; stage(f, f, s, v - old, "Rivalry"); B.mirroring = false; }
     if (v > old && !B.mirroring) for (const f of enemies(tar)) if (item(f, "mirrorherb")) { B.mirroring = true; useUp(f, `${Nm(f)} used its Mirror Herb to mirror its opponent's stat changes!`); stage(f, f, s, v - old); B.mirroring = false; }
@@ -974,7 +979,6 @@ function makeBattle(cfg) {
     if (sp === "wakeupslap" && tar.status === "SLP") p *= 2;
     if (sp === "smellingsalts" && tar.status === "PAR") p *= 2;
     if (sp === "assurance" && since(tar.hitT)) p *= 2;
-    if (sp === "payback" && since(tar.actT)) p *= 2;
     if (sp === "tantrum" && att.flags.failed) p *= 2;
     if (sp === "retaliate" && since(B.faintT && B.faintT[att.team])) p *= 2;
     if (sp === "lashout" && since(att.lowerT)) p *= 2;
@@ -1011,7 +1015,10 @@ function makeBattle(cfg) {
   const SLICE = new Set(["aerialace", "aircutter", "airslash", "aquacutter", "behemothblade", "bitterblade", "ceaselessedge", "crosspoison", "cut", "furycutter",
     "kowtowcleave", "leafblade", "mightycleave", "nightslash", "populationbomb", "psyblade", "psychocut", "razorleaf", "razorshell", "sacredsword", "secretsword", "slash",
     "solarblade", "stoneaxe", "tachyoncutter", "xscissor"]);
-  const SECONDARY_SP = new Set(["triattack", "secretpower", "throatchop", "psychicnoise"]);
+  const SECONDARY_SP = new Set(["triattack", "secretpower", "throatchop", "psychicnoise", "burningjealousy"]);
+  // Burning Jealousy (the owner's rule, 2026-10-21): it burns a target with any stat at +2 or higher, as its stat badge shows it (the
+  // stages moves made and the ones fixed to an item, an Ability or the field)
+  const jealous = x => Object.values(shownStages(x)).some(v => v >= 2);
   // Pledges: two different ones from one side, the second within a round of the first (since its user's last turn), make the
   // second a 150-power combined move with a field effect for 4 rounds: a sea of fire or a swamp on the other side, a rainbow on yours
   const PLEDGE = { firepledge: "fire", grasspledge: "grass", waterpledge: "water" };
@@ -1156,7 +1163,10 @@ function makeBattle(cfg) {
     if (!sk || !tar || !tar.alive) return 0;
     const rd = redirect(att, sk, tar);
     if (rd !== tar) return !legacy(att) && absorbs(rd, sk, att) && !item(att, "ringtarget") ? -1 : 0;   // it would go to a Follow Me or Lightning Rod user instead (who soaks it up)
-    if (has(tar, "PROTECT") && tar.team !== att.team) return 0;
+    // (Protect stops it, except what gets through Protect as the move goes off: an Unseen Fist contact move, Feint, Phantom Force
+    // and Shadow Force: useMove)
+    // (an unused Anticipation or Forewarn puts up Protect against the first attack: the owner's rule, 2026-10-21)
+    if (tar.team !== att.team && (has(tar, "PROTECT") || (!tar.flags.braced && (tab(att, tar, "ANTICIPATION") || tab(att, tar, "FOREWARN")))) && !(sk.M.ct && pv(att, "UNSEEN_FIST")) && sk.M.sp !== "feint" && sk.key !== "phantomforce" && sk.key !== "shadowforce") return 0;
     if (sk.M.pri > 0 && tar.team !== att.team && (inTerrain("psychic", tar) || allies(tar).some(a => tab(att, a, "NO_PRIORITY")))) return 0;   // (a priority move that would fail)
     // one-hit KO moves: the target's HP at their 30% accuracy, unless it's a boss or a higher level (then they always fail)
     if (OHKO.has(sk.M.sp)) return effOn(att, tar, sk) === 0 || tar.boss || tar.lvl > att.lvl || tab(att, tar, "STURDY") ? 0 : Math.round(tar.hp * accOf(att, tar, sk));
@@ -1209,7 +1219,7 @@ function makeBattle(cfg) {
     }
     // Conversion, Conversion 2 and Color Change (the owner's rules, 2026-10-16): before the damage is worked out, the target may become
     // a type that resists the attack (convert); the first strike only
-    if (first && M.c !== "X" && att.team !== tar.team) convert(tar, mtype(att, sk));
+    if (first && M.c !== "X" && att.team !== tar.team) convert(tar, mtype(att, sk), att);
     const cs = critStage(att, sk), noCrit = tab(att, tar, "NO_CRIT") || has(tar, "LUCKY");
     const crit = !noCrit && !FIXED[M.sp] && M.sp !== "superfang" && (sureCrit(att, sk) || sniperCrit(att) || (pv(att, "MERCILESS") && ["PSN", "TOX"].includes(tar.status)) || R() < critChance(cs));
     const r = damageOf(att, tar, sk, { crit });
@@ -1277,7 +1287,7 @@ function makeBattle(cfg) {
       const hb = pv(tar, "HIT_BOOST"); if (hb && (!hb.types || hb.types.includes(t))) stage(tar, tar, hb.stat, hb.n, tar.passives[0].name);
       const bz = pv(tar, "BERSERK");
       if (bz && crossed) { if (bz.shell) { for (const st of ["atk", "spa", "spe"]) stage(tar, tar, st, 1); for (const st of ["def", "sdf"]) stage(tar, tar, st, -1); } else stage(tar, tar, "spa", 1, "Berserk"); }
-      if (pv(tar, "EJECT_HALF") && crossed && !sheerOf(att, sk) && benchOf(tar.team).length && B.units.includes(tar)) { msg(`${Nm(tar)}'s ${tar.passives[0].name}!`); B.pivotQ.length = 0; B.pivotQ.push({ uid: tar.uid }); }   // (it cancels every other switch, U-turn's too, as on Showdown)
+      if (pv(tar, "EJECT_HALF") && crossed && !sheerOf(att, sk) && benchOf(tar.team).length && B.units.includes(tar)) { msg(`${Nm(tar)}'s ${tar.passives[0].name}!`); B.pivotQ.length = 0; B.pivotQ.push({ uid: tar.uid, guard: 1 }); }   // (it cancels every other switch, U-turn's too, as on Showdown)
       if (pv(tar, "COTTON_DOWN")) { msg(`${Nm(tar)}'s Cotton Down!`); for (const x of B.units) if (x.alive && x.team !== tar.team) stage(tar, x, "spe", -1); }   // (the opposing side only: the owner's rule, 2026-10-16)
       if (pv(tar, "SAND_SPIT") && B.weather !== "sand") { B.weather = "sand"; B.wxEnd = fieldRounds(item(tar, "smoothrock") ? 8 : 5); msg(`${Nm(tar)}'s Sand Spit!`); if (WEATHER.sand) msg(WEATHER.sand.turn); ev({ k: "weather", w: "sand" }); }
       if (pv(tar, "SEED_SOWER") && !(B.terrain && B.terrain.t === "grassy")) setTerrain(tar, "grassy");
@@ -1792,14 +1802,17 @@ function makeBattle(cfg) {
         if (s.target === "aoe_enemies") {
           let v = 0, kills = 0, dealt = 0;
           for (const f of foes) { const d = expectedDamage(u, f, s), r = dmgValue(s, f, d); v += r.v; kills += r.kill ? 1 : 0; dealt += Math.max(0, d); }
-          push(s, null, dealt <= 0 && v >= 0 ? harmless : adjust(v, kills, dealt));
+          push(s, null, dealt <= 0 && v >= 0 ? harmless - cdCost(s) : adjust(v, kills, dealt));
         } else for (const f of foes) {
           const d = expectedDamage(u, f, s), r = dmgValue(s, f, d);
-          let v = d === 0 ? harmless : adjust(r.v, r.kill, Math.max(0, d));   // an immunity: it would do nothing
+          // (an immunity or Protect: it would do nothing, and an S2 or S3 move would still go on cooldown for it, the owner's ask,
+          // 2026-10-21: so an S1 move goes into Protect, or a move that does something else, never one that has to wait)
+          let v = d === 0 ? harmless - cdCost(s) : adjust(r.v, r.kill, Math.max(0, d));
           if ((sp === "pursuit" || sp === "upperhand") && !r.kill) v = harmless;   // (the owner's rule) kept ready for their trigger, used only for a knockout
           if (d > 0 && !r.kill) { const e = effOn(u, f, s); v *= e < 1 ? AIW.resist : e > 1 ? AIW.superEff : 1; }
           // added effects: a chance to burn, paralyze or freeze a Pokémon that has no status yet
           if (d > 0 && M.ail && M.ac && !f.status && MAJOR.includes(M.ail) && !(TYPE_IMMUNE[M.ail] && f.types.includes(TYPE_IMMUNE[M.ail]))) v += M.ac / 100 * .25 * tw(f);
+          if (d > 0 && sp === "burningjealousy" && jealous(f) && !f.status && !f.types.includes("Fire") && !pv(u, "SHEER_FORCE")) v += .25 * tw(f);   // (a sure burn on a boosted foe)
           // a chance to flinch it: a flinch costs its next turn (the owner's rule, 2026-10-19), worth more the more dangerous it is
           if (d > 0 && !r.kill && combos(u, "flinch") && !f.flags.stun && !pv(f, "INNER_FOCUS") && !(f.shield > 0)) { const fl = flinchOf(u, s); if (fl) v += fl * AIW.flinch * tw(f); }
           if (d > 0 && !legacy(u)) v -= hitBack(u, f, s, r.kill);
@@ -2470,10 +2483,11 @@ function makeBattle(cfg) {
   // Conversion and Conversion 2 (the owner's rule, 2026-10-16): they can't be chosen. Just before an opposing attack's damage, a
   // Pokemon that knows one, ready, becomes a type that resists the attack (Conversion 2: one the attack doesn't affect at all, when
   // there is one, else one that resists it), picked at random among them, if that's better than what it is. That isn't its turn: the
-  // move goes on cooldown. With both, Conversion 2 goes when an immunity is there, else Conversion first. Its type is back when it leaves
-  function convert(x, t) {
+  // move goes on cooldown. With both, Conversion 2 goes when an immunity is there, else Conversion first. Its type is back when it leaves.
+  // A Ring Target's holder hits an immune type for ×1, so against it there's no immunity to pick, only a type that resists
+  function convert(x, t, att) {
     if (!t || t === "???" || !x.alive || x.flags.semi) return;
-    const imm = TYPES.filter(d => typeEff(t, [d]) === 0), res = TYPES.filter(d => typeEff(t, [d]) > 0 && typeEff(t, [d]) < 1), now = typeEff(t, x.types);
+    const imm = att && item(att, "ringtarget") ? [] : TYPES.filter(d => typeEff(t, [d]) === 0), res = TYPES.filter(d => typeEff(t, [d]) > 0 && typeEff(t, [d]) < 1), now = typeEff(t, x.types);
     const ready = sp => x.skills.find(k => k.M.sp === sp && skillReady(x, k));
     // (Color Change, the Ability, does what Conversion does, with no cooldown: it goes before Conversion, so the move stays ready)
     const order = imm.length ? ["conversion2", "COLOR_CHANGE", "conversion"] : ["COLOR_CHANGE", "conversion", "conversion2"];
@@ -2541,7 +2555,7 @@ function makeBattle(cfg) {
     else if (H.hitBoost === M.c && bOk) { if (!sheer) tar.flags.keePend = 1; }   // (Kee and Maranga: once the move is done, afterMoveItems)
     else if (H.retaliate === M.c && bOk && att.alive) { useUp(tar, `${Nm(tar)} ate its ${H.n}!`); chip(att, att.max.hp / 8, `${Nm(att)} was hurt by ${nm(tar)}'s ${H.n}!`); }
     else if (H.seHeal && e > 1 && bOk) { useUp(tar); heal(tar, tar.max.hp * H.seHeal, `${Nm(tar)} restored its HP using its ${H.n}!`); }
-    else if (k === "ejectbutton" && !sheer && benchOf(tar.team).length && B.units.includes(tar) && !B.pivotQ.length) { useUp(tar, `${Nm(tar)} is switched out with the Eject Button!`); B.pivotQ.push({ uid: tar.uid }); }   // (one a move)
+    else if (k === "ejectbutton" && !sheer && benchOf(tar.team).length && B.units.includes(tar) && !B.pivotQ.length) { useUp(tar, `${Nm(tar)} is switched out with the Eject Button!`); B.pivotQ.push({ uid: tar.uid, guard: 1 }); }   // (one a move)
     else if (k === "redcard" && !sheer) tar.redCard = true;
   }
   // terrain seeds: +1 to a defense when their terrain is on the field
@@ -2625,7 +2639,7 @@ function makeBattle(cfg) {
     if (sp === "clearsmog" && x.alive) { x.stages = newStages(); msg(`${Nm(x)}'s stat changes were removed!`); fxEv(x); }
     if (sp === "wakeupslap" && x.alive && x.status === "SLP") { x.status = null; msg(`${Nm(x)} woke up!`); fxEv(x); }
     if (sp === "smellingsalts" && x.alive && x.status === "PAR") { x.status = null; msg(`${Nm(x)} was cured of paralysis!`); fxEv(x); }
-    if (sp === "burningjealousy" && x.alive && x.raiseT != null && x.raiseT > (u.actT == null ? -1 : u.actT)) tryStatus(u, x, "BRN", false);
+    if (sp === "burningjealousy" && x.alive && jealous(x) && !tab(u, x, "SHIELD_DUST") && !item(x, "covertcloak") && !sheerOf(u, sk)) tryStatus(u, x, "BRN", false);
     if (sp === "dragontail" && x.alive && !x.boss && !(B.wild && x.team === "E") && benchOf(x.team).length) { if (anchored(x)) msg(has(x, "INGRAIN") ? `${Nm(x)} anchored itself with its roots!` : `${Nm(x)} anchors itself with Suction Cups!`); else switchOut(x, pick(benchOf(x.team)), true); }
     // Whirlwind (house rule: a 60-power attack): blows the target away, so a random Pokémon from its bench comes in; a boss, a
     // wild Pokémon or one with nobody to come in loses its turn meter and stat changes instead
@@ -2888,6 +2902,12 @@ function makeBattle(cfg) {
       return useMove(u, virt, tg);
     }
     if (sp === "transform") return transform(u, targets[0]);
+    // Anticipation and Forewarn (the owner's rule, 2026-10-21): the first attack from the other side aimed at it, one that can affect
+    // it, puts up Protect until its next turn, once a battle (Feint, Unseen Fist and the like still get through)
+    if (M.c !== "X") for (const x of targets) if (x.team !== u.team && x.alive && !x.flags.braced && !has(x, "PROTECT") && (tab(u, x, "ANTICIPATION") || tab(u, x, "FOREWARN")) && effOn(u, x, sk) !== 0) {
+      x.flags.braced = 1; addEff(x, "PROTECT", 99, x, true); const pe = effOf(x, "PROTECT"); if (pe) pe.shield = "protect";
+      msg(`${Nm(x)}'s ${x.passives[0].name} warned it of the attack!`); ev({ k: "aura", u: x.uid });
+    }
     // Protect and Detect: moves from the other side fail against it until its next turn
     if (sp === "feint") for (const x of targets) if (has(x, "PROTECT")) { removeEff(x, "PROTECT"); msg(`${Nm(x)} fell for the feint!`); }
     if (sk.key === "phantomforce" || sk.key === "shadowforce") for (const x of targets) if (has(x, "PROTECT")) { removeEff(x, "PROTECT"); msg(psT(sk.key, "activate", { TARGET: nm(x) })); }
@@ -3177,7 +3197,7 @@ function makeBattle(cfg) {
       const pv0 = B.pivotQ.shift(), u = B.units.find(x => x.uid === pv0.uid);
       if (u && u.alive && benchOf(u.team).length && !fieldOn("fairyLock")) {
         if (picks(u.team)) { B.needPick = u.slot; B.needPivot = pv0; B.needTeam = u.team; return "replace"; }
-        switchOut(u, aiReplacement(u.team), pv0.keep ? (pv0.keep === "shed" ? { sub: pv0.sub } : "baton") : false); return "sendin";
+        const x = aiReplacement(u.team); switchOut(u, x, pv0.keep ? (pv0.keep === "shed" ? { sub: pv0.sub } : "baton") : false); if (pv0.guard && x) guardIn(x); return "sendin";
       }
     }
     // empty places are filled before anyone moves. Each trainer chooses: the opponent first (the best matchup against what's
@@ -3250,7 +3270,7 @@ function makeBattle(cfg) {
     const x = benchOf(team).find(y => y.uid === uid) || aiReplacement(team);
     const piv = B.needPivot; B.needPick = null; B.needPivot = null; B.needTeam = null;
     if (!x) return;
-    if (piv) { const u = B.units.find(y => y.uid === piv.uid); if (u && u.alive) switchOut(u, x, piv.keep ? (piv.keep === "shed" ? { sub: piv.sub } : "baton") : false); }
+    if (piv) { const u = B.units.find(y => y.uid === piv.uid); if (u && u.alive) { switchOut(u, x, piv.keep ? (piv.keep === "shed" ? { sub: piv.sub } : "baton") : false); if (piv.guard) guardIn(x); } }
     else sendIn(team, slot, x);
   };
   // what the AI would do for this Pokémon, without doing it (an online battle's timer runs out: the player's own phone works the move

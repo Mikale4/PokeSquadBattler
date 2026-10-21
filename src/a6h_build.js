@@ -134,8 +134,10 @@ function abilityValue(k, abKey, c = {}) {
     case "OOZE": return meta.drain * .1;
     case "SOUNDPROOF": return DEF * meta.sound;
     case "EARLY_BIRD": return (meta.status.SLP || 0) * .3 + (mv.includes("rest") ? .04 : 0);
-    case "PICKUP": return .002;
-    case "BALL_FETCH": return .002;   // (a Safari Ball now and then after a Journey win: nothing in battle)
+    // (no battle effect, the owner's ask, 2026-10-21: just below an Ability that can matter in battle, even one that needs a partner
+    // or a Berry, so it goes only to a Pokémon with nothing else; on the Showdown site it does nothing at all)
+    case "PICKUP": return -.002;
+    case "BALL_FETCH": return -.002;   // (a Safari Ball now and then after a Journey win: nothing in battle)
     case "TECHNICIAN": case "SHEER_FORCE": case "HUSTLE": case "IRON_FIST": case "RECKLESS": case "SKILL_LINK": case "SERENE": case "ADAPT":
     case "TINTED": case "SCRAPPY": return 0;
     case "NO_GUARD": return -meta.inacc * DEF * .5;   // foes never miss it either
@@ -227,7 +229,10 @@ function abilityValue(k, abKey, c = {}) {
     case "UNAWARE": return meta.setup * .35;
     case "UNBURDEN": return .25;   // (the owner's rule: Speed +2 whenever it holds no item; itemValue charges a lasting item for it)
     case "WONDER_SKIN": return meta.statusMoves * .15;
-    case "ANTICIPATION": case "FOREWARN": case "FRISK": return .003;
+    // (the owner's rules, 2026-10-21) a Protect of its own against the first attack, once a battle: a little less than Disguise, as the
+    // other side can spend a cheap S1 move on it; Frisk takes one random foe's held item as it comes in, once a battle
+    case "ANTICIPATION": case "FOREWARN": return .15;
+    case "FRISK": return .06;
     // generations 6 to 9 (what powers up its attacks is in abMoveMul)
     case "FLAGPOW": case "ATE": case "AURA": return A.guard ? .03 : 0;
     case "TYPEPOW": return A.allies ? .03 + mates.filter(x => (x.mv || []).some(m => MOVES[m] && MOVES[m].t === A.type && MOVES[m].c !== "X")).length * .03 : 0;
@@ -359,8 +364,10 @@ const COVER_SAMPLE = () => COVER_SAMPLE.v || (COVER_SAMPLE.v = COMP_POOL().map(k
 // how well a set of attacking types hits the pool: the average of its best multiplier against each Pokémon (2 at most); against
 // c.cover instead when a plan is for given foes (their types: the Demo's plan for a Journey battle, demoFoes in a9g_demo.js)
 const COVER = new Map();
-const coverIn = (ts, sample) => !ts.length ? .5 : sample.reduce((a, d) => a + Math.min(2, Math.max(...ts.map(t => typeEff(t, d)))), 0) / sample.length;
-const coverOf = (ts, sample) => { if (sample) return coverIn(ts, sample); if (!ts.length) return .5; const id = ts.slice().sort().join(); if (!COVER.has(id)) COVER.set(id, COVER_SAMPLE().reduce((a, d) => a + Math.min(2, Math.max(...ts.map(t => typeEff(t, d)))), 0) / COVER_SAMPLE().length); return COVER.get(id); };
+// (ring: a Ring Target's holder, whose attacks hit a type immune to them for ×1: Xurkitree's Electric moves still cover Ground types)
+const effCov = (t, d, ring) => typeEff(t, d) || (ring ? 1 : 0);
+const coverIn = (ts, sample, ring) => !ts.length ? .5 : sample.reduce((a, d) => a + Math.min(2, Math.max(...ts.map(t => effCov(t, d, ring)))), 0) / sample.length;
+const coverOf = (ts, sample, ring) => { if (sample) return coverIn(ts, sample, ring); if (!ts.length) return .5; const id = ts.slice().sort().join() + (ring ? "|ring" : ""); if (!COVER.has(id)) COVER.set(id, COVER_SAMPLE().reduce((a, d) => a + Math.min(2, Math.max(...ts.map(t => effCov(t, d, ring)))), 0) / COVER_SAMPLE().length); return COVER.get(id); };
 // what a team gets out of a weather: Speed-doubling Abilities, the attacks it powers up, Rock- or Ice-types' extra bulk
 // the terrain a team's Surge Ability sets up
 const TERRAIN_SET = { electricterrain: "electric", grassyterrain: "grassy", mistyterrain: "misty", psychicterrain: "psychic" };
@@ -422,6 +429,13 @@ function moveIn0(k, m, ab, held, c) {
   if (c && c.tr && slowsFoe(m)) return 1;
   if (M.c !== "X") {
     v *= Math.pow(Math.max(b[1], b[3], 20) / 95, .8);
+    // its nature, once it's known: +10% or -10% to the stat the attack uses (Body Press goes by Defense, Foul Play by the target's Attack)
+    const nat = c && c.nat && NATURES[c.nat], st = M.sp === "bodypress" ? "def" : M.sp === "foulplay" ? null : M.c === "P" ? "atk" : "spa";
+    if (nat && st) v *= nat[0] === st ? 1.1 : nat[1] === st ? .9 : 1;
+    // (Unburden: an item taken from the target ends its Speed +2, so Thief and Covet are worse than plain attacks to it)
+    if ((M.sp === "thief" || m === "covet") && abilityOf(ab || OPS[k].ab).id === "UNBURDEN") v *= .7;
+    // (Acrobatics, valued ×1.2 for its double power: an item held that's never used up keeps it at its own power for good)
+    if (M.sp === "acrobatics" && held && !USED_UP.test(held)) v /= 1.2;
     const w = c && c.wx;
     // Weather Ball: in the team's weather, 100 power and the weather's type (Fire, Water, Rock or Ice). A special move, so never on a
     // Pokémon that hits harder physically (the owner's rule)
@@ -492,18 +506,19 @@ function comboBonus(k, mv, ab, held, c) {
   if ((has("followme") || has("ragepowder")) && mv.some(m => M_(m) && M_(m).c !== "X" && M_(m).dr > 0)) v += 20;
   return v;
 }
-// a set of three (one per slot): each move as above, a second attack of a type it already has counts less, and the set as a
-// whole is worth more the more of the pool it hits hard
+// a set of three (one per slot): each move as above, a second attack of a type it already has counts less (not for a Ring Target's
+// holder: nothing is immune to its type, and the types that resist it count in the coverage: Xurkitree's Discharge after Shock Wave
+// won 60% of 144 head-to-heads against Dazzling Gleam, 2026-10-21), and the set as a whole is worth more the more of the pool it hits hard
 function setValue(k, mv, ab, held, c) {
-  const ts = []; let v = 0;
+  const ts = [], rep = held === "ringtarget" ? 1 : .75; let v = 0;
   mv.forEach((m, i) => {
     if (!m || !MOVES[m]) return;
     const M = MOVES[m]; let x = moveIn(k, m, ab, held, c);
-    if (M.c !== "X") { const t = mvType(m, c); if (ts.includes(t)) x *= .75; ts.push(t); }
+    if (M.c !== "X") { const t = mvType(m, c); if (ts.includes(t)) x *= rep; ts.push(t); }
     v += x * (SLOT_USE[i + 1] || .5);
   });
   v += comboBonus(k, mv, ab, held, c) * .6;
-  return v * Math.sqrt(coverOf(ts, c && c.cover) / 1.4);
+  return v * Math.sqrt(coverOf(ts, c && c.cover, held === "ringtarget") / 1.4);
 }
 // (moves that only work in odd cases are left out, as in Legend sets: Snore, Sleep Talk, fainting on purpose)
 function optMoves(k, pool, ab, held, c) {
@@ -517,12 +532,12 @@ function optMoves(k, pool, ab, held, c) {
     return top.length ? top : [[null, 0, null]];
   });
   let best = [null, null, null], bv = -1;
-  const u1 = SLOT_USE[1], u2 = SLOT_USE[2], u3 = SLOT_USE[3];
+  const u1 = SLOT_USE[1], u2 = SLOT_USE[2], u3 = SLOT_USE[3], rep = held === "ringtarget" ? 1 : .75;
   for (const a of opts[0]) for (const b of opts[1]) for (const d of opts[2]) {
     const ts = []; let v = 0;
-    for (const [x, u] of [[a, u1], [b, u2], [d, u3]]) { if (!x[0]) continue; let w = x[1]; if (x[2]) { if (ts.includes(x[2])) w *= .75; ts.push(x[2]); } v += w * u; }
+    for (const [x, u] of [[a, u1], [b, u2], [d, u3]]) { if (!x[0]) continue; let w = x[1]; if (x[2]) { if (ts.includes(x[2])) w *= rep; ts.push(x[2]); } v += w * u; }
     if (COMBO_PART.has(a[0]) || COMBO_PART.has(b[0]) || COMBO_PART.has(d[0])) v += comboBonus(k, [a[0], b[0], d[0]], ab, held, c) * .6;
-    v *= Math.sqrt(coverOf(ts, c && c.cover) / 1.4);
+    v *= Math.sqrt(coverOf(ts, c && c.cover, held === "ringtarget") / 1.4);
     if (v > bv) { bv = v; best = [a[0], b[0], d[0]]; }
   }
   return { mv: best, v: bv };
@@ -549,13 +564,15 @@ const abilityScore = (k, a, mv, c = {}) => .5 * (setValue(k, mv, a, c.held, c) /
 const pickAbility = (k, c = {}) => bestBuild(k, c).ab;
 // the physical and special shares of what it does, and how much of it is attacking
 function offShares(k, mv, ab, held, c) {
-  let p = 0, sp = 0, all = 0;
+  let p = 0, sp = 0, df = 0, all = 0;
   mv.forEach((m, i) => {
     if (!m || !MOVES[m]) return;
-    const x = Math.max(0, moveIn(k, m, ab, held, c)) * (SLOT_USE[i + 1] || .5);
-    all += x; if (MOVES[m].c === "P") p += x; if (MOVES[m].c === "S") sp += x;
+    const x = Math.max(0, moveIn(k, m, ab, held, c)) * (SLOT_USE[i + 1] || .5), M = MOVES[m];
+    all += x;
+    // (Body Press hits with the user's Defense, Foul Play with the target's Attack)
+    if (M.sp === "bodypress") df += x; else if (M.sp === "foulplay") {} else if (M.c === "P") p += x; else if (M.c === "S") sp += x;
   });
-  return { p: p / (all || 1), s: sp / (all || 1), atk: (p + sp) / (all || 1) };
+  return { p: p / (all || 1), s: sp / (all || 1), d: df / (all || 1), atk: (p + sp + df) / (all || 1) };
 }
 // the nature: +10% where it counts most, -10% where it counts least. What it does is roughly its turns x what each turn does x
 // how long it lasts: +10% to the attacking stat it uses is +10% to its attacks, +10% Defense or Sp. Def keeps it in 10% longer
@@ -570,9 +587,10 @@ function optNature(k, mv, ab, c = {}) {
   // out, the owner's rule; how fast it is doesn't change that)
   const redirect = (mv || []).some(m => MOVES[m] && (MOVES[m].sp === "followme" || MOVES[m].sp === "spotlight"));
   const rb = redirect ? 2 : 1, ra = redirect ? .3 : 1;
-  const w = { atk: .1 * o.p * hit * ra, spa: .1 * o.s * hit * ra, def: .1 * meta.phys * rb, sdf: .1 * (1 - meta.phys) * rb, spe: c.tr ? -turns : turns * (weatherFast ? .3 : 1) };
+  const w = { atk: .1 * o.p * hit * ra, spa: .1 * o.s * hit * ra, def: .1 * meta.phys * rb + .1 * o.d * hit * ra, sdf: .1 * (1 - meta.phys) * rb, spe: c.tr ? -turns : turns * (weatherFast ? .3 : 1) };
   let best = "serious", bv = 0;
-  for (const n of MINT_NATURES) { const [u, d] = NATURES[n]; if (!u) continue; const v = w[u] - w[d] * 1.1; if (v > bv + 1e-9) { bv = v; best = n; } }
+  const used = { atk: o.p > .02, spa: o.s > .02, def: o.d > .02 };
+  for (const n of MINT_NATURES) { const [u, d] = NATURES[n]; if (!u || used[d]) continue; const v = w[u] - w[d] * 1.1; if (v > bv + 1e-9) { bv = v; best = n; } }
   return best;
 }
 // a held item's worth to this Pokémon with this build (b: { mv, ab }), as a share of its strength
@@ -585,6 +603,9 @@ function optNature(k, mv, ab, c = {}) {
 // Wind for Normal types, Machamp's Payback for Gengar). More generations bring more immunities (Dark types for Psychic), and it
 // counts them as they come.
 const RING_K = 2;
+// the owner's picks (2026-10-21): nearly every attack they have is one type an immunity stops (Electric into Ground types, Ghost into
+// Normal types), so they always hold a Ring Target, one a team (the Item Clause): their moves are picked knowing it (npcBuild)
+const RING_ALWAYS = new Set(["regieleki", "xurkitree", "spectrier"]);
 // what the top tiers' teams are immune to (Master Ball and up run archetype teams): a few line-ups of every archetype, with the
 // Ability its role wants (else the species' own), so it follows the archetypes. Top-tier Trainers judge Ring Target against
 // these, the opponents they really meet, not every Pokémon counted equally (Legend teams: 47% immune to Ground, 5% to Ghost;
@@ -605,10 +626,19 @@ function topImmune() {
 const FIELD_ITEMS = new Set(["heatrock", "damprock", "smoothrock", "icyrock", "terrainextender", "roomservice"]);
 const ATTACK_ITEMS = new Set(["choiceband", "choicespecs", "lifeorb", "expertbelt", "muscleband", "wiseglasses", "berserkgene", ...Object.keys(HELD).filter(h => HELD[h].boost || (HELD[h].types && !HELD[h].only))]);
 // Unburden (Speed +2 while it holds no item): an item that's never used up costs it that
-const USED_UP = /berry$|sash|gem|herb|seed$|balloon|whiteherb|powerherb|weaknesspolicy|blunderpolicy|adrenalineorb|ejectbutton|ejectpack|redcard|berserkgene/;
+const USED_UP = /berry$|sash|gem|herb|(electric|grassy|misty|psychic)seed$|balloon|whiteherb|powerherb|weaknesspolicy|blunderpolicy|adrenalineorb|ejectbutton|ejectpack|redcard|berserkgene/;
+// Acrobatics (double power while its user holds no item): an item that's never used up halves it for good, so it costs half of
+// Acrobatics' share of the set's damage (the owner's ask, 2026-10-21: no Choice Specs on an Acrobatics user)
+const acroShare = (k, b, c) => {
+  let a = 0, all = 0;
+  (b.mv || []).forEach((m, i) => { if (!m || !MOVES[m] || MOVES[m].c === "X") return; const x = Math.max(0, moveIn(k, m, b.ab, null, c)) * (SLOT_USE[i + 1] || .5); all += x; if (MOVES[m].sp === "acrobatics") a += x; });
+  return all ? a / all : 0;
+};
 function itemValue(k, h, b, c = {}) {
-  const v = itemValue0(k, h, b, c);
-  return v > -1 && abilityOf(b.ab || OPS[k].ab).id === "UNBURDEN" && !USED_UP.test(h) ? v - .25 : v;
+  let v = itemValue0(k, h, b, c);
+  if (v > -1 && abilityOf(b.ab || OPS[k].ab).id === "UNBURDEN" && !USED_UP.test(h)) v -= .25;
+  if (v > -1 && (b.mv || []).some(m => MOVES[m] && MOVES[m].sp === "acrobatics") && !USED_UP.test(h)) v -= .5 * acroShare(k, b, c);
+  return v;
 }
 function itemValue0(k, h, b, c = {}) {
   const H = HELD[h]; if (!H) return -1;
@@ -718,7 +748,9 @@ function itemValue0(k, h, b, c = {}) {
     // gap: next to nothing for Dragonite (Dragon Tail and Fly when Stomping Tantrum can't land) or Machamp (Payback for Gengar),
     // most for Dugtrio (all Ground) or Jolteon (Electric and little else)
     case "ringtarget": {
+      if (RING_ALWAYS.has(k)) return 2;
       const imm = c.immune || meta.immune || {}, WALL = { Normal: "Ghost", Fighting: "Ghost" };
+      // (Acrobatics at its strength with an item held, half its no-item power, moveIn0: the Ring Target is never used up)
       const atks = mv.map((m, i) => ({ M: MOVES[m], v: Math.max(0, moveIn(k, m, b.ab, h, c)) * (SLOT_USE[i + 1] || .5) })).filter(a => a.M.c !== "X" && a.v > 0);
       const all = atks.reduce((s, a) => s + a.v, 0) || 1;
       let x = 0;
@@ -809,15 +841,24 @@ function npcBuild(k, p, ac, c = {}) {
   let abs = c.ab ? [c.ab] : ac.capsule ? (ac.patch ? null : regularAbilities(k)) : [p.ab || OPS[k].ab];
   if (c.ban && c.ban.abilities.size) { const ok = (abs || [...regularAbilities(k), ...hiddenAbilities(k)]).filter(a => !banAb(a)); abs = ok.length ? ok : abs; }
   const keys = (c.keys || (c.key ? [c.key] : [])).filter(m => !banMv(m));
-  const id = [MOVE_WORTH_ON ? 1 : 0, k, p.lvl, ac.tmB, ac.tutor ? 1 : 0, abs ? abs.join("/") : "*", ac.mint ? "" : p.nat, c.wx || "", c.terrain || "", c.tr ? 1 : 0, c.wxG ? JSON.stringify(c.wxG) : "", c.teamSpe || "", keys.join("+"), c.sts ? c.sts.any + "/" + c.sts.psn : "", c.ban ? [...c.ban.moves, ...c.ban.abilities].join(",") : "", c.favor ? [...(c.favor.moves || []), ...(c.favor.abilities || [])].join(",") : ""].join("|");
+  const ring = RING_ALWAYS.has(k) && ac.items("ringtarget") > 0;   // (the owner's picks: the Ring Target it will hold)
+  const id = [MOVE_WORTH_ON ? 1 : 0, k, p.lvl, ac.tmB, ac.tutor ? 1 : 0, abs ? abs.join("/") : "*", ac.mint ? "" : p.nat, c.wx || "", c.terrain || "", c.tr ? 1 : 0, c.wxG ? JSON.stringify(c.wxG) : "", c.teamSpe || "", keys.join("+"), c.sts ? c.sts.any + "/" + c.sts.psn : "", c.ban ? [...c.ban.moves, ...c.ban.abilities].join(",") : "", c.favor ? [...(c.favor.moves || []), ...(c.favor.abilities || [])].join(",") : "", ring ? 1 : 0].join("|");
   let x = NPC_BUILD.get(id);
   if (!x) {
     // (a Trainer's Smeargle comes already sketched: any move, the owner's rule)
     let pool = sketcher(k) ? sketchable() : [...levelMoves(k, p.lvl), ...OPS[k].tms.filter(n => ac.tms.has(n)).map(n => TM_MOVE[n]).filter(Boolean), ...(ac.tutor ? [...OPS[k].egg, ...OPS[k].tutor] : [])];
     if (c.ban && c.ban.moves.size) pool = pool.filter(m => !banMv(m));
     if (keys.length) pool = [...keys, ...pool.filter(m => MOVES[m] && !keys.some(x => slotOf(x) === slotOf(m)))];   // the moves its role is there for
-    const B = bestBuild(k, { meta: poolMeta(), wx: c.wx, terrain: c.terrain, tr: c.tr, wxG: c.wxG, teamSpe: c.teamSpe, sts: c.sts, pool, abs: abs && abs.filter(Boolean), free: true, favor: c.favor });
-    x = { mv: B.mv, ab: B.ab, nat: ac.mint ? optNature(k, B.mv, B.ab, { meta: poolMeta(), tr: c.tr, wx: c.wx }) : p.nat };
+    // (without Mints its nature is the one it has, and the moves are picked for it)
+    const bc = { meta: poolMeta(), wx: c.wx, terrain: c.terrain, tr: c.tr, wxG: c.wxG, teamSpe: c.teamSpe, sts: c.sts, pool, abs: abs && abs.filter(Boolean), free: true, favor: c.favor, ...(ring ? { held: "ringtarget" } : {}), ...(ac.mint ? {} : { nat: p.nat }) };
+    let B = bestBuild(k, bc), nat = ac.mint ? optNature(k, B.mv, B.ab, { meta: poolMeta(), tr: c.tr, wx: c.wx }) : p.nat;
+    // the moves again knowing the nature (it can make the other kind of attack the better one: Wild Charge over Thunderbolt for an
+    // Adamant Arctozolt), then the nature for those: whichever whole set is worth more stays (the owner's ask, 2026-10-21)
+    if (ac.mint && NATURES[nat] && NATURES[nat][0]) {
+      const B2 = bestBuild(k, { ...bc, nat }), nat2 = optNature(k, B2.mv, B2.ab, { meta: poolMeta(), tr: c.tr, wx: c.wx });
+      if (setValue(k, B2.mv, B2.ab, bc.held || null, { ...bc, nat: nat2 }) > setValue(k, B.mv, B.ab, bc.held || null, { ...bc, nat }) + 1e-9) { B = B2; nat = nat2; }
+    }
+    x = { mv: B.mv, ab: B.ab, nat };
     NPC_BUILD.set(id, x); if (NPC_BUILD.size > 8000) NPC_BUILD.delete(NPC_BUILD.keys().next().value);
   }
   return x;
@@ -858,9 +899,12 @@ function npcOptimize(acc, ac0, team = true) {
     for (const x of add) noPivot.add(x.k);
     return add.length > 0;
   };
+  // (acc.moveBan: moves a Pokémon must not run, { key: [moves] }: the Random Battle's set variants, tools/build_random_teams.js)
   const banOf = k => {
-    if (!noTR.has(k) && !noPivot.has(k)) return {};
+    const own = acc.moveBan && acc.moveBan[k];
+    if (!noTR.has(k) && !noPivot.has(k) && !(own && own.length)) return {};
     const moves = new Set(extra.ban ? extra.ban.moves : []), abilities = new Set(extra.ban ? extra.ban.abilities : []);
+    for (const m of own || []) moves.add(m);
     if (noTR.has(k)) moves.add("trickroom");
     if (noPivot.has(k)) { for (const m of PIVOT_OUT) moves.add(m); for (const a of PIVOT_AB) abilities.add(a); }
     return { ban: { moves, abilities } };

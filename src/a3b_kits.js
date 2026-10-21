@@ -138,7 +138,7 @@ function moveDesc(sk) {
     hardpress: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)", hex: "Double power against a target with a status condition",
     venoshock: "Double power against a poisoned target", brine: "Double power against a target at half HP or less", acrobatics: "Double power if the user holds no item",
     wakeupslap: "Double power against a sleeping target, and wakes it up", assurance: "Double power if the target was already hit since the user's last turn",
-    payback: "Double power if the target has moved since the user's last turn", tantrum: "Double power if the user's last move failed",
+    tantrum: "Double power if the user's last move failed",
     retaliate: "Double power if a teammate fainted since the user's last turn", lashout: "Double power if the user's stats were lowered since its last turn",
     weatherball: "In weather it becomes that weather's type (Fire, Water, Rock or Ice) and doubles in power", ragefist: `${M.p} power, plus 50 for every hit the user has taken (up to 350)`,
     foulplay: "Uses the target's Attack instead of the user's", bodypress: "Uses the user's Defense instead of its Attack",
@@ -148,7 +148,7 @@ function moveDesc(sk) {
     finalgambit: "Deals damage equal to the user's HP, and the user faints", counter: "It can't be chosen: when an opposing physical move damages the user, it hits back at that attacker by itself for twice the damage once the attack is over, if it's ready (that isn't the user's turn: the move just goes on cooldown)",
     mirrorcoat: "It can't be chosen: when an opposing special move damages the user, it hits back at that attacker by itself for twice the damage once the attack is over, if it's ready (that isn't the user's turn: the move just goes on cooldown)", synchronoise: "Only hits a Pokémon that shares a type, its status condition, its Ability or its nature with the user",
     freezedry: "Super effective against Water types", steelbeam: "The user loses a quarter of its max HP, hit or miss (the owner's rule; Magic Guard keeps it)", burnup: "The user loses its Fire type (without it, the move still works: the owner's rule)",
-    expandingforce: "In Psychic Terrain, with the user on the ground: 50% stronger and hits every foe", grassyglide: "A +1 priority move (in Grassy Terrain): the user gets +10% turn meter when it's sent out", burningjealousy: "Burns a target whose stats rose since the user's last turn",
+    expandingforce: "In Psychic Terrain, with the user on the ground: 50% stronger and hits every foe", grassyglide: "A +1 priority move (in Grassy Terrain): the user gets +10% turn meter when it's sent out", burningjealousy: "Burns a target with any stat at +2 or higher (as its stat badge shows: boosts from moves, items, Abilities and the field)",
     poltergeist: "", clearsmog: "Resets the target's stat changes", fakeout: "Works on any turn, not just the user's first on the field",
     mistyexplosion: "The user faints; 50% stronger in Misty Terrain", tripleaxel: `Strikes three times, at ${M.p}, ${M.p * 2} and ${M.p * 3} power; each strike can miss`,
     eruption: "Random power from 10 to 150, like Magnitude (Loaded Dice: always 150)", metalburst: "It can't be chosen: when an opposing attack damages the user, it hits back at that attacker by itself for 1.5 times the damage once the attack is over, if it's ready (that isn't the user's turn: the move just goes on cooldown)",
@@ -344,10 +344,10 @@ const ABILITY = {
   "cloud-nine": ["Cloud Nine", "When it comes onto the field, it ends the weather for good (an area's own weather too); while it's in battle, any weather set later has no effect.", { id: "CLOUD" }],
   aftermath: ["Aftermath", "If a contact move knocks it out, the attacker loses 1/4 of its max HP.", { id: "AFTERMATH" }],
   analytic: ["Analytic", "With its Speed down a stage or more, its moves are 50% stronger, and 50% more for each stage further down (×1.5 at -1, ×2 at -2 ... ×4 at -6).", { id: "ANALYTIC" }],
-  anticipation: ["Anticipation", "When it enters battle, it shudders if an opposing Pokémon has a super-effective or one-hit KO move.", { id: "ANTICIPATION" }],
+  anticipation: ["Anticipation", "The first time an attack from the other side is aimed at it, it protects itself (Protect, until its next turn). Once a battle.", { id: "ANTICIPATION" }],   // (the owner's rule, 2026-10-21)
   drought: ["Drought", "Turns the sunlight harsh for about five rounds when it enters battle.", { id: "DROUGHT" }],
-  forewarn: ["Forewarn", "When it enters battle, it reveals the opposing team's most powerful move.", { id: "FOREWARN" }],
-  frisk: ["Frisk", "When it enters battle, it checks the opposing Pokémon's held items.", { id: "FRISK" }],
+  forewarn: ["Forewarn", "The first time an attack from the other side is aimed at it, it protects itself (Protect, until its next turn). Once a battle.", { id: "FOREWARN" }],   // (the owner's rule, 2026-10-21)
+  frisk: ["Frisk", "When it comes onto the field, it knocks off a random opposing Pokémon's held item (Sticky Hold keeps it). Once a battle.", { id: "FRISK" }],   // (the owner's rule, 2026-10-21)
   gluttony: ["Gluttony", "It eats its HP Berry the moment it takes any damage.", { id: "GLUTTONY" }],
   harvest: ["Harvest", "50% chance each turn to grow back a Berry it has used (every turn in harsh sunlight).", { id: "HARVEST" }],
   healer: ["Healer", "30% chance each turn to cure a teammate on the field of its status condition.", { id: "HEALER" }],
@@ -450,10 +450,10 @@ const ABILITY = {
   stakeout: ["Stakeout", "Its moves are twice as strong against a Pokémon that hasn't acted since coming onto the field.", { id: "STAKEOUT" }],
   "gorilla-tactics": ["Gorilla Tactics", "Attack +1 (and it can still use any of its moves).", { id: "GORILLA" }],
   merciless: ["Merciless", "Its moves always land a critical hit on a poisoned target.", { id: "MERCILESS" }],
-  "tablets-of-ruin": ["Tablets of Ruin", "Every other Pokémon on the field: Attack −1.", { id: "RUIN", stat: "atk" }],
-  "sword-of-ruin": ["Sword of Ruin", "Every other Pokémon on the field: Defense −1.", { id: "RUIN", stat: "def" }],
-  "vessel-of-ruin": ["Vessel of Ruin", "Every other Pokémon on the field: Sp. Atk −1.", { id: "RUIN", stat: "spa" }],
-  "beads-of-ruin": ["Beads of Ruin", "Every other Pokémon on the field: Sp. Def −1.", { id: "RUIN", stat: "sdf" }],
+  "tablets-of-ruin": ["Tablets of Ruin", "Every opposing Pokémon on the field: Attack −1.", { id: "RUIN", stat: "atk" }],
+  "sword-of-ruin": ["Sword of Ruin", "Every opposing Pokémon on the field: Defense −1.", { id: "RUIN", stat: "def" }],
+  "vessel-of-ruin": ["Vessel of Ruin", "Every opposing Pokémon on the field: Sp. Atk −1.", { id: "RUIN", stat: "spa" }],
+  "beads-of-ruin": ["Beads of Ruin", "Every opposing Pokémon on the field: Sp. Def −1.", { id: "RUIN", stat: "sdf" }],
   protosynthesis: ["Protosynthesis", "In harsh sunlight, or while it holds Booster Energy, its highest stat +1.", { id: "PARADOX", w: "sun" }],
   "quark-drive": ["Quark Drive", "In Electric Terrain, or while it holds Booster Energy, its highest stat +1.", { id: "PARADOX", t: "electric" }],
   "orichalcum-pulse": ["Orichalcum Pulse", "It makes the sunlight harsh when it comes in, and in harsh sunlight Attack +1.", { id: "DROUGHT", w: "sun", atkSun: 1 }],
@@ -832,7 +832,7 @@ function moveValue0(k, m) {
       throatchop: 1.05, psychicnoise: 1.05, flameburst: 1.05, smackdown: 1.05 };
     if (SP_MUL[M.sp]) p *= SP_MUL[M.sp];
     if (M.pre) p *= 1.1;
-    if (["hex", "venoshock", "brine", "acrobatics", "wakeupslap", "assurance", "payback", "tantrum", "retaliate", "lashout", "smellingsalts", "fusion"].includes(M.sp)) p *= M.sp === "fusion" ? 1.05 : 1.2;
+    if (["hex", "venoshock", "brine", "acrobatics", "wakeupslap", "assurance", "tantrum", "retaliate", "lashout", "smellingsalts", "fusion"].includes(M.sp)) p *= M.sp === "fusion" ? 1.05 : 1.2;
     if (["fissure", "horndrill", "guillotine", "sheercold"].includes(M.sp)) p = 45;
     if (M.sp === "selfdestruct" || M.sp === "explosion") p *= .3;
     if (["outrage", "thrash", "petaldance", "ragingfury"].includes(m)) p *= .92;   // (confused after it)

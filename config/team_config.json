@@ -14557,7 +14557,9 @@
    "muscleband",
    "wiseglasses",
    "kingsrock",
-   "razorfang"
+   "razorfang",
+   "ejectbutton",
+   "ejectpack"
   ],
   "restricted": [],
   "ban": {

@@ -3,7 +3,9 @@
 //  - pokesquad/random-teams.json, [Gen 9] PokeSquad Random Battle: six random fully evolved Pokémon (every one with two or more
 //    moves, Legendaries too: one Legendary, one Mythical, one Ultra Beast and one Paradox at most, one of each species), their sets
 //    built as a team by the game's optimizer (npcOptimize at the Legend tier: moves, Abilities, natures, items under the Item
-//    Clause), in random order (the first three lead: no team preview, as in Showdown's Random Battle)
+//    Clause), in random order (the first three lead: no team preview, as in Showdown's Random Battle); every Pokémon in at least
+//    three different sets (the owner's ask, 2026-10-21: until it has three, its next team bans a move of each set it has had, then
+//    it takes them in turn; top-up teams for any still short)
 //  - pokesquad/random-trainer-teams.json, [Gen 9] PokeSquad Random Trainer Battle: top Trainers' teams (npcAccount at the Legend
 //    tier: each archetype's plan from the team config), leads first (npcLeads), made the way the Bot's are (tools/build_bot_teams.js)
 // Lv 100 (the owner's pick). Built on the server's engine bundle (build.sh writes it first) in worker processes at a low priority;
@@ -35,18 +37,48 @@ if (process.argv[2] === '--worker') {
       return order.map(k => ({ k, mv: (o.prog[k].mv || []).filter(Boolean), ab: o.prog[k].ab, nat: o.prog[k].nat, held: o.prog[k].held || null }))
         .map(m => ({ ...m, mvNames: m.mv.map(x => MOVES[x] ? MOVES[x].n : x), heldName: m.held && HELD[m.held] ? HELD[m.held].n : '' }));
     }
-    // six random fully evolved Pokémon: one of each species, the PvP limits; built as a team; in random order
-    function rtRandom(i) {
-      const R0 = seeded(hash('random:' + i)), team = [], ids = new Set();
+    // three different sets for every Pokémon (the owner's ask, 2026-10-21): until it has three, its next team bans one move of each
+    // set it has had (its S3 move first, then its S2, then its S1), so the optimizer builds it another; then it takes the three in
+    // turn, each with the moves its own set was built without
+    const VAR = {};
+    function banFor(k) {
+      const v = VAR[k] || (VAR[k] = { sets: [], n: 0, fail: 0 });
+      if (v.sets.length < 3 && v.fail < 3) {
+        if (!v.sets.length) return { ban: [], fresh: true };
+        const slot = (v.sets.length === 1 ? [2, 1, 0] : [1, 2, 0])[v.fail];
+        return { ban: [...new Set(v.sets.map(s => s.mv[slot]).filter(Boolean))], fresh: true };
+      }
+      const s = v.sets[v.n++ % v.sets.length];
+      return { ban: s.ban, fresh: false };
+    }
+    function recordSet(k, mv, b) {
+      const v = VAR[k], key = mv.join('/');
+      if (!b.fresh) return;
+      if (!v.sets.some(s => s.key === key)) { v.sets.push({ key, mv: mv.slice(), ban: b.ban }); v.fail = 0; } else v.fail++;
+    }
+    // a team built around these Pokémon (the rest random): one of each species, the PvP limits; built as a team; in random order
+    function rtTeam(R0, first) {
+      const team = [], ids = new Set();
+      for (const k of first) if (!ids.has(OPS[k].id) && pvpFits(team, k)) { team.push(k); ids.add(OPS[k].id); }
       while (team.length < 6) {
         const k = RT_POOL[Math.floor(R0() * RT_POOL.length)];
         if (ids.has(OPS[k].id) || !pvpFits(team, k)) continue;
         team.push(k); ids.add(OPS[k].id);
       }
       const prog = {}; for (const k of team) prog[k] = { lvl: 100, ab: OPS[k].ab, nat: 'hardy', mv: [] };
-      const o = npcOptimize({ team: team.slice(), roster: team.slice(), prog, badges: 8, lvl: 100 }, npcAccess(100, T_LEGEND), true);
+      const bans = {}; for (const k of team) bans[k] = banFor(k);
+      const moveBan = {}; for (const k of team) if (bans[k].ban.length) moveBan[k] = bans[k].ban;
+      const o = npcOptimize({ team: team.slice(), roster: team.slice(), prog, badges: 8, lvl: 100, moveBan }, npcAccess(100, T_LEGEND), true);
+      for (const k of team) recordSet(k, (o.prog[k].mv || []).filter(Boolean), bans[k]);
       const order = team.slice(); for (let j = order.length - 1; j > 0; j--) { const r = Math.floor(R0() * (j + 1)); [order[j], order[r]] = [order[r], order[j]]; }
       return { name: 'Random', team: rtNames(o, order) };
+    }
+    // six random fully evolved Pokémon
+    function rtRandom(i) { return rtTeam(seeded(hash('random:' + i)), []); }
+    // a top-up team for a Pokémon that has fewer than three sets yet: the sets it already has come in from the main process
+    function rtTopup(i, k, have) {
+      VAR[k] = VAR[k] || { sets: have.map(mv => ({ key: mv.join('/'), mv, ban: [] })), n: 0, fail: 0 };
+      return rtTeam(seeded(hash('topup:' + k + ':' + i)), [k]);
     }
     // a top Trainer's team, as the Bot's (tools/build_bot_teams.js)
     function rtTrainer(i) {
@@ -58,6 +90,18 @@ if (process.argv[2] === '--worker') {
       return { name: archName(o.arch || d.arch) || 'Balanced', team: rtNames(o, order) };
     }
   `, c);
+  if (kind === 'topup') {
+    // (from: a file of { k, have }: each Pokémon that has fewer than three sets, and the move sets it has: teams built around it until
+    // it has three, or six tries)
+    const jobs = JSON.parse(fs.readFileSync(process.argv[4], 'utf8')), topup = vm.runInContext('rtTopup', c), count = vm.runInContext('k => (VAR[k] || { sets: [] }).sets.length', c);
+    let i = 0;
+    for (const j of jobs) for (let a = 0; a < 6 && count(j.k) < 3; a++) {
+      let t = null;
+      try { t = topup(a, j.k, j.have); } catch (e) { t = { error: String(e && e.message || e) }; }
+      process.send({ i: i++, t, k: j.k });
+    }
+    process.exit(0);
+  }
   const make = vm.runInContext(kind === 'random' ? 'rtRandom' : 'rtTrainer', c);
   for (let i = from; i < to; i++) {
     let t = null;
@@ -89,6 +133,23 @@ function build(kind, n) {
     if (left === 0) done(got);
   });
 }
+// the top-up: the jobs split over the workers, every team they make
+function topup(jobs) {
+  return new Promise(done => {
+    const got = []; let left = 0;
+    const per = Math.ceil(jobs.length / W);
+    for (let w = 0; w < W; w++) {
+      const part = jobs.slice(w * per, (w + 1) * per); if (!part.length) continue;
+      const file = path.join(os.tmpdir(), `pokesquad-topup-${process.pid}-${w}.json`); fs.writeFileSync(file, JSON.stringify(part));
+      left++;
+      const child = fork(__filename, ['--worker', 'topup', file], { stdio: 'inherit' });
+      try { os.setPriority(child.pid, os.constants.priority.PRIORITY_BELOW_NORMAL); } catch (e) {}
+      child.on('message', m => got.push(m));
+      child.on('exit', () => { try { fs.unlinkSync(file); } catch (e) {} if (--left === 0) done(got); });
+    }
+    if (left === 0) done(got);
+  });
+}
 (async () => {
   const t0 = Date.now();
   const raw = { random: await build('random', want.random), trainer: await build('trainer', want.trainer) };
@@ -105,13 +166,32 @@ function build(kind, n) {
   const c = sandbox();
   const keys = {}; for (const k of vm.runInContext('Object.keys(OPS)', c)) { const sp = Dex.species.get(k); keys[toID(sp.exists ? sp.name : k)] = k; keys[k] = k; }
   c.PokeSquad.setNames({ name: k => (Dex.species.get(k).exists ? Dex.species.get(k).name : k), key: s => keys[toID(s)] || keys[toID(Dex.species.get(s).name)] || null });
+  const moveKey = s => s.moves.join('/');
   for (const [kind, n, file] of [['random', NR, 'random-teams.json'], ['trainer', NT, 'random-trainer-teams.json']]) {
     const teams = [], dropped = [];
-    for (const t of raw[kind]) {
-      if (teams.length >= n) break;
-      if (!t || t.error) { dropped.push(t ? t.error : 'not built'); continue; }
+    const take = (t, keep) => {
+      if (!t || t.error) { dropped.push(t ? t.error : 'not built'); return; }
       const sets = t.team.map(set), problems = c.PokeSquad.validateTeam(sets);
-      if (problems) dropped.push(`${t.name}: ${problems[0]}`); else teams.push({ name: t.name, team: sets });
+      if (problems) dropped.push(`${t.name}: ${problems[0]}`); else if (!keep || keep(sets)) teams.push({ name: t.name, team: sets });
+    };
+    for (const t of raw[kind]) { if (teams.length >= n) break; take(t); }
+    if (kind === 'random') {
+      // every Pokémon with three different sets (by its moves): top-up teams for those with fewer, each kept only if it brings one
+      // of them a set it didn't have
+      const have = () => { const h = {}; for (const t of teams) for (const s of t.team) (h[s.species] = h[s.species] || new Set()).add(moveKey(s)); return h; };
+      // (rounds: a top-up team's other five can be Pokémon short of three too)
+      for (let round = 1; round <= 3; round++) {
+        const h0 = have(), jobs = Object.entries(h0).filter(([, v]) => v.size < 3)
+          .map(([sp, v]) => ({ k: keys[toID(sp)], have: [...v].map(x => x.split('/').map(toID)) })).filter(j => j.k);
+        if (!jobs.length) break;
+        console.log(`top-up ${round}: ${jobs.length} Pokémon with fewer than three sets`);
+        for (const m of await topup(jobs)) {
+          take(m.t, sets => { const s = sets.find(x => keys[toID(x.species)] === m.k), h = have(); return !!s && (h[s.species] || new Set()).size < 3 && !(h[s.species] || new Set()).has(moveKey(s)); });
+        }
+      }
+      const h1 = have(), short = Object.entries(h1).filter(([, v]) => v.size < 3);
+      console.log(`sets per Pokémon (by moves): ${Object.keys(h1).length} Pokémon, ${Object.keys(h1).length - short.length} with three or more`
+        + (short.length ? `; fewer: ${short.map(([sp, v]) => `${sp} ${v.size}`).join(', ')}` : ''));
     }
     // (a team a line: the server reads the file once)
     fs.writeFileSync(path.join(SERVER, 'pokesquad', file), '[\n' + teams.map(t => JSON.stringify(t)).join(',\n') + '\n]\n');
