@@ -31,7 +31,7 @@ const G = vm.runInContext(`(() => {
   const mons = OP_KEYS.filter(k => !OPS[k].bf).sort((a, b) => OPS[a].id - OPS[b].id || OP_KEYS.indexOf(a) - OP_KEYS.indexOf(b));
   return {
     mons: mons.map(k => ({ k, n: OPS[k].n, gen: OPS[k].gen, types: OPS[k].types, b: OPS[k].b, ab: OPS[k].ab, abs: OPS[k].abs, groups: pvpGroups(k), learn: [...new Set(learnPool(k))] })),
-    moves: Object.keys(MOVES).map(k => { const M = MOVES[k], s = slotOf(k), sk = skillFor(k, s); return { k, n: M.n, s, cd: sk.cd, t: M.t, c: M.c, p: M.c === "X" ? 0 : M.sp === "ragefist" ? M.p : (sk.pow || M.p || 0), rage: M.sp === "ragefist" ? 1 : 0, a: M.a || 0, pri: M.pri || 0, d: sk.desc || "" }; }),
+    moves: Object.keys(MOVES).map(k => { const M = MOVES[k], s = slotOf(k), sk = skillFor(k, s); return { k, n: M.n, s, cd: sk.cd, t: M.t, c: M.c, p: M.c === "X" ? 0 : M.sp === "ragefist" || M.sp === "storedpower" ? M.p : (sk.pow || M.p || 0), rage: M.sp === "ragefist" ? 1 : M.sp === "storedpower" ? 2 : 0, a: M.a || 0, pri: M.pri || 0, d: sk.desc || "" }; }),
     abilities: [...new Set(mons.flatMap(k => OPS[k].abs.map(a => a.k)))].map(k => { const A = abilityOf(k); return { k, n: A.name, d: A.text || "", works: A.id !== "NONE" }; }),
     held: Object.keys(HELD).map(k => ({ k, n: HELD[k].n, d: HELD[k].d || "", src: HELD[k].src || "" })),
     ban: { pokemon: [...R.ban.pokemon], moves: [...R.ban.moves], items: [...R.ban.items], abilities: [...R.ban.abilities] }, limits: R.limits,
@@ -53,8 +53,9 @@ for (const m of G.moves) {
   const short = sent.find(s => !/^(Priority [+-]\d|Mastery:)/.test(s)) || sent[0] || "";
   const sl = SLOTTED.exec(m.k);
   moveIx[m.k] = moves.length;
-  // (rage: Stored Power, Rage, Punishment and Payback work like Rage Fist here, 50 power plus 50 a hit taken: the site's tooltip counts
-  // the hits, from the turn meter's line, so their power is the base 50, not the one-hit 100 the game's AI counts on)
+  // (rage: 1 for Rage, Punishment and Payback, which work like Rage Fist here, 50 power plus 50 a hit taken; 2 for Stored Power and
+  // Power Trip, 50 plus 50 a raised stage; both up to 250: the site's tooltip counts the hits, from the turn meter's line, or the
+  // stages, so their power is the base 50, not the 100 the game's AI counts on)
   moves.push([id, sl ? `${m.n} (S${m.s})` : 0, m.s, m.t, m.c, m.p, m.a, m.pri, short, m.d, sl ? sl[1] : 0, m.rage]);
 }
 const species = [], fix = {}, abil = {}, learn = {}, seen = new Set();

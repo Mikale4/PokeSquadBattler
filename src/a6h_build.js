@@ -496,7 +496,8 @@ function comboBonus(k, mv, ab, held, c) {
   // Baton Pass after a boost passes it on; Protect or a Substitute while Toxic or Leech Seed does its work; Hex and Venoshock
   // (double power on a statused or poisoned target) with a move that inflicts it
   const M_ = m => m && MOVES[m];
-  // Stored Power: 20 power plus 20 for every stat boost the user has (an S1 move, so it can be used every turn)
+  // Stored Power and Power Trip (50, +50 for every raised stage on the user's badge): with a move that raises its own stats
+  if ((has("storedpower") || has("powertrip")) && mv.some(m => M_(m) && M_(m).c === "X" && M_(m).st && M_(m).sw !== "target" && M_(m).st.some(([, n]) => n > 0))) v += 25;
   if (has("batonpass") && mv.some(m => M_(m) && M_(m).c === "X" && M_(m).st && M_(m).sw !== "target" && M_(m).st.some(([, n]) => n > 0))) v += 20;
   if (COVERS.some(has) && (has("toxic") || has("leechseed"))) v += 10;
   if (has("hex") && mv.some(m => M_(m) && M_(m).c === "X" && ["SLP", "PAR", "BRN", "PSN", "TOX"].includes(M_(m).ail))) v += 15;

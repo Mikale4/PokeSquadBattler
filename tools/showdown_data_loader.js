@@ -40,13 +40,14 @@
 		var T = {
 			learnsets: {}, slots: {}, abilities: {}, tiers: [], items: [], formatSlices: {},
 			overrideMoveData: {}, overrideSpeciesData: {}, overrideAbilityData: {}, overrideItemData: {}, overrideTier: {},
-			cd: D.cd, iv: D.iv, level: D.level, limits: D.limits, itemClause: D.itemClause, ban: D.ban, version: D.v, rage: [],
+			cd: D.cd, iv: D.iv, level: D.level, limits: D.limits, itemClause: D.itemClause, ban: D.ban, version: D.v, rage: [], boostPower: [],
 		};
 		var banned = function (list, id) { return list.indexOf(id) >= 0; };
 		var ids = [];
 		D.moves.forEach(function (m) {
 			// [id, its own name (a slotted copy) or 0, slot, type, category, power, accuracy (0: never misses), priority, short text, text, base id,
-			// 1 for the moves that work like Rage Fist here (T.rage: Stored Power, Rage, Punishment, Payback)]
+			// 1 for the moves that work like Rage Fist here (T.rage: Rage, Punishment, Payback), 2 for the ones that grow with the user's raised
+			// stages (T.boostPower: Stored Power, Power Trip)]
 			var id = m[0];
 			ids.push(id);
 			if (m[10] && !BattleMovedex[id] && BattleMovedex[m[10]]) {
@@ -57,7 +58,8 @@
 				unindexed.push(id);
 			}
 			T.slots[id] = m[2];
-			if (m[11]) T.rage.push(id);
+			if (m[11] === 1) T.rage.push(id);
+			else if (m[11] === 2) T.boostPower.push(id);
 			T.overrideMoveData[id] = { type: m[3], category: CAT[m[4]] || 'Status', basePower: m[5], accuracy: m[6] || true, priority: m[7] };
 		});
 		var gen = 0;

@@ -966,7 +966,10 @@ function makeBattle(cfg) {
     if (sp === "spitup") return 100 * (att.flags.stock || 0);
     if (sp === "trumpcard") return [40, 50, 60, 80, 200][Math.min(4, att.flags.trump || 0)];
     if (sp === "fickle") return B.fickleX ? 160 : 80;                 // Fickle Beam: double power half the time (the owner's rule)
-    if (sp === "ragefist") return Math.min(350, (M.p || 50) + 50 * (att.hitsTaken || 0));   // Rage Fist, Rage, Punishment and Stored Power: 50, +50 a hit taken
+    if (sp === "ragefist") return Math.min(250, (M.p || 50) + 50 * (att.hitsTaken || 0));   // Rage Fist, Rage, Punishment and Payback: 50, +50 a hit taken, up to 250
+    // Stored Power and Power Trip (the owner's rule, 2026-10-21): 50, +50 for every raised stage on the user's stat badge (moves' stages
+    // and the ones fixed to an item, an Ability or the field; accuracy and evasion too), up to 250
+    if (sp === "storedpower") { const st = shownStages(att); let n = 0; for (const s in st) if (st[s] > 0) n += st[s]; return Math.min(250, (M.p || 50) + 50 * n); }
     let p = sk.pow;
     if (sp === "lastresort" && lrBoost(att)) p *= 2;
     const since = x => x != null && x > (att.actT == null ? -1 : att.actT);

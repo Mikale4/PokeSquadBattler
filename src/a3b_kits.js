@@ -37,7 +37,7 @@ function makeSkill(key, slot) {
   const M = MOVES[key], target = moveTarget(M);
   const sk = { slot, key, name: M.n, type: M.t, cat: M.c, pow: M.p, acc: M.a, cd: CD[slot], target, M, anim: moveAnim(M, target) };
   if (M.c === "X" && slot === 1) sk.cd = 0;
-  if (VAR_P[M.sp]) { sk.pow = M.sp === "ragefist" ? M.p + 50 : VAR_P[M.sp]; sk.vary = 1; }   // (Rage Fist and the moves like it: one hit taken, the usual)   // Gyro Ball, Flail, Heavy Slam...: power that depends on the battle
+  if (VAR_P[M.sp]) { sk.pow = M.sp === "ragefist" || M.sp === "storedpower" ? M.p + 50 : VAR_P[M.sp]; sk.vary = 1; }   // (Rage Fist and the moves like it: one hit taken, the usual; Stored Power and Power Trip: one raised stage)   // Gyro Ball, Flail, Heavy Slam...: power that depends on the battle
   if (POW_RANGE[M.sp]) { sk.vary = 1; sk.range = POW_RANGE[M.sp]; }   // Magnitude: 10 to 150 a use (its average counts)
   if (M.hit) sk.hits = M.hit;
   sk.mk = masteryKind(sk);
@@ -140,7 +140,7 @@ function moveDesc(sk) {
     wakeupslap: "Double power against a sleeping target, and wakes it up", assurance: "Double power if the target was already hit since the user's last turn",
     tantrum: "Double power if the user's last move failed",
     retaliate: "Double power if a teammate fainted since the user's last turn", lashout: "Double power if the user's stats were lowered since its last turn",
-    weatherball: "In weather it becomes that weather's type (Fire, Water, Rock or Ice) and doubles in power", ragefist: `${M.p} power, plus 50 for every hit the user has taken (up to 350)`,
+    weatherball: "In weather it becomes that weather's type (Fire, Water, Rock or Ice) and doubles in power", ragefist: `${M.p} power, plus 50 for every hit the user has taken (up to 250)`, storedpower: `${M.p} power, plus 50 for every raised stage on the user's stat badge, accuracy and evasion too (up to 250)`,
     foulplay: "Uses the target's Attack instead of the user's", bodypress: "Uses the user's Defense instead of its Attack",
     psyshock: "Hits the target's Defense instead of its Sp. Def", chipaway: "Ignores the target's stat changes", alwayscrit: "Always lands a critical hit",
     feint: "Hits through Protect and Detect", thief: "Steals the target's held item if the user holds none", pluck: "Eats the target's Berry, if it holds one",
@@ -810,7 +810,7 @@ const canLearnTM = (k, n) => OPS[k].tms.includes(n);
 const FIXED_V = { dragonrage: 55, sonicboom: 35, nightshade: 65, seismictoss: 65, psywave: 55, superfang: 80, endeavor: 45, finalgambit: 45, counter: 50,
   mirrorcoat: 50, metalburst: 55 };
 // variable-power moves: a typical power
-const VAR_P = { weight: 71, heavy: 71, gyroball: 71, electroball: 71, flail: 60, wringout: 71, hardpress: 71, ragefist: 100,
+const VAR_P = { weight: 71, heavy: 71, gyroball: 71, electroball: 71, flail: 60, wringout: 71, hardpress: 71, ragefist: 100, storedpower: 100,
   eruption: 71, present: 45, spitup: 100, naturalgift: 80, fling: 40, trumpcard: 60, bide: 50 };
 function moveValue(k, m) { const M = MOVES[m], v = moveValue0(k, m); return M && M.c === "X" && M.pri > 0 ? v * (1 + priBracket(M) / 15) : v; }   // (its turn meter on entry: +3, 30%, is ×1.2)
 // a move's strikes (a 2-5-strike move: 3 on average, the engine's 2, 2, 2, 3, 3, 3, 4, 5), the most with Skill Link or Loaded Dice
@@ -823,7 +823,7 @@ function moveValue0(k, m) {
   if (M.c !== "X") {
     if (M.sp === "struggle") return 1;
     const hits = M.hit ? (M.hit[0] === M.hit[1] ? M.hit[0] : 3) : 1;
-    let p = ((m === "dragonenergy" && 71) || FIXED_V[M.sp] || (M.sp === "ragefist" ? M.p + 50 : VAR_P[M.sp]) || M.p) * hits * (M.a ? M.a / 100 : 1.05);
+    let p = ((m === "dragonenergy" && 71) || FIXED_V[M.sp] || (M.sp === "ragefist" || M.sp === "storedpower" ? M.p + 50 : VAR_P[M.sp]) || M.p) * hits * (M.a ? M.a / 100 : 1.05);
     if (M.sp === "uturn") p *= 1.15;                                     // hits, then makes room for a better matchup
     if (M.sp === "fakeout") p *= 1.2;
     // this game's rules: the doubling moves grow over a battle, Triple Axel's strikes rise (20, 40, 60), Pursuit hits switchers for

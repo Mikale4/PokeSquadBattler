@@ -360,11 +360,13 @@ SPECIAL.update({k: k.replace("-", "") for k in """after-you ally-switch assist b
 EXCLUDE = set()   # (every move has a rule now; Tera Blast is a Normal-type move here, physical when the user's Attack is higher)
 # variable power, fixed here: Magnitude's average, Return and Frustration at their best
 FIXED_POWER = {"magnitude": 70, "return": 102, "frustration": 102}
-# house rule (the owner's): Rage works like Rage Fist: +50 for every hit the user has taken (up to 350); from 50 power, as do Punishment
-# and Stored Power, which work exactly like Rage Fist too (the owner's rule, 2026-10-16: META_FIX), all S2 moves
+# house rule (the owner's): Rage works like Rage Fist: +50 for every hit the user has taken (up to 250 since 2026-10-21); from 50
+# power, as does Punishment, which works exactly like Rage Fist too (the owner's rule, 2026-10-16: META_FIX), all S2 moves
 SPECIAL["rage"] = "ragefist"
 SPECIAL["punishment"] = "ragefist"
-SPECIAL["stored-power"] = "ragefist"
+# Stored Power and Power Trip (the owner's rule, 2026-10-21): 50 power, +50 for every raised stage on the user's stat badge, up to 250,
+# S3 moves (Stored Power had worked like Rage Fist since 2026-10-16)
+SPECIAL["stored-power"] = "storedpower"
 # (and Payback, the owner's rule, 2026-10-21: 50 power, +50 for every hit the user has taken, an S2 move like the others)
 SPECIAL["payback"] = "ragefist"
 # house rule (the owner's): Whirlwind is a 60-power attack (special: it's a wind; Normal type, never misses, moves last, an S1 move)
@@ -378,7 +380,7 @@ META_FIX = {
     # Beat Up (the owner's rule, 2026-10-16): an ordinary 2-5-strike move, 25 power a strike and S2 like the others
     "beat-up": {"hit": [2, 5], "p": 25},
     # the owner's rules, 2026-10-16: Triple Kick from 20 (20, 40 and 60, as Triple Axel: above), Rage, Punishment and Stored Power 50
-    "rage": {"p": 50}, "punishment": {"p": 50}, "stored-power": {"p": 50},
+    "rage": {"p": 50}, "punishment": {"p": 50}, "stored-power": {"p": 50}, "power-trip": {"p": 50},
     "wave-crash": {"dr": -33}, "axe-kick": {"ail": "CNF", "ac": 30, "crash": 1}, "supercell-slam": {"crash": 1},
     "pounce": {"st": [["spe", -1]], "sc": 100, "sw": "target"}, "trailblaze": {"st": [["spe", 1]], "sc": 100, "sw": "self"},
     "chilling-water": {"st": [["atk", -1]], "sc": 100, "sw": "target"}, "alluring-voice": {"ail": "CNF", "ac": 100}, "psychic-noise": {}, "ice-spinner": {},
@@ -526,7 +528,7 @@ SLOT_FIX = {"splash": 1, "transform": 3, "sonicboom": 1, "dragonrage": 2, "night
             "superfang": 3, "endeavor": 3, "focuspunch": 3, "hyperbeam": 3, "selfdestruct": 3, "explosion": 3, "mistyexplosion": 3,
             "fissure": 3, "horndrill": 3, "guillotine": 3, "sheercold": 3, "finalgambit": 3, "struggle": 1, "weight": 2, "heavy": 2,
             "gyroball": 2, "electroball": 2, "flail": 2, "wringout": 2, "hardpress": 2, "counter": 2, "mirrorcoat": 2,
-            "ragefist": 2, "revenge": 2, "assurance": 2, "venoshock": 2, "hex": 2, "fakeout": 2, "tripleaxel": 2, "whirlwind": 1, "pursuit": 2, "metalburst": 2, "present": 2,
+            "ragefist": 2, "storedpower": 3, "revenge": 2, "assurance": 2, "venoshock": 2, "hex": 2, "fakeout": 2, "tripleaxel": 2, "whirlwind": 1, "pursuit": 2, "metalburst": 2, "present": 2,
             "eruption": 3, "hiddenpower": 1, "sketch": 2, "lastrespects": 2, "filletaway": 2, "shedtail": 2,
             "bide": 2, "spitup": 3, "naturalgift": 2, "fling": 2, "trumpcard": 2, "beatup": 2, "future": 3, "conversion": 2, "conversion2": 3,
             "ramp": 2}   # (the doubling moves: Rollout, Fury Cutter, Echoed Voice, Round; slots are looked up by a move's special rule first)
