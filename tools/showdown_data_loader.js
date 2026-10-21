@@ -116,8 +116,11 @@
 	(function wait() {
 		if (!loaded()) return setTimeout(wait, 50);
 		// (a data file that loads again replaces Showdown's tables or texts: lay the game's back over them)
+		var redraw = !BattleTeambuilderTable[MOD] || !textsOn();
 		if (!BattleTeambuilderTable[MOD]) apply();
 		else if (!textsOn()) applyTexts();
+		// (anything drawn before it, such as a team open as the page loads, is drawn again on the game's data)
+		if (redraw && window.PS && PS.update) PS.update();
 		if (unindexed.length && indexReady()) { unindexed.forEach(function (id) { addToIndex(id, 'move'); }); unindexed = []; }
 		setTimeout(wait, 1000);
 	})();
