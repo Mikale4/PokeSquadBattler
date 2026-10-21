@@ -18,7 +18,7 @@ a7_engine plus `tools/showdown_adapter.js`, the translator: `readTeam`/`validate
 `tools/build_showdown_data.js` + `tools/showdown_data_loader.js` (the `gen9pokesquad` mod, `isPokeSquad`; three move slots).
 build.sh writes both; after a rules or data change, push the forks too (only when the owner asks). The server's
 PokeSquad Bot (`server/chat-plugins/pokesquad-bot.ts`, the client's Battle the Bot) plays top Trainer teams from
-`showdown/server/pokesquad/bot-teams.json`: rerun `node tools/build_bot_teams.js` after a team config, optimizer or rules change.
+`showdown/server/pokesquad/bot-teams.json`: rerun `node tools/build_bot_teams.js` after a team config, optimizer or rules change. The two Random Battles (`[Gen 9] PokeSquad Random Battle`: six random fully evolved Pokémon optimized as a team; `... Random Trainer Battle`: top Trainer teams; Lv 100, no team preview, the owner's picks) draw from pools `node tools/build_random_teams.js` makes ahead of time (`random-teams.json`, `random-trainer-teams.json` there; `randomTeam` in the fork's `server/pokesquad.ts`): rerun it after the same changes.
 
 ## Never edit `PokeSquad Battler.html` directly
 It's a build output. Edit the parts in `src/` and rebuild. `PokeSquad Battler Reference.html` (every move, Ability, item and TM) is generated
